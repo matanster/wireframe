@@ -1,4 +1,4 @@
 getViewport = require('./util')
-console.log 'utils loaded'
+console.log 'javascript main started'
 viewPort = getViewport()
 console.dir viewPort

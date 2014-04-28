@@ -47,7 +47,7 @@ app.use express.favicon()
 if env is 'production'
   app.use express.logger('default')    # This would be verbose enough for production
 else 
-  app.disable('etag');
+  app.disable('etag');                 # helping to avoid browser caching
   app.use express.logger('dev')        # dev is colorful (for a terminal) and not overly verbose
 
 app.use express.bodyParser()
@@ -86,6 +86,7 @@ startServer = () ->
   
   # In dev mode, self-test on startup
   unless env is 'production' 
+
     #testFile = 'AzPP5D8IS0GDeeC1hFxs'
     #testFile = 'xt7duLM0Q3Ow2gIBOvED'
     #testFile = 'leZrsgpZQOSCCtS98bsu'

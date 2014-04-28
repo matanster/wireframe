@@ -21,6 +21,8 @@
   "devDependencies": {
     "gulp": "~3.6.2",
     "gulp-watch": "~0.6.2",
-    "gulp-browserify": "~0.5.0"
+    "gulp-browserify": "~0.5.0",
+    "primus": "~2.2.0",
+    "ws": "~0.4.31"
   }
 }

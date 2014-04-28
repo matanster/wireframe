@@ -1,6 +1,15 @@
 <html>
   <head>
     <script type='text/javascript' src='/script/main.js'></script>
+    <script src="/script/primus.js"></script>
+    <script>
+      var primus = new Primus('http://localhost:3000');
+
+      primus.on('data', function message(data) {
+        console.log('@@@ refreshing by gulp ' + data + ' request @@@');
+        document.location.reload(true);         
+        });
+    </script>
   </head>
   <body>
     <p>aaaa</p>
