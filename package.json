@@ -1,0 +1,26 @@
+{
+  "name": "wireframe",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "start": "coffee app.coffee"
+  },
+  "dependencies": {
+    "express": "~3.3.4",
+    "coffee-script": "~1.7.1",
+    "ejs": "*",
+    "stylus": "*",
+    "passport": "~0.1.18",
+    "passport-google": "~0.3.0",
+    "nconf": "~0.6.9",
+    "rethinkdb": "~1.11.0-4",
+    "winston": "~0.7.3",
+    "async": "~0.7.0",
+    "sync": "~0.2.2"
+  },
+  "devDependencies": {
+    "gulp": "~3.6.2",
+    "gulp-watch": "~0.6.2",
+    "gulp-browserify": "~0.5.0"
+  }
+}
