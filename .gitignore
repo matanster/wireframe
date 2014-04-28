@@ -13,8 +13,6 @@ lib-cov
 pids
 logs
 
-public/script
-
 node_modules
 
 npm-debug.log

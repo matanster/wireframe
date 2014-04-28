@@ -13,7 +13,7 @@ gulp.task('default', function() {
 });
 
 //
-// task for continous building upon javascript change - 
+// task for automatic building upon javascript change - 
 // invoked via 'gulp watch'
 // 
 gulp.task("watch", function() {
