@@ -13,7 +13,7 @@ lib-cov
 pids
 logs
 
-script
+public/script
 
 node_modules
 
