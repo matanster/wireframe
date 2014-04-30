@@ -5,3 +5,7 @@ exports.getViewport = function() {
     height: window.innerHeight
   };
 };
+
+exports.calcLength = function(i1, i2) {
+  return i2 - i1 + 1;
+};
