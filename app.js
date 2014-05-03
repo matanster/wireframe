@@ -66,6 +66,8 @@ app.use(app.router);
 
 app.use(express["static"](path.join(__dirname, 'public')));
 
+app.get('/getData', require('./ajax/getMockData').get);
+
 startServer = function() {
   var server, testFile, testUrl;
   server = http.createServer(app);

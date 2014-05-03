@@ -59,18 +59,10 @@ app.use app.router
 #app.use require('stylus').middleware(__dirname + '/public')
 app.use express.static(path.join(__dirname, 'public'))
 
-#app.use errorHandling.errorHandler
-#app.use express.errorHandler() if env is 'production' # TODO: test if this is better than my own.
-
 #
 # Setup some routing
 #
-#app.get '/', routes.index
-
-#
-# Authorization
-#
-#authorization.googleAuthSetup(app, host, routes)
+app.get '/getData', require('./ajax/getMockData').get
 
 startServer = () ->
   #
