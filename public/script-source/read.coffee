@@ -1,6 +1,6 @@
 util = require('./util')
 data = require('./data')
-console.log 'javascript main started'
+console.log 'read.js main started'
 
 # Globals
 svg = {}

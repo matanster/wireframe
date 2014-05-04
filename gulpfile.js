@@ -7,9 +7,13 @@ var clientRefresh = require('./clientRefresh');
 // task for building - invoked simply via 'gulp'
 // 
 gulp.task('default', function() {
-  return gulp.src('public/script-source/main.js') /* source to build */
+  gulp.src('public/script-source/read.js') /* source to build */
         .pipe(browserify())
-        .pipe(gulp.dest('public/script'))         /* output directory */
+        .pipe(gulp.dest('public/script'))  /* output directory */
+
+  gulp.src('public/script-source/connect.js') /* source to build */
+        .pipe(browserify())
+        .pipe(gulp.dest('public/script'))     /* output directory */
 });
 
 //
