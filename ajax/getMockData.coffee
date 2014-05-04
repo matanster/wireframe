@@ -15,10 +15,9 @@ exports.get = (req, res) ->
       else
         throw e;
 
-    json      = JSON.parse(text)
-    finalText = json.text
+    #json = JSON.parse(text)
     
-    res.end(finalText)
+    res.end(text)
 
   else 
     console.log 'unidentified query'

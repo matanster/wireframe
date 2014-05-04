@@ -4,7 +4,7 @@ var fs;
 fs = require('fs');
 
 exports.get = function(req, res) {
-  var err, finalText, json, jsonFile, path, text;
+  var err, jsonFile, path, text;
   if (req.query.data != null) {
     path = './mock-data';
     jsonFile = req.query.data;
@@ -19,9 +19,7 @@ exports.get = function(req, res) {
         throw e;
       }
     }
-    json = JSON.parse(text);
-    finalText = json.text;
-    return res.end(finalText);
+    return res.end(text);
   } else {
     console.log('unidentified query');
     return res.send(400);
