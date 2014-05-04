@@ -26,4 +26,8 @@ gulp.task("watch", function() {
         clientRefresh.broadcast()
     });
 
+    watch({glob: "public/landing/*"}, function() {
+        clientRefresh.broadcast()
+    });
+
 });

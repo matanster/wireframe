@@ -5,14 +5,15 @@
     <link href='http://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic,700italic' rel='stylesheet' type='text/css'>    
     <script src="/script/d3.min.js" charset="utf-8"></script>        
     <script src="/script/primus.js"></script>
-    <script>
+    <script src='/script/clientRefresh.js'></script>      
+    <!--script>
       var primus = new Primus('http://localhost:3000');
 
       primus.on('data', function message(data) {
         console.log('@@@ refreshing by gulp ' + data + ' request @@@');
         document.location.reload(true);         
         });
-    </script>
+    </script-->
     <!--link href='http://fonts.googleapis.com/css?family=Roboto|Averia+Sans+Libre' rel='stylesheet' type='text/css'-->
   </head>
   <body style="margin: 0px">

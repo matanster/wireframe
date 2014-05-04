@@ -18,3 +18,4 @@ exports.go = (url, postData, callback) ->
   else          # http get request
     ajaxRequest.open('GET', url, true)
     ajaxRequest.send(null)
+
