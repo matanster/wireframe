@@ -33,7 +33,13 @@ sceneDefine = (categories) ->
     
     svg.boxes = []
     for box in [0..numberOfBoxes-1]
-      categoryBox = svg.main.append('g');
+      categoryBox = svg.main.append('g')
+
+      # avoid standard text handling of the category texts (selection, touch callouts)
+      categoryBox.style('-webkit-user-select', 'none') 
+                 .style('-webkit-touch-callout', 'none')      
+                 .style('user-select', 'none') # future compatibility
+
 
       rectangle = categoryBox.append('rect')
                            .style('fill', colorScale(box))   
@@ -60,6 +66,39 @@ sceneDefine = (categories) ->
                            .style('stroke', '#999999')
                            .style('fill', '#222222')   
 
+                           #  
+                           # edge drag behavior
+                           #
+                           .on('mouseover', () -> 
+                              console.log('hover')
+                              this.style.cursor = "ew-resize")
+
+                           .on('mouseout', () -> 
+                              console.log('end hover')
+                              this.style.cursor = "default")
+
+                           .on('mousedown', () -> 
+                              console.log('click')
+                              this.style.cursor = "ew-resize"
+                              xInitial = event.clientX
+                              widthInitialBoundary = svg.textPortBoundary.attr('width')
+                              widthInitialText = svg.textPort.attr('width')
+                              element = d3.select(this)
+                              # monitor mouse movement till click is released
+                              window.onmousemove = (event) ->
+                                xDiff = xInitial - event.clientX
+                                svg.textPortBoundary.attr('width', widthInitialBoundary - xDiff)
+                                svg.textPort.attr('width', widthInitialText - xDiff)
+                              window.onmouseup = (event) ->
+                                window.onmousemove = null
+                                event.target.style.cursor = "default"
+                                element.transition().duration(500).style('stroke', '#999999')
+                                console.log 'mouse up'
+
+                              element.transition().duration(300).style('stroke', '#FFEEBB')
+                              return
+                              ) 
+    
     svg.textPort = svg.main.append('rect')
                            .style('stroke', '#222222')
                            .style('fill', '#222222')   

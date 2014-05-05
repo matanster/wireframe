@@ -38,6 +38,7 @@ sceneDefine = function(categories) {
     _results = [];
     for (box = _i = 0, _ref = numberOfBoxes - 1; 0 <= _ref ? _i <= _ref : _i >= _ref; box = 0 <= _ref ? ++_i : --_i) {
       categoryBox = svg.main.append('g');
+      categoryBox.style('-webkit-user-select', 'none').style('-webkit-touch-callout', 'none').style('user-select', 'none');
       rectangle = categoryBox.append('rect').style('fill', colorScale(box)).style('stroke-width', '0px').style('fill-opacity', '1');
       text = categoryBox.append('text').text(categories[box]).style("text-anchor", "middle").attr("dominant-baseline", "central").style("font-family", "Helvetica").style("font-weight", "bold").style('fill', '#EEEEEE');
       rectangle.on('mouseover', function() {
@@ -50,7 +51,34 @@ sceneDefine = function(categories) {
     return _results;
   };
   textPort = function() {
-    svg.textPortBoundary = svg.main.append('rect').style('stroke', '#999999').style('fill', '#222222');
+    svg.textPortBoundary = svg.main.append('rect').style('stroke', '#999999').style('fill', '#222222').on('mouseover', function() {
+      console.log('hover');
+      return this.style.cursor = "ew-resize";
+    }).on('mouseout', function() {
+      console.log('end hover');
+      return this.style.cursor = "default";
+    }).on('mousedown', function() {
+      var element, widthInitialBoundary, widthInitialText, xInitial;
+      console.log('click');
+      this.style.cursor = "ew-resize";
+      xInitial = event.clientX;
+      widthInitialBoundary = svg.textPortBoundary.attr('width');
+      widthInitialText = svg.textPort.attr('width');
+      element = d3.select(this);
+      window.onmousemove = function(event) {
+        var xDiff;
+        xDiff = xInitial - event.clientX;
+        svg.textPortBoundary.attr('width', widthInitialBoundary - xDiff);
+        return svg.textPort.attr('width', widthInitialText - xDiff);
+      };
+      window.onmouseup = function(event) {
+        window.onmousemove = null;
+        event.target.style.cursor = "default";
+        element.transition().duration(500).style('stroke', '#999999');
+        return console.log('mouse up');
+      };
+      element.transition().duration(300).style('stroke', '#FFEEBB');
+    });
     return svg.textPort = svg.main.append('rect').style('stroke', '#222222').style('fill', '#222222');
   };
   titlePort = function() {
