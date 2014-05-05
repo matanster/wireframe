@@ -130,5 +130,6 @@ data.get('categories', function(response) {
   console.log(response);
   categories = JSON.parse(response);
   sceneDefine(categories.names);
-  return syncInit();
+  syncInit();
+  return document.body.style.cursor = "default";
 });

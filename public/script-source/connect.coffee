@@ -1,6 +1,6 @@
 util = require('./util')
 data = require('./data')
-console.log 'connect.jsZ started'
+console.log 'connect.js started'
 
 # Globals
 svg = {}
@@ -15,7 +15,7 @@ calcEnd   = () -> 90
 # that won't change with subsequent window resizing
 #
 #####################################################################
-sceneDefine = () ->
+sceneDefine = (callback) ->
 
   main = () ->
     svg.main = d3.select('body').append('svg').style('background-color', '#222288')   
@@ -38,19 +38,32 @@ sceneDefine = () ->
     for element in [svg.upload, svg.link, svg.dropbox]
       element.on('mouseover', () -> 
                   console.log('hover')
-                  document.body.style.cursor = "pointer")
+                  this.style.cursor = "pointer")
 
              .on('mouseout', () -> 
                   console.log('end hover')
-                  document.body.style.cursor = "initial")
-
+                  this.style.cursor = "default")
 
              .on('mousedown', () -> 
                   console.log('click')
-                  window.location.href = '/read.html')
-    
+                  this.style.cursor = "progress"
+                  setTimeout((() -> window.location.href = '/read.html'), 50)) # need this wait because of https://code.google.com/p/chromium/issues/detail?id=3a69986&thanks=369986&ts=1399291013
+  
+  text = () ->
+    svg.text = svg.main.append('text').text("let us know where's the article")
+                              .style("text-anchor", "middle")
+                              .attr("dominant-baseline", "central")
+                              .style("font-family", "Helvetica")
+                              .style("font-weight", "bold")
+                              .attr("font-size", "35px")
+
   main()
+  text()
   images()
+
+  callback()
+
+
 
 ######################################################
 #
@@ -61,6 +74,8 @@ sceneSync = () ->
 
   viewport = util.getViewport()
   console.dir viewport
+
+  console.log 'starting scene sync'
 
   start = calcStart()
   end   = 0 # calcEnd()
@@ -78,23 +93,31 @@ sceneSync = () ->
             .attr('height', diameter)
             .attr('x', widthQuantum * 1)
             .attr('y', heightQuantum * 2)
-            .style('opacity', 0)            
+            .style('opacity', 0.01)            
 
   svg.link.attr('width', diameter)
             .attr('height', diameter)
             .attr('x', widthQuantum * 4)
             .attr('y', heightQuantum * 3)
-            .style('opacity', 0)
+            .style('opacity', 0.01)
 
   svg.dropbox.attr('width', diameter)
             .attr('height', diameter)
             .attr('x', widthQuantum * 7)
             .attr('y', heightQuantum * 2)
-            .style('opacity', 0)
+            .style('opacity', 0.01)
 
-  svg.upload.transition().duration(3000).style('opacity', 1)
-  svg.link.transition().duration(3000).style('opacity', 1)  
-  svg.dropbox.transition().duration(3000).style('opacity', 1)  
+  svg.text.attr('x', viewport.width / 2)
+          .attr('y', heightQuantum * 1.5)
+          .style('fill', '#EEEEEE') 
+          .style('opacity', 1)  
+   
+  #svg.text.transition().style('opacity', 1)
+  svg.upload.transition().style('opacity', 1).duration(1000).delay(600)
+  svg.link.transition().style('opacity', 1).duration(1000).delay(1400)  
+  svg.dropbox.transition().style('opacity', 1).duration(1000).delay(2000)  
+
+  return  
 
 syncInit = () ->
   sceneSync()                          # initial sync
@@ -105,5 +128,5 @@ syncInit = () ->
 #  Start it all  #
 #                #
 ##################
-sceneDefine()
-syncInit()
+sceneDefine(syncInit)
+#syncInit()

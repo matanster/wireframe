@@ -147,7 +147,8 @@ data.get('categories', function(response) {
   console.log(response);
   categories = JSON.parse(response);
   sceneDefine(categories.names);
-  return syncInit();
+  syncInit();
+  return document.body.style.cursor = "default";
 });
 
 },{"./data":1,"./util":4}],3:[function(require,module,exports){
