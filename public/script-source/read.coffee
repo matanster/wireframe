@@ -121,9 +121,10 @@ sceneDefine = (categories) ->
   svg.fontDecreaseButton = svg.fontSize.append("svg:image")
     .attr("xlink:href","fontSmall.svg")
 
-  svg.fontDecreaseButton
-    .on('mouseover', () -> console.log('hover'))
-    .on('mousedown', () -> console.log('click font decrease'))  
+  setTimeout((() -> 
+    svg.fontDecreaseButton
+      .on('mouseover', () -> console.log('hover'))
+      .on('mousedown', () -> console.log('click font decrease'))), 50)
 
   svg.fontIncreaseButton = svg.fontSize.append("svg:image")
     .attr("xlink:href","fontLarge.svg")

@@ -91,11 +91,13 @@ sceneDefine = function(categories) {
   titlePort();
   svg.fontSize = svg.main.append("g");
   svg.fontDecreaseButton = svg.fontSize.append("svg:image").attr("xlink:href", "fontSmall.svg");
-  svg.fontDecreaseButton.on('mouseover', function() {
-    return console.log('hover');
-  }).on('mousedown', function() {
-    return console.log('click font decrease');
-  });
+  setTimeout((function() {
+    return svg.fontDecreaseButton.on('mouseover', function() {
+      return console.log('hover');
+    }).on('mousedown', function() {
+      return console.log('click font decrease');
+    });
+  }), 50);
   return svg.fontIncreaseButton = svg.fontSize.append("svg:image").attr("xlink:href", "fontLarge.svg").on('mouseover', function() {
     return console.log('hover');
   }).on('mousedown', function() {
