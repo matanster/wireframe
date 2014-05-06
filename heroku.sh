@@ -1,2 +1,2 @@
-git push heroku master
+time git push heroku master
 heroku logs
