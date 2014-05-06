@@ -15,7 +15,7 @@ calcEnd   = () -> 90
 # that won't change with subsequent window resizing
 #
 #####################################################################
-sceneDefine = (categories) ->
+sceneDefine = (categories, callback) ->
 
   main = () ->
     svg.main = d3.select('body').append('svg').style('background-color', '#222222')   
@@ -121,16 +121,19 @@ sceneDefine = (categories) ->
   svg.fontDecreaseButton = svg.fontSize.append("svg:image")
     .attr("xlink:href","fontSmall.svg")
 
-  setTimeout((() -> 
-    svg.fontDecreaseButton
-      .on('mouseover', () -> console.log('hover'))
-      .on('mousedown', () -> console.log('click font decrease'))), 50)
-
   svg.fontIncreaseButton = svg.fontSize.append("svg:image")
     .attr("xlink:href","fontLarge.svg")
-    .on('mouseover', () -> console.log('hover'))
-    .on('mousedown', () -> console.log('click font increase'))  
 
+  setTimeout((() -> 
+    console.log 'after waiting'
+    svg.fontDecreaseButton
+      .on('mouseover', () -> console.log('hover'))
+      .on('mousedown', () -> console.log('click font decrease'))
+    svg.fontIncreaseButton 
+      .on('mouseover', () -> console.log('hover'))
+      .on('mousedown', () -> console.log('click font increase'))), 10000)  
+
+  callback()
 
 ######################################################
 #
@@ -242,7 +245,6 @@ data.get('abstract', (response) -> console.log(response))
 data.get('categories', (response) -> 
   console.log(response)
   categories = JSON.parse(response)
-  sceneDefine(categories.names)
-  syncInit()
+  sceneDefine(categories.names, syncInit)
   document.body.style.cursor = "default" # needed because of https://code.google.com/p/chromium/issues/detail?id=3a69986&thanks=369986&ts=1399291013
   )
