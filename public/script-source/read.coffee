@@ -15,7 +15,7 @@ calcEnd   = () -> 90
 # that won't change with subsequent window resizing
 #
 #####################################################################
-sceneDefine = (categories, callback) ->
+sceneDefine = (categories) ->
 
   main = () ->
     svg.main = d3.select('body').append('svg').style('background-color', '#222222')   
@@ -130,10 +130,6 @@ sceneDefine = (categories, callback) ->
     .on('mouseover', () -> console.log('hover'))
     .on('mousedown', () -> console.log('click font increase')) 
 
-  setTimeout((() -> 
-    console.log 'after waiting'
-    callback()), 5000)
-
 ######################################################
 #
 # Keep everything harmonized with the viewport size
@@ -244,6 +240,7 @@ data.get('abstract', (response) -> console.log(response))
 data.get('categories', (response) -> 
   console.log(response)
   categories = JSON.parse(response)
-  sceneDefine(categories.names, syncInit)
+  sceneDefine(categories.names)
+  syncInit()
   document.body.style.cursor = "default" # needed because of https://code.google.com/p/chromium/issues/detail?id=3a69986&thanks=369986&ts=1399291013
   )

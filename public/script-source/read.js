@@ -19,7 +19,7 @@ calcEnd = function() {
   return 90;
 };
 
-sceneDefine = function(categories, callback) {
+sceneDefine = function(categories) {
   var boxBlock, main, textPort, titlePort;
   main = function() {
     return svg.main = d3.select('body').append('svg').style('background-color', '#222222');
@@ -97,15 +97,11 @@ sceneDefine = function(categories, callback) {
   }).on('mousedown', function() {
     return console.log('click font decrease');
   });
-  svg.fontIncreaseButton.on('mouseover', function() {
+  return svg.fontIncreaseButton.on('mouseover', function() {
     return console.log('hover');
   }).on('mousedown', function() {
     return console.log('click font increase');
   });
-  return setTimeout((function() {
-    console.log('after waiting');
-    return callback();
-  }), 5000);
 };
 
 sceneSync = function() {
@@ -162,6 +158,7 @@ data.get('categories', function(response) {
   var categories;
   console.log(response);
   categories = JSON.parse(response);
-  sceneDefine(categories.names, syncInit);
+  sceneDefine(categories.names);
+  syncInit();
   return document.body.style.cursor = "default";
 });
