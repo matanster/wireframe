@@ -120,20 +120,19 @@ sceneDefine = (categories, callback) ->
 
   svg.fontDecreaseButton = svg.fontSize.append("svg:image")
     .attr("xlink:href","fontSmall.svg")
-
   svg.fontIncreaseButton = svg.fontSize.append("svg:image")
     .attr("xlink:href","fontLarge.svg")
 
+  svg.fontDecreaseButton
+    .on('mouseover', () -> console.log('hover'))
+    .on('mousedown', () -> console.log('click font decrease'))
+  svg.fontIncreaseButton 
+    .on('mouseover', () -> console.log('hover'))
+    .on('mousedown', () -> console.log('click font increase')) 
+
   setTimeout((() -> 
     console.log 'after waiting'
-    svg.fontDecreaseButton
-      .on('mouseover', () -> console.log('hover'))
-      .on('mousedown', () -> console.log('click font decrease'))
-    svg.fontIncreaseButton 
-      .on('mouseover', () -> console.log('hover'))
-      .on('mousedown', () -> console.log('click font increase'))), 10000)  
-
-  callback()
+    callback()), 5000)
 
 ######################################################
 #

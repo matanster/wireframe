@@ -109,20 +109,20 @@ sceneDefine = function(categories, callback) {
   svg.fontSize = svg.main.append("g");
   svg.fontDecreaseButton = svg.fontSize.append("svg:image").attr("xlink:href", "fontSmall.svg");
   svg.fontIncreaseButton = svg.fontSize.append("svg:image").attr("xlink:href", "fontLarge.svg");
-  setTimeout((function() {
+  svg.fontDecreaseButton.on('mouseover', function() {
+    return console.log('hover');
+  }).on('mousedown', function() {
+    return console.log('click font decrease');
+  });
+  svg.fontIncreaseButton.on('mouseover', function() {
+    return console.log('hover');
+  }).on('mousedown', function() {
+    return console.log('click font increase');
+  });
+  return setTimeout((function() {
     console.log('after waiting');
-    svg.fontDecreaseButton.on('mouseover', function() {
-      return console.log('hover');
-    }).on('mousedown', function() {
-      return console.log('click font decrease');
-    });
-    return svg.fontIncreaseButton.on('mouseover', function() {
-      return console.log('hover');
-    }).on('mousedown', function() {
-      return console.log('click font increase');
-    });
-  }), 10000);
-  return callback();
+    return callback();
+  }), 5000);
 };
 
 sceneSync = function() {
