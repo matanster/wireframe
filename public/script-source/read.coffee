@@ -116,7 +116,7 @@ sceneDefine = (categories) ->
   textPort()
   titlePort()
 
-  svg.fontSize = svg.main.append("svg")
+  svg.fontSize = svg.main.append("g")
 
   svg.fontDecreaseButton = svg.fontSize.append("svg:image")
     .attr("xlink:href","fontSmall.svg")
@@ -184,11 +184,10 @@ sceneSync = () ->
            .attr("font-size", "25px")
            .attr("dominant-baseline", "central")
             
-  svg.fontSize.attr('x', 1340)
-    .attr('y', 30)  
+  svg.fontSize.attr('transform', 'translate(1365,26) scale(0.08)')
     .attr('width', 100)
     .attr('height', 80)
-    .attr("viewBox",'0,0,796,1248')
+    #.attr("viewBox",'0,0,796,1248')
 
   svg.fontDecreaseButton.attr('x',0)
     .attr('y',0)
