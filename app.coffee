@@ -46,6 +46,17 @@ app.use express.favicon()
 # (specific logging info and colors can be configured if custom settings are not enough)
 if env is 'production'
   app.use express.logger('default')    # This would be verbose enough for production
+  
+  # require http Basic Auth authentication 
+  app.use(express.basicAuth((user, pass) ->
+    if user is 'demo' and pass is 'articlio'
+      console.log 'user authenticated through basic auth'
+      return true
+    else
+      console.log "user failed authenticating through basic auth - failed username was #{user}"
+      return false
+    ))
+
 else 
   app.disable('etag');                 # helping to avoid browser caching
   app.use express.logger('dev')        # dev is colorful (for a terminal) and not overly verbose

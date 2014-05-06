@@ -49,6 +49,15 @@ app.use(express.favicon());
 
 if (env === 'production') {
   app.use(express.logger('default'));
+  app.use(express.basicAuth(function(user, pass) {
+    if (user === 'demo' && pass === 'articlio') {
+      console.log('user authenticated through basic auth');
+      return true;
+    } else {
+      console.log("user failed authenticating through basic auth - failed username was " + user);
+      return false;
+    }
+  }));
 } else {
   app.disable('etag');
   app.use(express.logger('dev'));
