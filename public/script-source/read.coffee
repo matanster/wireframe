@@ -184,20 +184,29 @@ sceneSync = () ->
            .style("font-weight", "bold")
            .attr("font-size", "25px")
            .attr("dominant-baseline", "central")
-            
-  svg.fontSize.attr('transform', 'translate(1365,26) scale(0.08)')
-    .attr('width', 100)
-    .attr('height', 80)
-    #.attr("viewBox",'0,0,796,1248')
 
-  svg.fontDecreaseButton.attr('x',0)
-    .attr('y',0)
-    .attr('width', 398)
-    .attr('height', 624)
-  svg.fontIncreaseButton.attr('x',398)
-    .attr('y',0)
-    .attr('width', 398)
-    .attr('height', 624)
+
+  #
+  # taking care of font size buttons geometry - 
+  # currently directly scaling the images.
+  # alternative scaling method - nest under new svg element having a viewbox
+  #
+
+  #svg.fontSize.attr('transform', 'translate(1000,26) scale(0.08)')
+  #.attr("viewBox",'0,0,796,1248')
+  fontButtonGeometry = 
+    'width':  398 * 0.08, # source image pixel width  * scaling factor
+    'height': 624 * 0.08  # source image pixel height * scaling factor
+  svg.fontDecreaseButton
+    .attr('x', viewport.width - (fontButtonGeometry.width * 2) - 7)
+    .attr('y', start - (fontButtonGeometry.height) - 7)
+    .attr('width', fontButtonGeometry.width)
+    .attr('height', fontButtonGeometry.height)
+  svg.fontIncreaseButton
+    .attr('x', viewport.width - (fontButtonGeometry.width) - 7 - 1)
+    .attr('y', start - (fontButtonGeometry.height) - 7)
+    .attr('width', fontButtonGeometry.width)
+    .attr('height', fontButtonGeometry.height)
 
   # calculate for boxes
   for i in [0..svg.boxes.length-1]

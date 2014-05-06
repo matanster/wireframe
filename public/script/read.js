@@ -122,7 +122,7 @@ sceneDefine = function(categories) {
 };
 
 sceneSync = function() {
-  var boxH, end, height, i, start, totalH, width, _i, _j, _ref, _ref1, _results;
+  var boxH, end, fontButtonGeometry, height, i, start, totalH, width, _i, _j, _ref, _ref1, _results;
   viewport = util.getViewport();
   console.dir(viewport);
   start = calcStart();
@@ -134,9 +134,12 @@ sceneSync = function() {
   svg.textPort.attr('width', 800 - 10).attr('height', totalH + end + 19).attr('x', 300 + 5).attr('y', start + 5 + 5).style('stroke-width', '15px').attr('rx', 10).attr('rx', 10);
   svg.titlePort.attr('width', viewport.width).attr('height', start).attr('x', 0).attr('y', 0).style('stroke-width', '7px').attr('rx', 10).attr('rx', 10);
   svg.title.attr('x', viewport.width / 2).attr('y', start / 2).style('fill', "#999999").style('font-family', 'Helvetica').style("font-weight", "bold").attr("font-size", "25px").attr("dominant-baseline", "central");
-  svg.fontSize.attr('transform', 'translate(1365,26) scale(0.08)').attr('width', 100).attr('height', 80);
-  svg.fontDecreaseButton.attr('x', 0).attr('y', 0).attr('width', 398).attr('height', 624);
-  svg.fontIncreaseButton.attr('x', 398).attr('y', 0).attr('width', 398).attr('height', 624);
+  fontButtonGeometry = {
+    'width': 398 * 0.08,
+    'height': 624 * 0.08
+  };
+  svg.fontDecreaseButton.attr('x', viewport.width - (fontButtonGeometry.width * 2) - 7).attr('y', start - fontButtonGeometry.height - 7).attr('width', fontButtonGeometry.width).attr('height', fontButtonGeometry.height);
+  svg.fontIncreaseButton.attr('x', viewport.width - fontButtonGeometry.width - 7 - 1).attr('y', start - fontButtonGeometry.height - 7).attr('width', fontButtonGeometry.width).attr('height', fontButtonGeometry.height);
   for (i = _i = 0, _ref = svg.boxes.length - 1; 0 <= _ref ? _i <= _ref : _i >= _ref; i = 0 <= _ref ? ++_i : --_i) {
     svg.boxes[i].x1 = 0;
     svg.boxes[i].y1 = start + Math.floor(boxH * i) - 0.5;
