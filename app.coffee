@@ -86,24 +86,17 @@ startServer = () ->
   server.listen app.get('port'), ->
     logging.logGreen 'Server listening on port ' + app.get('port') + '....'
 
-  
+  ### 
   # In dev mode, self-test on startup
+  #
   unless env is 'production' 
 
-    #testFile = 'AzPP5D8IS0GDeeC1hFxs'
-    #testFile = 'xt7duLM0Q3Ow2gIBOvED'
-    #testFile = 'leZrsgpZQOSCCtS98bsu'
-    #testUrl = 'http://localhost/extract?name=' + testFile
-    #testFile = 'S7VUdDeES5O6Xby6xtc7'
     testFile = 'rwUEzeLnRfKgNh23R82W'
-
     testUrl = 'http://localhost/handleInputFile?inkUrl=https://www.filepicker.io/api/file/' + testFile
-    #http.get(testUrl, (res) ->
-    #  logging.logBlue 'Server response to its own synthetic client is: ' + res.statusCode)
+    http.get(testUrl, (res) ->
+      logging.logBlue 'Server response to its own synthetic client is: ' + res.statusCode)
+  ###
 
-#
-# Get data that can apply to any document
-#
 
 selfMonitor = require('./selfMonitor').start()
 startServer()

@@ -78,16 +78,23 @@ app.use(express["static"](path.join(__dirname, 'public')));
 app.get('/getData', require('./ajax/getMockData').get);
 
 startServer = function() {
-  var server, testFile, testUrl;
+  var server;
   server = http.createServer(app);
   server.timeout = 0;
-  server.listen(app.get('port'), function() {
+  return server.listen(app.get('port'), function() {
     return logging.logGreen('Server listening on port ' + app.get('port') + '....');
   });
-  if (env !== 'production') {
-    testFile = 'rwUEzeLnRfKgNh23R82W';
-    return testUrl = 'http://localhost/handleInputFile?inkUrl=https://www.filepicker.io/api/file/' + testFile;
-  }
+  /* 
+  # In dev mode, self-test on startup
+  #
+  unless env is 'production' 
+  
+    testFile = 'rwUEzeLnRfKgNh23R82W'
+    testUrl = 'http://localhost/handleInputFile?inkUrl=https://www.filepicker.io/api/file/' + testFile
+    http.get(testUrl, (res) ->
+      logging.logBlue 'Server response to its own synthetic client is: ' + res.statusCode)
+  */
+
 };
 
 selfMonitor = require('./selfMonitor').start();
