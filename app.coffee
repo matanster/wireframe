@@ -40,7 +40,7 @@ app.set 'views', __dirname + '/views'
 app.set 'view engine', 'ejs'
 app.use express.favicon()
 
-# Setup the connect.js logger used by express.js
+# Set up the connect.js logger used by express.js
 # See http://www.senchalabs.org/connect/logger.html for configuration options.
 # (specific logging info and colors can be configured if custom settings are not enough)
 if env is 'production'
