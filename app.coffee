@@ -16,21 +16,20 @@ logging = require './logging'
 errorHandling = require './errorHandling'
 authorization = require './authorization'
 
+logging.init()
+
+app = express()
+
 #
 # Configure and start express
 #
-app = express()
-env = app.get('env')
-
-logging.init()
-
+env = nconf.get('env')
 logging.logGreen "Starting in mode #{env}"
-
 logging.log('Starting in mode ' + env) 
 
 # Get-or-default basic networking config
 host = nconf.get 'host'
-logging.logGreen 'Using hostname ' + nconf.get('host')
+logging.logGreen 'Using hostname ' + host
 app.set 'port', process.env.PORT or 80
 logging.logGreen 'Using port ' + app.get('port')
 

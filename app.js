@@ -23,11 +23,11 @@ errorHandling = require('./errorHandling');
 
 authorization = require('./authorization');
 
+logging.init();
+
 app = express();
 
-env = app.get('env');
-
-logging.init();
+env = nconf.get('env');
 
 logging.logGreen("Starting in mode " + env);
 
@@ -35,7 +35,7 @@ logging.log('Starting in mode ' + env);
 
 host = nconf.get('host');
 
-logging.logGreen('Using hostname ' + nconf.get('host'));
+logging.logGreen('Using hostname ' + host);
 
 app.set('port', process.env.PORT || 80);
 
