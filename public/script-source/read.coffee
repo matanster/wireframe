@@ -120,6 +120,8 @@ sceneDefine = (categories) ->
 
   svg.fontDecreaseButton = svg.fontSize.append("svg:image")
     .attr("xlink:href","fontSmall.svg")
+
+  svg.fontDecreaseButton
     .on('mouseover', () -> console.log('hover'))
     .on('mousedown', () -> console.log('click font decrease'))  
 
@@ -240,8 +242,6 @@ data.get('categories', (response) ->
   console.log(response)
   categories = JSON.parse(response)
   sceneDefine(categories.names)
-  
-  setTimeout((() -> syncInit()), 5000)
-  
+  syncInit()
   document.body.style.cursor = "default" # needed because of https://code.google.com/p/chromium/issues/detail?id=3a69986&thanks=369986&ts=1399291013
   )

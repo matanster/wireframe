@@ -90,7 +90,8 @@ sceneDefine = function(categories) {
   textPort();
   titlePort();
   svg.fontSize = svg.main.append("g");
-  svg.fontDecreaseButton = svg.fontSize.append("svg:image").attr("xlink:href", "fontSmall.svg").on('mouseover', function() {
+  svg.fontDecreaseButton = svg.fontSize.append("svg:image").attr("xlink:href", "fontSmall.svg");
+  svg.fontDecreaseButton.on('mouseover', function() {
     return console.log('hover');
   }).on('mousedown', function() {
     return console.log('click font decrease');
@@ -157,8 +158,6 @@ data.get('categories', function(response) {
   console.log(response);
   categories = JSON.parse(response);
   sceneDefine(categories.names);
-  setTimeout((function() {
-    return syncInit();
-  }), 5000);
+  syncInit();
   return document.body.style.cursor = "default";
 });
