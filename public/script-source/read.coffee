@@ -116,19 +116,15 @@ sceneDefine = (categories) ->
   textPort()
   titlePort()
 
-  group = svg.main.append("svg")
-    .attr('x', 1340)
-    .attr('y', 30)  
-    .attr('width', 100)
-    .attr('height', 80)
-    .attr("viewBox",'0,0,796,1248')
-  fontDecreaseButton = group.append("svg:image")
+  svg.fontSize = svg.main.append("svg")
+
+  fontDecreaseButton = svg.fontSize.append("svg:image")
     .attr('x',0)
     .attr('y',0)
     .attr('width', 398)
     .attr('height', 624)
     .attr("xlink:href","fontSmall.svg")
-  fontIncreaseButton = group.append("svg:image")
+  fontIncreaseButton = svg.fontSize.append("svg:image")
     .attr('x',398)
     .attr('y',0)
     .attr('width', 398)
@@ -197,6 +193,12 @@ sceneSync = () ->
            .attr("font-size", "25px")
            .attr("dominant-baseline", "central")
             
+
+  svg.fontSize.attr('x', 1340)
+    .attr('y', 30)  
+    .attr('width', 100)
+    .attr('height', 80)
+    .attr("viewBox",'0,0,796,1248')
 
   # calculate for boxes
   for i in [0..svg.boxes.length-1]
