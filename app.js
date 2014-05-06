@@ -7,10 +7,6 @@ nconf = require('nconf');
 
 nconf.argv().env();
 
-nconf.defaults({
-  host: 'localhost'
-});
-
 express = require('express');
 
 http = require('http');
@@ -33,6 +29,10 @@ logging.logGreen("Starting in mode " + env);
 
 logging.log('Starting in mode ' + env);
 
+nconf.defaults({
+  host: 'localhost'
+});
+
 host = nconf.get('host');
 
 logging.logGreen('Using hostname ' + host);
@@ -51,10 +51,10 @@ if (env === 'production') {
   app.use(express.logger('default'));
   app.use(express.basicAuth(function(user, pass) {
     if (user === 'demo' && pass === 'articlio') {
-      console.log('user authenticated through basic auth');
+      console.warn('user authenticated through basic auth');
       return true;
     } else {
-      console.log("user failed authenticating through basic auth - failed username was " + user);
+      console.info("user failed authenticating through basic auth - failed username was " + user);
       return false;
     }
   }));

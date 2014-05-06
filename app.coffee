@@ -2,7 +2,6 @@
 fs = require('fs')
 nconf = require('nconf')
 nconf.argv().env()
-nconf.defaults host: 'localhost'
 
 #
 # Express module dependencies.
@@ -28,6 +27,7 @@ logging.logGreen "Starting in mode #{env}"
 logging.log('Starting in mode ' + env) 
 
 # Get-or-default basic networking config
+nconf.defaults host: 'localhost'
 host = nconf.get 'host'
 logging.logGreen 'Using hostname ' + host
 app.set 'port', process.env.PORT or 80
@@ -49,10 +49,10 @@ if env is 'production'
   # require http Basic Auth authentication 
   app.use(express.basicAuth((user, pass) ->
     if user is 'demo' and pass is 'articlio'
-      console.log 'user authenticated through basic auth'
+      console.warn 'user authenticated through basic auth'
       return true
     else
-      console.log "user failed authenticating through basic auth - failed username was #{user}"
+      console.info "user failed authenticating through basic auth - failed username was #{user}"
       return false
     ))
 
