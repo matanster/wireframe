@@ -174,7 +174,9 @@ data.get('categories', function(response) {
   console.log(response);
   categories = JSON.parse(response);
   sceneDefine(categories.names);
-  syncInit();
+  setTimeout((function() {
+    return syncInit();
+  }), 5000);
   return document.body.style.cursor = "default";
 });
 
