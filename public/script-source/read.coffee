@@ -118,24 +118,15 @@ sceneDefine = (categories) ->
 
   svg.fontSize = svg.main.append("svg")
 
-  fontDecreaseButton = svg.fontSize.append("svg:image")
-    .attr('x',0)
-    .attr('y',0)
-    .attr('width', 398)
-    .attr('height', 624)
+  svg.fontDecreaseButton = svg.fontSize.append("svg:image")
     .attr("xlink:href","fontSmall.svg")
-  fontIncreaseButton = svg.fontSize.append("svg:image")
-    .attr('x',398)
-    .attr('y',0)
-    .attr('width', 398)
-    .attr('height', 624)
+    .on('mouseover', () -> console.log('hover'))
+    .on('mousedown', () -> console.log('click font decrease'))  
+
+  svg.fontIncreaseButton = svg.fontSize.append("svg:image")
     .attr("xlink:href","fontLarge.svg")
-
-  fontDecreaseButton.on('mouseover', () -> console.log('hover'))
-  fontDecreaseButton.on('mousedown', () -> console.log('click font decrease'))  
-
-  fontIncreaseButton.on('mouseover', () -> console.log('hover'))
-  fontIncreaseButton.on('mousedown', () -> console.log('click font increase'))  
+    .on('mouseover', () -> console.log('hover'))
+    .on('mousedown', () -> console.log('click font increase'))  
 
 
 ######################################################
@@ -193,12 +184,20 @@ sceneSync = () ->
            .attr("font-size", "25px")
            .attr("dominant-baseline", "central")
             
-
   svg.fontSize.attr('x', 1340)
     .attr('y', 30)  
     .attr('width', 100)
     .attr('height', 80)
     .attr("viewBox",'0,0,796,1248')
+
+  svg.fontDecreaseButton.attr('x',0)
+    .attr('y',0)
+    .attr('width', 398)
+    .attr('height', 624)
+  svg.fontIncreaseButton.attr('x',398)
+    .attr('y',0)
+    .attr('width', 398)
+    .attr('height', 624)
 
   # calculate for boxes
   for i in [0..svg.boxes.length-1]

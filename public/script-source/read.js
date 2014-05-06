@@ -20,7 +20,7 @@ calcEnd = function() {
 };
 
 sceneDefine = function(categories) {
-  var boxBlock, fontDecreaseButton, fontIncreaseButton, main, textPort, titlePort;
+  var boxBlock, main, textPort, titlePort;
   main = function() {
     return svg.main = d3.select('body').append('svg').style('background-color', '#222222');
   };
@@ -90,18 +90,14 @@ sceneDefine = function(categories) {
   textPort();
   titlePort();
   svg.fontSize = svg.main.append("svg");
-  fontDecreaseButton = svg.fontSize.append("svg:image").attr('x', 0).attr('y', 0).attr('width', 398).attr('height', 624).attr("xlink:href", "fontSmall.svg");
-  fontIncreaseButton = svg.fontSize.append("svg:image").attr('x', 398).attr('y', 0).attr('width', 398).attr('height', 624).attr("xlink:href", "fontLarge.svg");
-  fontDecreaseButton.on('mouseover', function() {
+  svg.fontDecreaseButton = svg.fontSize.append("svg:image").attr("xlink:href", "fontSmall.svg").on('mouseover', function() {
     return console.log('hover');
-  });
-  fontDecreaseButton.on('mousedown', function() {
+  }).on('mousedown', function() {
     return console.log('click font decrease');
   });
-  fontIncreaseButton.on('mouseover', function() {
+  return svg.fontIncreaseButton = svg.fontSize.append("svg:image").attr("xlink:href", "fontLarge.svg").on('mouseover', function() {
     return console.log('hover');
-  });
-  return fontIncreaseButton.on('mousedown', function() {
+  }).on('mousedown', function() {
     return console.log('click font increase');
   });
 };
@@ -120,6 +116,8 @@ sceneSync = function() {
   svg.titlePort.attr('width', viewport.width).attr('height', start).attr('x', 0).attr('y', 0).style('stroke-width', '7px').attr('rx', 10).attr('rx', 10);
   svg.title.attr('x', viewport.width / 2).attr('y', start / 2).style('fill', "#999999").style('font-family', 'Helvetica').style("font-weight", "bold").attr("font-size", "25px").attr("dominant-baseline", "central");
   svg.fontSize.attr('x', 1340).attr('y', 30).attr('width', 100).attr('height', 80).attr("viewBox", '0,0,796,1248');
+  svg.fontDecreaseButton.attr('x', 0).attr('y', 0).attr('width', 398).attr('height', 624);
+  svg.fontIncreaseButton.attr('x', 398).attr('y', 0).attr('width', 398).attr('height', 624);
   for (i = _i = 0, _ref = svg.boxes.length - 1; 0 <= _ref ? _i <= _ref : _i >= _ref; i = 0 <= _ref ? ++_i : --_i) {
     svg.boxes[i].x1 = 0;
     svg.boxes[i].y1 = start + Math.floor(boxH * i) - 0.5;
