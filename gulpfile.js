@@ -14,6 +14,10 @@ gulp.task('default', function() {
   gulp.src('public/script-source/connect.js') /* source to build */
         .pipe(browserify())
         .pipe(gulp.dest('public/script'))     /* output directory */
+
+  gulp.src('public/script-source/hive.js')    /* source to build */
+        .pipe(browserify())
+        .pipe(gulp.dest('public/script'))     /* output directory */
 });
 
 //
@@ -34,4 +38,7 @@ gulp.task("watch", function() {
         clientRefresh.broadcast()
     });
 
+    watch({glob: "mock-data/*"}, function() {
+        clientRefresh.broadcast()
+    });
 });
