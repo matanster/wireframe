@@ -1,5 +1,7 @@
-util = require('./util')
-data = require('./data')
+util        = require './util'
+data        = require './data'
+tokenize    = require './tokenize'
+viewporting = require './viewporting/viewporting'
 console.log 'read.js main started'
 
 # Globals
@@ -222,9 +224,11 @@ sceneSync = () ->
     width =  util.calcLength(svg.boxes[i].x1, svg.boxes[i].x2)
     height = util.calcLength(svg.boxes[i].y1, svg.boxes[i].y2)    
 
+    ###
     console.log svg.boxes[i].y1
     console.log svg.boxes[i].y2
     console.log '---'
+    ###
 
   # draw for boxes
   for i in [0..svg.boxes.length-1]
@@ -245,7 +249,6 @@ syncInit = () ->
 #  Start it all  #
 #                #
 ##################
-data.get('abstract', (response) -> console.log(response))
 data.get('categories', (response) -> 
   console.log(response)
   categories = JSON.parse(response)
@@ -253,3 +256,17 @@ data.get('categories', (response) ->
   syncInit()
   document.body.style.cursor = "default" # needed because of https://code.google.com/p/chromium/issues/detail?id=3a69986&thanks=369986&ts=1399291013
   )
+
+data.get('abstract', (response) -> 
+  
+  console.log(response)
+  tokens = tokenize(response)
+  console.dir tokens
+
+  viewporting(tokens, svg.main)
+
+
+  #textFlow.flow(svg.main, tokens, 'Helvetica', '16px', { 'start': 300, 'end':800 })  
+  )
+
+

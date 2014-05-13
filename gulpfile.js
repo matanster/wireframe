@@ -25,7 +25,7 @@ gulp.task('default', function() {
 // invoked via 'gulp watch'
 // 
 gulp.task("watch", function() {
-    watch({glob: "public/script-source/*.js"}, function() {
+    watch({glob: "public/script-source/**/*.js"}, function() {
         gulp.start("default");
         clientRefresh.broadcast()
     });
