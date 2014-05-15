@@ -7,9 +7,15 @@ console.log 'read.js main started'
 # Globals
 svg = {}
 viewport = null
+tokens = undefined
 
 calcStart = () -> 90
 calcEnd   = () -> 90
+
+layout =
+  'separator':
+    'left':
+      'x': 300
 
 #####################################################################
 #
@@ -91,6 +97,7 @@ sceneDefine = (categories) ->
                                 xDiff = xInitial - event.clientX
                                 svg.textPortBoundary.attr('width', widthInitialBoundary - xDiff)
                                 svg.textPort.attr('width', widthInitialText - xDiff)
+                                viewporting(tokens, svg.main, svg.textPort)
                               window.onmouseup = (event) ->
                                 window.onmousemove = null
                                 event.target.style.cursor = "default"
@@ -127,10 +134,14 @@ sceneDefine = (categories) ->
 
   svg.fontDecreaseButton
     .on('mouseover', () -> console.log('hover'))
-    .on('mousedown', () -> console.log('click font decrease'))
+    .on('mousedown', () -> 
+      console.log('click font decrease')
+      viewporting(tokens, svg.main, svg.textPort, -2))
   svg.fontIncreaseButton 
     .on('mouseover', () -> console.log('hover'))
-    .on('mousedown', () -> console.log('click font increase')) 
+    .on('mousedown', () -> 
+      console.log('click font increase')
+      viewporting(tokens, svg.main, svg.textPort, 2)) 
 
 ######################################################
 #
@@ -152,18 +163,20 @@ sceneSync = () ->
   svg.main.attr('width', viewport.width)
           .attr('height', viewport.height)
 
+  layout.separator.right = { 'x': viewport.width - (2 * layout.separator.left.x) }
+
   # draw text port
-  svg.textPortBoundary.attr('width', 800)
+  svg.textPortBoundary.attr('width', layout.separator.right.x)
               .attr('height', totalH + end + 19)
-              .attr('x', 300)
+              .attr('x', layout.separator.left.x)
               .attr('y', start + 5)
               .style('stroke-width', '25px')
               .attr('rx', 10)
               .attr('rx', 10)
 
-  svg.textPort.attr('width', 800 - 10)
+  svg.textPort.attr('width', layout.separator.right.x - 10)
               .attr('height', totalH + end + 19)
-              .attr('x', 300 + 5)
+              .attr('x', layout.separator.left.x + 5)
               .attr('y', start + 5 + 5)
               .style('stroke-width', '15px')
               .attr('rx', 10)
@@ -187,6 +200,8 @@ sceneSync = () ->
            .attr("font-size", "25px")
            .attr("dominant-baseline", "central")
 
+  # show text if source tokens already loaded
+  if tokens? then viewporting(tokens, svg.main, svg.textPort)
 
   #
   # taking care of font size buttons geometry - 
@@ -215,7 +230,7 @@ sceneSync = () ->
 
     svg.boxes[i].x1 = 0
     svg.boxes[i].y1 = start + Math.floor(boxH * i) - 0.5
-    svg.boxes[i].x2 = 300
+    svg.boxes[i].x2 = layout.separator.left.x
     if i is svg.boxes.length-1 # occupy last pixel
       svg.boxes[i].y2 = start + totalH + 0.5    
     else # leave last pixel to next box
@@ -264,9 +279,5 @@ data.get('abstract', (response) ->
   console.dir tokens
 
   viewporting(tokens, svg.main, svg.textPort)
-
-
-  #textFlow.flow(svg.main, tokens, 'Helvetica', '16px', { 'start': 300, 'end':800 })  
   )
-
 
