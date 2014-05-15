@@ -72,15 +72,15 @@ sceneDefine = (categories) ->
                            # edge drag behavior
                            #
                            .on('mouseover', () -> 
-                              console.log('hover')
+                              #console.log('hover')
                               this.style.cursor = "ew-resize")
 
                            .on('mouseout', () -> 
-                              console.log('end hover')
+                              #console.log('end hover')
                               this.style.cursor = "default")
 
                            .on('mousedown', () -> 
-                              console.log('click')
+                              #console.log('click')
                               this.style.cursor = "ew-resize"
                               xInitial = event.clientX
                               widthInitialBoundary = svg.textPortBoundary.attr('width')
@@ -95,7 +95,7 @@ sceneDefine = (categories) ->
                                 window.onmousemove = null
                                 event.target.style.cursor = "default"
                                 element.transition().duration(500).style('stroke', '#999999')
-                                console.log 'mouse up'
+                                #console.log 'mouse up'
 
                               element.transition().duration(300).style('stroke', '#FFEEBB')
                               return
@@ -263,7 +263,7 @@ data.get('abstract', (response) ->
   tokens = tokenize(response)
   console.dir tokens
 
-  viewporting(tokens, svg.main)
+  viewporting(tokens, svg.main, svg.textPort)
 
 
   #textFlow.flow(svg.main, tokens, 'Helvetica', '16px', { 'start': 300, 'end':800 })  

@@ -56,14 +56,11 @@ sceneDefine = function(categories) {
   };
   textPort = function() {
     svg.textPortBoundary = svg.main.append('rect').style('stroke', '#999999').style('fill', '#222222').on('mouseover', function() {
-      console.log('hover');
       return this.style.cursor = "ew-resize";
     }).on('mouseout', function() {
-      console.log('end hover');
       return this.style.cursor = "default";
     }).on('mousedown', function() {
       var element, widthInitialBoundary, widthInitialText, xInitial;
-      console.log('click');
       this.style.cursor = "ew-resize";
       xInitial = event.clientX;
       widthInitialBoundary = svg.textPortBoundary.attr('width');
@@ -78,8 +75,7 @@ sceneDefine = function(categories) {
       window.onmouseup = function(event) {
         window.onmousemove = null;
         event.target.style.cursor = "default";
-        element.transition().duration(500).style('stroke', '#999999');
-        return console.log('mouse up');
+        return element.transition().duration(500).style('stroke', '#999999');
       };
       element.transition().duration(300).style('stroke', '#FFEEBB');
     });
@@ -174,5 +170,5 @@ data.get('abstract', function(response) {
   console.log(response);
   tokens = tokenize(response);
   console.dir(tokens);
-  return viewporting(tokens, svg.main);
+  return viewporting(tokens, svg.main, svg.textPort);
 });
