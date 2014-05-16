@@ -90,34 +90,30 @@ sceneDefine = function(categories) {
       };
       element.transition().duration(300).style('stroke', '#FFEEBB');
     }).on('touchstart', function() {
-      var element;
+      var element, widthInitialBoundary, widthInitialText, xInitial;
       element = d3.select(this);
-      element.transition().duration(1200).style('stroke', '#FFEEBB');
-      console.log('touch start');
-      window.ontouchmove = function(event) {};
+      element.transition().duration(900).style('stroke', '#FFEEBB');
+      xInitial = event.changedTouches[0].clientX;
+      widthInitialBoundary = svg.textPortBoundary.attr('width');
+      widthInitialText = svg.textPort.attr('width');
+      window.ontouchmove = function(event) {
+        var xDiff;
+        xDiff = xInitial - event.changedTouches[0].clientX;
+        svg.textPortBoundary.attr('width', widthInitialBoundary - xDiff);
+        svg.textPort.attr('width', widthInitialText - xDiff);
+        return viewporting(tokens, svg.main, svg.textPort);
+      };
       window.ontouchcancel = function() {
         window.ontouchmove = null;
-        return element.transition().duration(1200).style('stroke', '#999999');
+        return element.transition().duration(600).style('stroke', '#999999');
       };
       window.ontouchleave = function() {
-        var touch, _i, _len, _ref;
         window.ontouchmove = null;
-        _ref = event.changedTouches;
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          touch = _ref[_i];
-          window.alert(touch.target + ' ' + touch.pageX);
-        }
-        return element.transition().duration(1200).style('stroke', '#999999');
+        return element.transition().duration(600).style('stroke', '#999999');
       };
-      return window.ontouched = function() {
-        var touch, _i, _len, _ref;
+      return window.ontouchend = function() {
         window.ontouchmove = null;
-        _ref = event.changedTouches;
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          touch = _ref[_i];
-          window.alert(touch.target + ' ' + touch.pageX);
-        }
-        return element.transition().duration(1200).style('stroke', '#999999');
+        return element.transition().duration(600).style('stroke', '#999999');
       };
     });
     return svg.textPort = svg.main.append('rect').style('stroke', '#222222').style('fill', '#222222');

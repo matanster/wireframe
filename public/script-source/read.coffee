@@ -110,29 +110,29 @@ sceneDefine = (categories) ->
         
                             .on('touchstart', () ->
                               element = d3.select(this)
-                              element.transition().duration(1200).style('stroke', '#FFEEBB')
-                              console.log('touch start')
+                              element.transition().duration(900).style('stroke', '#FFEEBB')
+                              xInitial = event.changedTouches[0].clientX
+                              widthInitialBoundary = svg.textPortBoundary.attr('width')
+                              widthInitialText = svg.textPort.attr('width')
 
                               window.ontouchmove = (event) -> 
-                                #for touch in event.changedTouches
-                                  #window.alert touch.target + ' '  + touch.pageX
+                                xDiff = xInitial - event.changedTouches[0].clientX
+                                svg.textPortBoundary.attr('width', widthInitialBoundary - xDiff)
+                                svg.textPort.attr('width', widthInitialText - xDiff)
+                                viewporting(tokens, svg.main, svg.textPort)
 
                               window.ontouchcancel = () ->
                                 window.ontouchmove = null
-                                element.transition().duration(1200).style('stroke', '#999999')
+                                element.transition().duration(600).style('stroke', '#999999')
                                 #window.alert 'touch cancel'
 
                               window.ontouchleave = () ->
                                 window.ontouchmove = null
-                                for touch in event.changedTouches
-                                  window.alert touch.target + ' '  + touch.pageX
-                                element.transition().duration(1200).style('stroke', '#999999')
+                                element.transition().duration(600).style('stroke', '#999999')
                                 
-                              window.ontouched = () ->
+                              window.ontouchend = () ->
                                 window.ontouchmove = null
-                                for touch in event.changedTouches
-                                  window.alert touch.target + ' '  + touch.pageX
-                                element.transition().duration(1200).style('stroke', '#999999')
+                                element.transition().duration(600).style('stroke', '#999999')
                                 #window.alert 'touch end')
                               )
     
