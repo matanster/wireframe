@@ -106,6 +106,36 @@ sceneDefine = function(categories) {
         return element.transition().duration(500).style('stroke', '#999999');
       };
       element.transition().duration(300).style('stroke', '#FFEEBB');
+    }).on('touchstart', function() {
+      var element;
+      element = d3.select(this);
+      element.transition().duration(1200).style('stroke', '#FFEEBB');
+      console.log('touch start');
+      window.ontouchmove = function(event) {};
+      window.ontouchcancel = function() {
+        window.ontouchmove = null;
+        return element.transition().duration(1200).style('stroke', '#999999');
+      };
+      window.ontouchleave = function() {
+        var touch, _i, _len, _ref;
+        window.ontouchmove = null;
+        _ref = event.changedTouches;
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          touch = _ref[_i];
+          window.alert(touch.target + ' ' + touch.pageX);
+        }
+        return element.transition().duration(1200).style('stroke', '#999999');
+      };
+      return window.ontouched = function() {
+        var touch, _i, _len, _ref;
+        window.ontouchmove = null;
+        _ref = event.changedTouches;
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          touch = _ref[_i];
+          window.alert(touch.target + ' ' + touch.pageX);
+        }
+        return element.transition().duration(1200).style('stroke', '#999999');
+      };
     });
     return svg.textPort = svg.main.append('rect').style('stroke', '#222222').style('fill', '#222222');
   };

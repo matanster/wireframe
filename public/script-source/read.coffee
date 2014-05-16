@@ -107,6 +107,34 @@ sceneDefine = (categories) ->
                               element.transition().duration(300).style('stroke', '#FFEEBB')
                               return
                               ) 
+        
+                            .on('touchstart', () ->
+                              element = d3.select(this)
+                              element.transition().duration(1200).style('stroke', '#FFEEBB')
+                              console.log('touch start')
+
+                              window.ontouchmove = (event) -> 
+                                #for touch in event.changedTouches
+                                  #window.alert touch.target + ' '  + touch.pageX
+
+                              window.ontouchcancel = () ->
+                                window.ontouchmove = null
+                                element.transition().duration(1200).style('stroke', '#999999')
+                                #window.alert 'touch cancel'
+
+                              window.ontouchleave = () ->
+                                window.ontouchmove = null
+                                for touch in event.changedTouches
+                                  window.alert touch.target + ' '  + touch.pageX
+                                element.transition().duration(1200).style('stroke', '#999999')
+                                
+                              window.ontouched = () ->
+                                window.ontouchmove = null
+                                for touch in event.changedTouches
+                                  window.alert touch.target + ' '  + touch.pageX
+                                element.transition().duration(1200).style('stroke', '#999999')
+                                #window.alert 'touch end')
+                              )
     
     svg.textPort = svg.main.append('rect')
                            .style('stroke', '#222222')
