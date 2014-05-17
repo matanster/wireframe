@@ -1,7 +1,7 @@
 util        = require './util'
 data        = require './data'
 tokenize    = require './tokenize'
-viewporting = require './viewporting/viewporting'
+textporting = require './textporting/textporting'
 console.log 'read.js main started'
 
 # Globals
@@ -16,6 +16,10 @@ layout =
   'separator':
     'left':
       'x': 300
+
+totalH = null
+boxH   = null
+end    = null
 
 #####################################################################
 #
@@ -95,9 +99,10 @@ sceneDefine = (categories) ->
                               window.onmousemove = (event) ->
                                 xDiff = xInitial - event.clientX
                                 svg.textPortBoundary.attr('width', widthInitialBoundary - xDiff)
-                                layout.separator.right.x -= xDiff
+                                layout.separator.right.x = event.clientX # to be corrected
                                 svg.textPort.attr('width', widthInitialText - xDiff)
-                                viewporting(tokens, svg.main, svg.textPort)
+                                textporting(tokens, svg.main, svg.textPort)
+                                svg.rightPane.redraw()
                               window.onmouseup = (event) ->
                                 window.onmousemove = null
                                 event.target.style.cursor = "default"
@@ -119,7 +124,7 @@ sceneDefine = (categories) ->
                                 xDiff = xInitial - event.changedTouches[0].clientX
                                 svg.textPortBoundary.attr('width', widthInitialBoundary - xDiff)
                                 svg.textPort.attr('width', widthInitialText - xDiff)
-                                viewporting(tokens, svg.main, svg.textPort)
+                                textporting(tokens, svg.main, svg.textPort)
 
                               window.ontouchcancel = () ->
                                 window.ontouchmove = null
@@ -155,7 +160,7 @@ sceneDefine = (categories) ->
                                     .style('stroke-width', '0px')
                                     .style('fill-opacity', '1')
 
-    svg.rightPane.refresh = () ->
+    svg.rightPane.redraw = () ->
       svg.rightPane.element.attr('x', layout.separator.right.x)
                    .attr('width', viewport.width - (layout.separator.right.x - layout.separator.left.x))
                    .attr('y', layout.start.y)
@@ -179,12 +184,12 @@ sceneDefine = (categories) ->
     .on('mouseover', () -> console.log('hover'))
     .on('mousedown', () -> 
       console.log('click font decrease')
-      viewporting(tokens, svg.main, svg.textPort, -2))
+      textporting(tokens, svg.main, svg.textPort, -2))
   svg.fontIncreaseButton 
     .on('mouseover', () -> console.log('hover'))
     .on('mousedown', () -> 
       console.log('click font increase')
-      viewporting(tokens, svg.main, svg.textPort, 2)) 
+      textporting(tokens, svg.main, svg.textPort, 2)) 
 
 ######################################################
 #
@@ -199,7 +204,7 @@ sceneSync = () ->
   layout.start = { 'y' : calcStart()}
   end   = 0 # calcEnd()
 
-  atotalH = viewport.height - layout.start.y - end
+  totalH = viewport.height - layout.start.y - end
   boxH = totalH / svg.boxes.length
 
   # draw main svg
@@ -244,7 +249,7 @@ sceneSync = () ->
            .attr("dominant-baseline", "central")
 
   # show text if source tokens already loaded
-  if tokens? then viewporting(tokens, svg.main, svg.textPort)
+  if tokens? then textporting(tokens, svg.main, svg.textPort)
 
   #
   # taking care of font size buttons geometry - 
@@ -298,7 +303,7 @@ sceneSync = () ->
     svg.boxes[i].text.attr('x', svg.boxes[i].x1 + width / 2)  
                      .attr('y', svg.boxes[i].y1 + height / 2)
 
-  svg.rightPane.refresh()
+  svg.rightPane.redraw()
 
     
 syncInit = () ->
@@ -324,6 +329,6 @@ data.get('abstract', (response) ->
   tokens = tokenize(response)
   console.dir tokens
 
-  viewporting(tokens, svg.main, svg.textPort)
+  textporting(tokens, svg.main, svg.textPort)
   )
 
