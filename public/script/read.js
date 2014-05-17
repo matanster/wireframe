@@ -51,7 +51,7 @@ layout = {
 };
 
 sceneDefine = function(categories) {
-  var boxBlock, main, textPort, titlePort;
+  var boxBlock, main, rightPane, textPort, titlePort;
   main = function() {
     return svg.main = d3.select('body').append('svg').style('background-color', '#222222');
   };
@@ -97,6 +97,7 @@ sceneDefine = function(categories) {
         var xDiff;
         xDiff = xInitial - event.clientX;
         svg.textPortBoundary.attr('width', widthInitialBoundary - xDiff);
+        layout.separator.right.x -= xDiff;
         svg.textPort.attr('width', widthInitialText - xDiff);
         return viewporting(tokens, svg.main, svg.textPort);
       };
@@ -139,8 +140,16 @@ sceneDefine = function(categories) {
     svg.titlePort = svg.main.append('rect').style('stroke', '#999999').style('fill', '#FFEEBB');
     return svg.title = svg.main.append('text').text("Entrepreneurship in 2020 - a Projection").style("text-anchor", "middle");
   };
+  rightPane = function() {
+    svg.rightPane = {};
+    svg.rightPane.element = svg.main.append('rect').style('fill', '#ccccff').style('stroke-width', '0px').style('fill-opacity', '1');
+    return svg.rightPane.refresh = function() {
+      return svg.rightPane.element.attr('x', layout.separator.right.x).attr('width', viewport.width - (layout.separator.right.x - layout.separator.left.x)).attr('y', layout.start.y).attr('height', totalH + end + 19);
+    };
+  };
   main();
   boxBlock(categories);
+  rightPane();
   textPort();
   titlePort();
   svg.fontSize = svg.main.append("g");
@@ -161,21 +170,23 @@ sceneDefine = function(categories) {
 };
 
 sceneSync = function() {
-  var boxH, end, fontButtonGeometry, height, i, start, totalH, width, _i, _j, _ref, _ref1, _results;
+  var atotalH, boxH, end, fontButtonGeometry, height, i, width, _i, _j, _ref, _ref1;
   viewport = util.getViewport();
   console.dir(viewport);
-  start = calcStart();
+  layout.start = {
+    'y': calcStart()
+  };
   end = 0;
-  totalH = viewport.height - start - end;
+  atotalH = viewport.height - layout.start.y - end;
   boxH = totalH / svg.boxes.length;
   svg.main.attr('width', viewport.width).attr('height', viewport.height);
   layout.separator.right = {
-    'x': viewport.width - (2 * layout.separator.left.x)
+    'x': viewport.width - layout.separator.left.x
   };
-  svg.textPortBoundary.attr('width', layout.separator.right.x).attr('height', totalH + end + 19).attr('x', layout.separator.left.x).attr('y', start + 5).style('stroke-width', '25px').attr('rx', 10).attr('rx', 10);
-  svg.textPort.attr('width', layout.separator.right.x - 10).attr('height', totalH + end + 19).attr('x', layout.separator.left.x + 5).attr('y', start + 5 + 5).style('stroke-width', '15px').attr('rx', 10).attr('rx', 10);
-  svg.titlePort.attr('width', viewport.width).attr('height', start).attr('x', 0).attr('y', 0).style('stroke-width', '7px').attr('rx', 10).attr('rx', 10);
-  svg.title.attr('x', viewport.width / 2).attr('y', start / 2).style('fill', "#999999").style('font-family', 'Helvetica').style("font-weight", "bold").attr("font-size", "25px").attr("dominant-baseline", "central");
+  svg.textPortBoundary.attr('x', layout.separator.left.x).attr('width', layout.separator.right.x - layout.separator.left.x).attr('height', totalH + end + 19).attr('y', layout.start.y + 5).style('stroke-width', '25px').attr('rx', 10).attr('rx', 10);
+  svg.textPort.attr('x', layout.separator.left.x + 5).attr('width', layout.separator.right.x - layout.separator.left.x - 10).attr('height', totalH + end + 19).attr('y', layout.start.y + 5 + 5).style('stroke-width', '15px').attr('rx', 10).attr('rx', 10);
+  svg.titlePort.attr('width', viewport.width).attr('height', layout.start.y).attr('x', 0).attr('y', 0).style('stroke-width', '7px').attr('rx', 10).attr('rx', 10);
+  svg.title.attr('x', viewport.width / 2).attr('y', layout.start.y / 2).style('fill', "#999999").style('font-family', 'Helvetica').style("font-weight", "bold").attr("font-size", "25px").attr("dominant-baseline", "central");
   if (tokens != null) {
     viewporting(tokens, svg.main, svg.textPort);
   }
@@ -183,16 +194,16 @@ sceneSync = function() {
     'width': 398 * 0.08,
     'height': 624 * 0.08
   };
-  svg.fontDecreaseButton.attr('x', viewport.width - (fontButtonGeometry.width * 2) - 7).attr('y', start - fontButtonGeometry.height - 7).attr('width', fontButtonGeometry.width).attr('height', fontButtonGeometry.height);
-  svg.fontIncreaseButton.attr('x', viewport.width - fontButtonGeometry.width - 7 - 1).attr('y', start - fontButtonGeometry.height - 7).attr('width', fontButtonGeometry.width).attr('height', fontButtonGeometry.height);
+  svg.fontDecreaseButton.attr('x', viewport.width - (fontButtonGeometry.width * 2) - 7).attr('y', layout.start.y - fontButtonGeometry.height - 7).attr('width', fontButtonGeometry.width).attr('height', fontButtonGeometry.height);
+  svg.fontIncreaseButton.attr('x', viewport.width - fontButtonGeometry.width - 7 - 1).attr('y', layout.start.y - fontButtonGeometry.height - 7).attr('width', fontButtonGeometry.width).attr('height', fontButtonGeometry.height);
   for (i = _i = 0, _ref = svg.boxes.length - 1; 0 <= _ref ? _i <= _ref : _i >= _ref; i = 0 <= _ref ? ++_i : --_i) {
     svg.boxes[i].x1 = 0;
-    svg.boxes[i].y1 = start + Math.floor(boxH * i) - 0.5;
+    svg.boxes[i].y1 = layout.start.y + Math.floor(boxH * i) - 0.5;
     svg.boxes[i].x2 = layout.separator.left.x;
     if (i === svg.boxes.length - 1) {
-      svg.boxes[i].y2 = start + totalH + 0.5;
+      svg.boxes[i].y2 = layout.start.y + totalH + 0.5;
     } else {
-      svg.boxes[i].y2 = start + Math.floor(boxH * (i + 1)) - 0.5;
+      svg.boxes[i].y2 = layout.start.y + Math.floor(boxH * (i + 1)) - 0.5;
     }
     width = util.calcLength(svg.boxes[i].x1, svg.boxes[i].x2);
     height = util.calcLength(svg.boxes[i].y1, svg.boxes[i].y2);
@@ -203,12 +214,11 @@ sceneSync = function() {
     */
 
   }
-  _results = [];
   for (i = _j = 0, _ref1 = svg.boxes.length - 1; 0 <= _ref1 ? _j <= _ref1 : _j >= _ref1; i = 0 <= _ref1 ? ++_j : --_j) {
     svg.boxes[i].element.attr('x', svg.boxes[i].x1).attr('width', width).attr('y', svg.boxes[i].y1).attr('height', height);
-    _results.push(svg.boxes[i].text.attr('x', svg.boxes[i].x1 + width / 2).attr('y', svg.boxes[i].y1 + height / 2));
+    svg.boxes[i].text.attr('x', svg.boxes[i].x1 + width / 2).attr('y', svg.boxes[i].y1 + height / 2);
   }
-  return _results;
+  return svg.rightPane.refresh();
 };
 
 syncInit = function() {
@@ -284,7 +294,7 @@ exports.calcLength = function(i1, i2) {
 // Generated by CoffeeScript 1.6.3
 var anchorSVG, fontSize;
 
-fontSize = '18px';
+fontSize = '36px';
 
 anchorSVG = void 0;
 
@@ -318,7 +328,7 @@ module.exports = function(tokens, mainSVG, textPortSVG, fontSizeChange) {
   if (anchorSVG != null) {
     anchorSVG.remove();
   }
-  anchorSVG = mainSVG.append('svg').style('text-anchor', 'start').style('fill', '#EEEEEE').style('font-family', fontFamily).style('font-size', fontSize);
+  anchorSVG = mainSVG.append('svg').style('text-anchor', 'start').style('fill', 'rgb(255,255,220)').style('font-family', fontFamily).style('font-size', fontSize);
   spaceWidth = tokenToViewable('a a').width - tokenToViewable('aa').width;
   viewPortFull = false;
   x = 0;
@@ -327,6 +337,9 @@ module.exports = function(tokens, mainSVG, textPortSVG, fontSizeChange) {
   for (_i = 0, _len = tokens.length; _i < _len; _i++) {
     token = tokens[_i];
     tokenViewable = tokenToViewable(token);
+    if (token.mark = '1') {
+      tokenViewable.svg.style('fill', 'rgb(255,255,220)');
+    }
     if (x + tokenViewable.width < textPort.width) {
       tokenViewable.svg.attr('x', textPort.x + x);
       tokenViewable.svg.attr('y', textPort.y + y);

@@ -1,5 +1,5 @@
 # module static variables
-fontSize   = '18px' # temporarily
+fontSize   = '36px' # temporarily
 anchorSVG = undefined # module static
 
 module.exports = (tokens, mainSVG, textPortSVG, fontSizeChange) ->
@@ -53,7 +53,7 @@ module.exports = (tokens, mainSVG, textPortSVG, fontSizeChange) ->
   anchorSVG = mainSVG.append('svg')
                               .style('text-anchor', 'start')
                               #.attr("dominant-baseline", "central")
-                              .style('fill', '#EEEEEE')                                                                                                                                            
+                              .style('fill', 'rgb(255,255,220)')                                                                                                                                            
                               .style('font-family',fontFamily)
                               .style('font-size',fontSize)
   
@@ -65,12 +65,17 @@ module.exports = (tokens, mainSVG, textPortSVG, fontSizeChange) ->
   y = 0
 
   for token in tokens
+
     tokenViewable = tokenToViewable(token)
     #console.log "token width = " + tokenViewable.width
     #console.log "x = " + x
     #console.log x
     #console.log tokenViewable
     #console.log textPort
+
+
+    if token.mark = '1'
+      tokenViewable.svg.style('fill', 'rgb(255,255,220)')
 
     if x + tokenViewable.width < textPort.width
       #console.log 'adding to line'

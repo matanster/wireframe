@@ -35,8 +35,6 @@ sceneDefine = (categories) ->
 
     #colorScale = d3.scale.linear().domain([0, numberOfBoxes-1]).range(['#87CEFA', '#00BFFF'])
     colorScale = d3.scale.linear().domain([0, numberOfBoxes-1]).range(['#CCCCE0','#AAAABE'])
-
-
     colorTransition = (i) -> (() -> d3.select(this).transition().duration(25).ease('circle').style('fill', colorScale(i)))
     
     svg.boxes = []
@@ -68,6 +66,7 @@ sceneDefine = (categories) ->
       svg.boxes[box].element = rectangle
       svg.boxes[box].text = text
 
+  
   textPort = () ->
 
     svg.textPortBoundary = svg.main.append('rect')
@@ -96,6 +95,7 @@ sceneDefine = (categories) ->
                               window.onmousemove = (event) ->
                                 xDiff = xInitial - event.clientX
                                 svg.textPortBoundary.attr('width', widthInitialBoundary - xDiff)
+                                layout.separator.right.x -= xDiff
                                 svg.textPort.attr('width', widthInitialText - xDiff)
                                 viewporting(tokens, svg.main, svg.textPort)
                               window.onmouseup = (event) ->
@@ -148,8 +148,23 @@ sceneDefine = (categories) ->
     svg.title = svg.main.append('text').text("Entrepreneurship in 2020 - a Projection")
                                        .style("text-anchor", "middle")
 
+  rightPane = () ->
+    svg.rightPane = {}
+    svg.rightPane.element = svg.main.append('rect')
+                                    .style('fill', '#ccccff')
+                                    .style('stroke-width', '0px')
+                                    .style('fill-opacity', '1')
+
+    svg.rightPane.refresh = () ->
+      svg.rightPane.element.attr('x', layout.separator.right.x)
+                   .attr('width', viewport.width - (layout.separator.right.x - layout.separator.left.x))
+                   .attr('y', layout.start.y)
+                   .attr('height', totalH + end + 19)
+                                  
+
   main()
   boxBlock(categories)
+  rightPane()
   textPort()
   titlePort()
 
@@ -181,31 +196,31 @@ sceneSync = () ->
   viewport = util.getViewport()
   console.dir viewport
 
-  start = calcStart()
+  layout.start = { 'y' : calcStart()}
   end   = 0 # calcEnd()
 
-  totalH = viewport.height - start - end
+  atotalH = viewport.height - layout.start.y - end
   boxH = totalH / svg.boxes.length
 
   # draw main svg
   svg.main.attr('width', viewport.width)
           .attr('height', viewport.height)
 
-  layout.separator.right = { 'x': viewport.width - (2 * layout.separator.left.x) }
+  layout.separator.right = { 'x': viewport.width - layout.separator.left.x }
 
   # draw text port
-  svg.textPortBoundary.attr('width', layout.separator.right.x)
+  svg.textPortBoundary.attr('x', layout.separator.left.x)
+              .attr('width', layout.separator.right.x - layout.separator.left.x)
               .attr('height', totalH + end + 19)
-              .attr('x', layout.separator.left.x)
-              .attr('y', start + 5)
+              .attr('y', layout.start.y + 5)
               .style('stroke-width', '25px')
               .attr('rx', 10)
               .attr('rx', 10)
 
-  svg.textPort.attr('width', layout.separator.right.x - 10)
+  svg.textPort.attr('x', layout.separator.left.x + 5)
+              .attr('width', layout.separator.right.x - layout.separator.left.x - 10)
               .attr('height', totalH + end + 19)
-              .attr('x', layout.separator.left.x + 5)
-              .attr('y', start + 5 + 5)
+              .attr('y', layout.start.y + 5 + 5)
               .style('stroke-width', '15px')
               .attr('rx', 10)
               .attr('rx', 10)
@@ -213,7 +228,7 @@ sceneSync = () ->
 
   # draw title port 
   svg.titlePort.attr('width', viewport.width)
-               .attr('height', start)
+               .attr('height', layout.start.y)
                .attr('x', 0)
                .attr('y', 0)
                .style('stroke-width', '7px')
@@ -221,7 +236,7 @@ sceneSync = () ->
                .attr('rx', 10)              
 
   svg.title.attr('x', viewport.width / 2)
-           .attr('y', start / 2)
+           .attr('y', layout.start.y / 2)
            .style('fill', "#999999")
            .style('font-family', 'Helvetica')
            .style("font-weight", "bold")
@@ -244,12 +259,12 @@ sceneSync = () ->
     'height': 624 * 0.08  # source image pixel height * scaling factor
   svg.fontDecreaseButton
     .attr('x', viewport.width - (fontButtonGeometry.width * 2) - 7)
-    .attr('y', start - (fontButtonGeometry.height) - 7)
+    .attr('y', layout.start.y - (fontButtonGeometry.height) - 7)
     .attr('width', fontButtonGeometry.width)
     .attr('height', fontButtonGeometry.height)
   svg.fontIncreaseButton
     .attr('x', viewport.width - (fontButtonGeometry.width) - 7 - 1)
-    .attr('y', start - (fontButtonGeometry.height) - 7)
+    .attr('y', layout.start.y - (fontButtonGeometry.height) - 7)
     .attr('width', fontButtonGeometry.width)
     .attr('height', fontButtonGeometry.height)
 
@@ -257,12 +272,12 @@ sceneSync = () ->
   for i in [0..svg.boxes.length-1]
 
     svg.boxes[i].x1 = 0
-    svg.boxes[i].y1 = start + Math.floor(boxH * i) - 0.5
+    svg.boxes[i].y1 = layout.start.y + Math.floor(boxH * i) - 0.5
     svg.boxes[i].x2 = layout.separator.left.x
     if i is svg.boxes.length-1 # occupy last pixel
-      svg.boxes[i].y2 = start + totalH + 0.5    
+      svg.boxes[i].y2 = layout.start.y + totalH + 0.5    
     else # leave last pixel to next box
-      svg.boxes[i].y2 = start + Math.floor((boxH * (i+1))) - 0.5
+      svg.boxes[i].y2 = layout.start.y + Math.floor((boxH * (i+1))) - 0.5
 
     width =  util.calcLength(svg.boxes[i].x1, svg.boxes[i].x2)
     height = util.calcLength(svg.boxes[i].y1, svg.boxes[i].y2)    
@@ -283,6 +298,9 @@ sceneSync = () ->
     svg.boxes[i].text.attr('x', svg.boxes[i].x1 + width / 2)  
                      .attr('y', svg.boxes[i].y1 + height / 2)
 
+  svg.rightPane.refresh()
+
+    
 syncInit = () ->
   sceneSync()                          # initial sync
   window.onresize = () -> sceneSync()  # keep sync forever
