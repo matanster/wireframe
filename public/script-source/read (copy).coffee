@@ -30,7 +30,7 @@ end    = null
 sceneDefine = (categories) ->
 
   main = () ->
-    svg.main = d3.select('body').append('svg').style('background-color', '#999999')   
+    svg.main = d3.select('body').append('svg').style('background-color', '#222222')   
 
   boxBlock = (categories) ->
 
@@ -75,7 +75,7 @@ sceneDefine = (categories) ->
 
     svg.textPortBoundary = svg.main.append('rect')
                            .style('stroke', '#999999')
-                           .style('fill', '#999999')   
+                           .style('fill', '#222222')   
 
                            #  
                            # edge drag behavior
@@ -112,10 +112,7 @@ sceneDefine = (categories) ->
                               element.transition().duration(300).style('stroke', '#FFEEBB')
                               return
                               ) 
-                            # To be merged with the mouse interaction code for the same.
-                            # Note that this code assumes only one tap, whereas 
-                            # in reality a whole touch list is created if there's 
-                            # more than one simultaneous tap - which will likely break this code        
+        
                             .on('touchstart', () ->
                               element = d3.select(this)
                               element.transition().duration(900).style('stroke', '#FFEEBB')
@@ -150,25 +147,24 @@ sceneDefine = (categories) ->
 
   titlePort = () ->
     svg.titlePort = svg.main.append('rect')
-                            #.style('stroke', '#999999')
+                            .style('stroke', '#999999')
                             .style('fill', '#FFEEBB')   
 
-    svg.title = svg.main.append('text').text("Something Something Something")
+    svg.title = svg.main.append('text').text("Entrepreneurship in 2020 - a Projection")
                                        .style("text-anchor", "middle")
 
   rightPane = () ->
     svg.rightPane = {}
     svg.rightPane.element = svg.main.append('rect')
                                     .style('fill', '#ccccff')
-                                    .style('stroke-width', '1px')
-                                    .style('stroke', '#bbbbee')
+                                    .style('stroke-width', '0px')
                                     .style('fill-opacity', '1')
 
     svg.rightPane.redraw = () ->
       svg.rightPane.element.attr('x', layout.separator.right.x)
                    .attr('width', viewport.width - (layout.separator.right.x - layout.separator.left.x))
                    .attr('y', layout.start.y)
-                   .attr('height', totalH)
+                   .attr('height', totalH + end + 19)
                                   
 
   main()
@@ -220,26 +216,26 @@ sceneSync = () ->
   # draw text port
   svg.textPortBoundary.attr('x', layout.separator.left.x)
               .attr('width', layout.separator.right.x - layout.separator.left.x)
-              .attr('height', totalH)
+              .attr('height', totalH + end + 19)
               .attr('y', layout.start.y + 5)
               .style('stroke-width', '25px')
-              #.attr('rx', 10)
-              #.attr('rx', 10)
+              .attr('rx', 10)
+              .attr('rx', 10)
 
   svg.textPort.attr('x', layout.separator.left.x + 5)
               .attr('width', layout.separator.right.x - layout.separator.left.x - 10)
-              .attr('height', totalH) # this is a hack - it ends below viewport bottom, otherwise curved edge shows
-              .attr('y', layout.start.y + 5 + 10)
+              .attr('height', totalH + end + 19)
+              .attr('y', layout.start.y + 5 + 5)
               .style('stroke-width', '15px')
               .attr('rx', 10)
               .attr('rx', 10)
 
 
   # draw title port 
-  svg.titlePort.attr('width', viewport.width - 5 - 5)
-               .attr('height', layout.start.y - 5 - 5)
-               .attr('x', 5)
-               .attr('y', 5)
+  svg.titlePort.attr('width', viewport.width)
+               .attr('height', layout.start.y)
+               .attr('x', 0)
+               .attr('y', 0)
                .style('stroke-width', '7px')
                .attr('rx', 10)
                .attr('rx', 10)              

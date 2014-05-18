@@ -59,7 +59,7 @@ end = null;
 sceneDefine = function(categories) {
   var boxBlock, main, rightPane, textPort, titlePort;
   main = function() {
-    return svg.main = d3.select('body').append('svg').style('background-color', '#222222');
+    return svg.main = d3.select('body').append('svg').style('background-color', '#999999');
   };
   boxBlock = function(categories) {
     var box, categoryBox, colorScale, colorTransition, numberOfBoxes, rectangle, text, _i, _ref, _results;
@@ -88,7 +88,7 @@ sceneDefine = function(categories) {
     return _results;
   };
   textPort = function() {
-    svg.textPortBoundary = svg.main.append('rect').style('stroke', '#999999').style('fill', '#222222').on('mouseover', function() {
+    svg.textPortBoundary = svg.main.append('rect').style('stroke', '#999999').style('fill', '#999999').on('mouseover', function() {
       return this.style.cursor = "ew-resize";
     }).on('mouseout', function() {
       return this.style.cursor = "default";
@@ -144,14 +144,14 @@ sceneDefine = function(categories) {
     return svg.textPort = svg.main.append('rect').style('stroke', '#222222').style('fill', '#222222');
   };
   titlePort = function() {
-    svg.titlePort = svg.main.append('rect').style('stroke', '#999999').style('fill', '#FFEEBB');
-    return svg.title = svg.main.append('text').text("Entrepreneurship in 2020 - a Projection").style("text-anchor", "middle");
+    svg.titlePort = svg.main.append('rect').style('fill', '#FFEEBB');
+    return svg.title = svg.main.append('text').text("Something Something Something").style("text-anchor", "middle");
   };
   rightPane = function() {
     svg.rightPane = {};
-    svg.rightPane.element = svg.main.append('rect').style('fill', '#ccccff').style('stroke-width', '0px').style('fill-opacity', '1');
+    svg.rightPane.element = svg.main.append('rect').style('fill', '#ccccff').style('stroke-width', '1px').style('stroke', '#bbbbee').style('fill-opacity', '1');
     return svg.rightPane.redraw = function() {
-      return svg.rightPane.element.attr('x', layout.separator.right.x).attr('width', viewport.width - (layout.separator.right.x - layout.separator.left.x)).attr('y', layout.start.y).attr('height', totalH + end + 19);
+      return svg.rightPane.element.attr('x', layout.separator.right.x).attr('width', viewport.width - (layout.separator.right.x - layout.separator.left.x)).attr('y', layout.start.y).attr('height', totalH);
     };
   };
   main();
@@ -190,9 +190,9 @@ sceneSync = function() {
   layout.separator.right = {
     'x': viewport.width - layout.separator.left.x
   };
-  svg.textPortBoundary.attr('x', layout.separator.left.x).attr('width', layout.separator.right.x - layout.separator.left.x).attr('height', totalH + end + 19).attr('y', layout.start.y + 5).style('stroke-width', '25px').attr('rx', 10).attr('rx', 10);
-  svg.textPort.attr('x', layout.separator.left.x + 5).attr('width', layout.separator.right.x - layout.separator.left.x - 10).attr('height', totalH + end + 19).attr('y', layout.start.y + 5 + 5).style('stroke-width', '15px').attr('rx', 10).attr('rx', 10);
-  svg.titlePort.attr('width', viewport.width).attr('height', layout.start.y).attr('x', 0).attr('y', 0).style('stroke-width', '7px').attr('rx', 10).attr('rx', 10);
+  svg.textPortBoundary.attr('x', layout.separator.left.x).attr('width', layout.separator.right.x - layout.separator.left.x).attr('height', totalH).attr('y', layout.start.y + 5).style('stroke-width', '25px');
+  svg.textPort.attr('x', layout.separator.left.x + 5).attr('width', layout.separator.right.x - layout.separator.left.x - 10).attr('height', totalH).attr('y', layout.start.y + 5 + 10).style('stroke-width', '15px').attr('rx', 10).attr('rx', 10);
+  svg.titlePort.attr('width', viewport.width - 5 - 5).attr('height', layout.start.y - 5 - 5).attr('x', 5).attr('y', 5).style('stroke-width', '7px').attr('rx', 10).attr('rx', 10);
   svg.title.attr('x', viewport.width / 2).attr('y', layout.start.y / 2).style('fill', "#999999").style('font-family', 'Helvetica').style("font-weight", "bold").attr("font-size", "25px").attr("dominant-baseline", "central");
   if (tokens != null) {
     textporting(tokens, svg.main, svg.textPort);
@@ -287,24 +287,20 @@ fontSize = '36px';
 anchorSVG = void 0;
 
 module.exports = function(tokens, mainSVG, textPortSVG, fontSizeChange) {
-  var fontFamily, paddingX, paddingY, spaceWidth, textPort, token, tokenToViewable, tokenViewable, viewPortFull, x, y, _i, _len, _results;
+  var ButtonGeometry, downBUtton, fontFamily, lHeight, paddingX, paddingY, spaceWidth, textPort, token, tokenToViewable, tokenViewable, viewPortFull, x, y, _i, _len;
   console.log('textPorting started');
   if (fontSizeChange != null) {
     fontSize = parseFloat(fontSize) + fontSizeChange + 'px';
   }
-  paddingX = 10;
-  paddingY = 20;
-  textPort = {
-    'width': parseFloat(textPortSVG.attr('width') - (paddingX * 2)),
-    'height': parseFloat(textPortSVG.attr('height') - (paddingY * 2)),
-    'x': parseFloat(textPortSVG.attr('x')) + paddingX,
-    'y': parseFloat(textPortSVG.attr('y')) + paddingY
-  };
   fontFamily = 'Helvetica';
+  if (anchorSVG != null) {
+    anchorSVG.remove();
+  }
+  anchorSVG = mainSVG.append('svg').style('text-anchor', 'start').style('fill', 'rgb(255,255,220)').style('font-family', fontFamily).style('font-size', fontSize);
   tokenToViewable = function(token) {
     var height, svg, visualToken, width;
     visualToken = {};
-    svg = anchorSVG.append('text').attr('y', -100).attr('x', -100);
+    svg = anchorSVG.append('text').attr('y', -100).attr('x', -100).style("dominant-baseline", "hanging");
     svg.text(token);
     width = svg.node().getBBox().width;
     height = svg.node().getBBox().height;
@@ -313,15 +309,19 @@ module.exports = function(tokens, mainSVG, textPortSVG, fontSizeChange) {
     visualToken.width = width;
     return visualToken;
   };
-  if (anchorSVG != null) {
-    anchorSVG.remove();
-  }
-  anchorSVG = mainSVG.append('svg').style('text-anchor', 'start').style('fill', 'rgb(255,255,220)').style('font-family', fontFamily).style('font-size', fontSize);
   spaceWidth = tokenToViewable('a a').width - tokenToViewable('aa').width;
+  lHeight = tokenToViewable('l').height;
+  paddingX = 10;
+  paddingY = 10;
+  textPort = {
+    'x': parseFloat(textPortSVG.attr('x')) + paddingX,
+    'width': parseFloat(textPortSVG.attr('width') - (paddingX * 2)),
+    'y': parseFloat(textPortSVG.attr('y')) + paddingY,
+    'height': parseFloat(textPortSVG.attr('height') - (paddingY * 2) - lHeight - 50)
+  };
   viewPortFull = false;
   x = 0;
   y = 0;
-  _results = [];
   for (_i = 0, _len = tokens.length; _i < _len; _i++) {
     token = tokens[_i];
     tokenViewable = tokenToViewable(token);
@@ -346,12 +346,19 @@ module.exports = function(tokens, mainSVG, textPortSVG, fontSizeChange) {
       }
     }
     if (x + spaceWidth < textPort.width) {
-      _results.push(x += spaceWidth);
-    } else {
-      _results.push(void 0);
+      x += spaceWidth;
     }
   }
-  return _results;
+  downBUtton = anchorSVG.append('svg:image').attr('xlink:href', 'images/downScroll3.svg').attr('x', 400).attr('width', 500).attr('y', 400).attr('height', textPort.height - 40).on('mouseover', function() {
+    return console.log('hover');
+  }).on('mousedown', function() {
+    console.log('scroll');
+    return textporting(tokens, svg.main, svg.textPort);
+  });
+  return ButtonGeometry = {
+    'width': 848,
+    'height': 154
+  };
 };
 
 },{}],5:[function(require,module,exports){
