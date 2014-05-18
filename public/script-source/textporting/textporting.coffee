@@ -102,17 +102,4 @@ module.exports = (tokens, mainSVG, textPortSVG, fontSizeChange) ->
       x += spaceWidth
       #console.log "x after space adding = " + x
 
-  downBUtton = anchorSVG.append('svg:image')
-    .attr('xlink:href','images/downScroll3.svg')
-    .attr('x', 400)
-    .attr('width', 500)
-    .attr('y', 400)
-    .attr('height', textPort.height - 40)
-    .on('mouseover', () -> console.log('hover'))
-    .on('mousedown', () -> 
-      console.log('scroll')
-      textporting(tokens, svg.main, svg.textPort)) 
-
-  ButtonGeometry = 
-    'width':  848, # source image pixel width  * scaling factor
-    'height': 154  # source image pixel height * scaling factor
+ 

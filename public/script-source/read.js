@@ -151,11 +151,27 @@ sceneDefine = function(categories) {
     console.log('click font decrease');
     return textporting(tokens, svg.main, svg.textPort, -2);
   });
-  return svg.fontIncreaseButton.on('mouseover', function() {
+  svg.fontIncreaseButton.on('mouseover', function() {
     return console.log('hover');
   }).on('mousedown', function() {
     console.log('click font increase');
     return textporting(tokens, svg.main, svg.textPort, 2);
+  });
+  svg.downButton = {};
+  svg.downButton.geometry = {
+    'width': 500,
+    'height': 50,
+    'paddingY': 15
+  };
+  return svg.downButton.element = svg.main.append('svg:image').attr('xlink:href', 'images/downScroll4.svg').attr('preserveAspectRatio', 'none').on('mouseover', function() {
+    console.log('hover');
+    return svg.downButton.element.transition().duration(200).attr('y', svg.downButton.geometry.y + (svg.downButton.geometry.paddingY / 3));
+  }).on('mouseout', function() {
+    console.log('hover');
+    return svg.downButton.element.transition().duration(400).attr('y', svg.downButton.geometry.y);
+  }).on('mousedown', function() {
+    console.log('scroll');
+    return textporting(tokens, svg.main, svg.textPort);
   });
 };
 
@@ -208,6 +224,8 @@ sceneSync = function() {
     svg.boxes[i].element.attr('x', svg.boxes[i].x1).attr('width', width).attr('y', svg.boxes[i].y1).attr('height', height);
     svg.boxes[i].text.attr('x', svg.boxes[i].x1 + width / 2).attr('y', svg.boxes[i].y1 + height / 2);
   }
+  svg.downButton.geometry.y = svg.main.attr('height') - svg.downButton.geometry.height - svg.downButton.geometry.paddingY;
+  svg.downButton.element.attr('x', (svg.main.attr('width') - svg.downButton.geometry.width) / 2).attr('width', svg.downButton.geometry.width).attr('y', svg.downButton.geometry.y).attr('height', svg.downButton.geometry.height);
   return svg.rightPane.redraw();
 };
 

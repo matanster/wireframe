@@ -177,6 +177,7 @@ sceneDefine = (categories) ->
   textPort()
   titlePort()
 
+  # font buttons
   svg.fontSize = svg.main.append("g")
 
   svg.fontDecreaseButton = svg.fontSize.append("svg:image")
@@ -194,6 +195,29 @@ sceneDefine = (categories) ->
     .on('mousedown', () -> 
       console.log('click font increase')
       textporting(tokens, svg.main, svg.textPort, 2)) 
+
+  # viewport down button 
+  svg.downButton = {}
+
+  svg.downButton.geometry = 
+    'width': 500
+    'height': 50
+    'paddingY': 15
+
+  svg.downButton.element = svg.main.append('svg:image')
+    .attr('xlink:href','images/downScroll4.svg')
+    .attr('preserveAspectRatio', 'none')
+    .on('mouseover', () -> 
+      console.log('hover')
+      svg.downButton.element.transition().duration(200).attr('y', svg.downButton.geometry.y + (svg.downButton.geometry.paddingY / 3)))
+    .on('mouseout', () -> 
+      console.log('hover')
+      svg.downButton.element.transition().duration(400).attr('y', svg.downButton.geometry.y))
+    .on('mousedown', () -> 
+      console.log('scroll')
+      textporting(tokens, svg.main, svg.textPort)) 
+
+
 
 ######################################################
 #
@@ -306,6 +330,14 @@ sceneSync = () ->
 
     svg.boxes[i].text.attr('x', svg.boxes[i].x1 + width / 2)  
                      .attr('y', svg.boxes[i].y1 + height / 2)
+
+  svg.downButton.geometry.y = svg.main.attr('height') - svg.downButton.geometry.height - svg.downButton.geometry.paddingY # stick near bottom
+
+  svg.downButton.element
+    .attr('x', (svg.main.attr('width') - svg.downButton.geometry.width) / 2) # center 
+    .attr('width', svg.downButton.geometry.width) 
+    .attr('y', svg.downButton.geometry.y)
+    .attr('height', svg.downButton.geometry.height)
 
   svg.rightPane.redraw()
 

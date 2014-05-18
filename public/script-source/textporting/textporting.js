@@ -6,7 +6,7 @@ fontSize = '36px';
 anchorSVG = void 0;
 
 module.exports = function(tokens, mainSVG, textPortSVG, fontSizeChange) {
-  var ButtonGeometry, downBUtton, fontFamily, lHeight, paddingX, paddingY, spaceWidth, textPort, token, tokenToViewable, tokenViewable, viewPortFull, x, y, _i, _len;
+  var fontFamily, lHeight, paddingX, paddingY, spaceWidth, textPort, token, tokenToViewable, tokenViewable, viewPortFull, x, y, _i, _len, _results;
   console.log('textPorting started');
   if (fontSizeChange != null) {
     fontSize = parseFloat(fontSize) + fontSizeChange + 'px';
@@ -41,6 +41,7 @@ module.exports = function(tokens, mainSVG, textPortSVG, fontSizeChange) {
   viewPortFull = false;
   x = 0;
   y = 0;
+  _results = [];
   for (_i = 0, _len = tokens.length; _i < _len; _i++) {
     token = tokens[_i];
     tokenViewable = tokenToViewable(token);
@@ -65,17 +66,10 @@ module.exports = function(tokens, mainSVG, textPortSVG, fontSizeChange) {
       }
     }
     if (x + spaceWidth < textPort.width) {
-      x += spaceWidth;
+      _results.push(x += spaceWidth);
+    } else {
+      _results.push(void 0);
     }
   }
-  downBUtton = anchorSVG.append('svg:image').attr('xlink:href', 'images/downScroll3.svg').attr('x', 400).attr('width', 500).attr('y', 400).attr('height', textPort.height - 40).on('mouseover', function() {
-    return console.log('hover');
-  }).on('mousedown', function() {
-    console.log('scroll');
-    return textporting(tokens, svg.main, svg.textPort);
-  });
-  return ButtonGeometry = {
-    'width': 848,
-    'height': 154
-  };
+  return _results;
 };
