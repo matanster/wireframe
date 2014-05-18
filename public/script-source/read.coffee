@@ -1,11 +1,16 @@
 util        = require './util'
 data        = require './data'
 tokenize    = require './tokenize'
-textporting = require './textporting/textporting'
+textporting = require './textporting'
+
+# Import global geometry
+globalDims = require './globalDims'
+svg    = globalDims.svg
+layout = globalDims.layout
+
 console.log 'read.js main started'
 
 # Globals
-svg = {}
 viewport = null
 tokens = undefined
 
@@ -101,7 +106,7 @@ sceneDefine = (categories) ->
                                 svg.textPortBoundary.attr('width', widthInitialBoundary - xDiff)
                                 layout.separator.right.x = event.clientX # to be corrected
                                 svg.textPort.attr('width', widthInitialText - xDiff)
-                                textporting(tokens, svg.main, svg.textPort)
+                                textporting(tokens)
                                 svg.rightPane.redraw()
                               window.onmouseup = (event) ->
                                 window.onmousemove = null
@@ -127,7 +132,7 @@ sceneDefine = (categories) ->
                                 xDiff = xInitial - event.changedTouches[0].clientX
                                 svg.textPortBoundary.attr('width', widthInitialBoundary - xDiff)
                                 svg.textPort.attr('width', widthInitialText - xDiff)
-                                textporting(tokens, svg.main, svg.textPort)
+                                textporting(tokens)
 
                               window.ontouchcancel = () ->
                                 window.ontouchmove = null
@@ -189,19 +194,19 @@ sceneDefine = (categories) ->
     .on('mouseover', () -> console.log('hover'))
     .on('mousedown', () -> 
       console.log('click font decrease')
-      textporting(tokens, svg.main, svg.textPort, -2))
+      textporting(tokens, -2))
   svg.fontIncreaseButton 
     .on('mouseover', () -> console.log('hover'))
     .on('mousedown', () -> 
       console.log('click font increase')
-      textporting(tokens, svg.main, svg.textPort, 2)) 
+      textporting(tokens, 2)) 
 
   # viewport down button 
   svg.downButton = {}
 
   svg.downButton.geometry = 
     'width': 500
-    'height': 50
+    'height': 40
     'paddingY': 15
 
   svg.downButton.element = svg.main.append('svg:image')
@@ -209,13 +214,13 @@ sceneDefine = (categories) ->
     .attr('preserveAspectRatio', 'none')
     .on('mouseover', () -> 
       console.log('hover')
-      svg.downButton.element.transition().duration(200).attr('y', svg.downButton.geometry.y + (svg.downButton.geometry.paddingY / 3)))
+      svg.downButton.element.transition().ease('bounce').duration(200).attr('y', svg.downButton.geometry.y + (svg.downButton.geometry.paddingY / 3)))
     .on('mouseout', () -> 
       console.log('hover')
       svg.downButton.element.transition().duration(400).attr('y', svg.downButton.geometry.y))
     .on('mousedown', () -> 
       console.log('scroll')
-      textporting(tokens, svg.main, svg.textPort)) 
+      textporting(tokens, 0, true)) 
 
 
 
@@ -277,7 +282,7 @@ sceneSync = () ->
            .attr("dominant-baseline", "central")
 
   # show text if source tokens already loaded
-  if tokens? then textporting(tokens, svg.main, svg.textPort)
+  if tokens? then textporting(tokens)
 
   #
   # taking care of font size buttons geometry - 
@@ -364,7 +369,6 @@ data.get('abstract', (response) ->
   console.log(response)
   tokens = tokenize(response)
   console.dir tokens
-
-  textporting(tokens, svg.main, svg.textPort)
+  textporting(tokens)
   )
 
