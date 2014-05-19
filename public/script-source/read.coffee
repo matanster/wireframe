@@ -99,15 +99,20 @@ sceneDefine = (categories) ->
                               xInitial = event.clientX
                               widthInitialBoundary = svg.textPortBoundary.attr('width')
                               widthInitialText = svg.textPort.attr('width')
+                              rightInitialSeparator = layout.separator.right.x
                               element = d3.select(this)
                               # monitor mouse movement till click is released
                               window.onmousemove = (event) ->
                                 xDiff = xInitial - event.clientX
+
+                                layout.separator.right.x = rightInitialSeparator - xDiff 
+
                                 svg.textPortBoundary.attr('width', widthInitialBoundary - xDiff)
-                                layout.separator.right.x = event.clientX # to be corrected
                                 svg.textPort.attr('width', widthInitialText - xDiff)
+
                                 textporting(tokens)
                                 svg.rightPane.redraw()
+                                svg.downButton.redraw()
                               window.onmouseup = (event) ->
                                 window.onmousemove = null
                                 event.target.style.cursor = "default"
@@ -205,19 +210,19 @@ sceneDefine = (categories) ->
   svg.downButton = {}
 
   svg.downButton.geometry = 
-    'width': 500
-    'height': 40
-    'paddingY': 15
+    'paddingY': 15,
+    'paddingX': 10, # to do: adjust per screen aspect ratio
+    'height': 35
 
   svg.downButton.element = svg.main.append('svg:image')
     .attr('xlink:href','images/downScroll4.svg')
     .attr('preserveAspectRatio', 'none')
     .on('mouseover', () -> 
       console.log('hover')
-      svg.downButton.element.transition().ease('bounce').duration(200).attr('y', svg.downButton.geometry.y + (svg.downButton.geometry.paddingY / 3)))
+      svg.downButton.element.transition().ease('sin').duration(200).attr('height', svg.downButton.geometry.height + (svg.downButton.geometry.paddingY *2/3)))
     .on('mouseout', () -> 
       console.log('hover')
-      svg.downButton.element.transition().duration(400).attr('y', svg.downButton.geometry.y))
+      svg.downButton.element.transition().duration(400).attr('height', svg.downButton.geometry.height))
     .on('mousedown', () -> 
       console.log('scroll')
       textporting(tokens, 0, true)) 
@@ -336,13 +341,20 @@ sceneSync = () ->
     svg.boxes[i].text.attr('x', svg.boxes[i].x1 + width / 2)  
                      .attr('y', svg.boxes[i].y1 + height / 2)
 
-  svg.downButton.geometry.y = svg.main.attr('height') - svg.downButton.geometry.height - svg.downButton.geometry.paddingY # stick near bottom
+  # draw down button
+  svg.downButton.redraw = () ->
+    svg.downButton.geometry.x = layout.separator.left.x + svg.downButton.geometry.paddingX
+    svg.downButton.geometry.width = layout.separator.right.x - layout.separator.left.x - (2 * svg.downButton.geometry.paddingX)
 
-  svg.downButton.element
-    .attr('x', (svg.main.attr('width') - svg.downButton.geometry.width) / 2) # center 
-    .attr('width', svg.downButton.geometry.width) 
-    .attr('y', svg.downButton.geometry.y)
-    .attr('height', svg.downButton.geometry.height)
+    svg.downButton.geometry.y = svg.main.attr('height') - svg.downButton.geometry.height - svg.downButton.geometry.paddingY # stick near bottom
+
+    svg.downButton.element
+      .attr('x', svg.downButton.geometry.x) # center 
+      .attr('width', svg.downButton.geometry.width) 
+      .attr('y', svg.downButton.geometry.y)
+      .attr('height', svg.downButton.geometry.height)
+
+  svg.downButton.redraw()
 
   svg.rightPane.redraw()
 

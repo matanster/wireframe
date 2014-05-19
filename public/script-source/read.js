@@ -80,20 +80,22 @@ sceneDefine = function(categories) {
     }).on('mouseout', function() {
       return this.style.cursor = "default";
     }).on('mousedown', function() {
-      var element, widthInitialBoundary, widthInitialText, xInitial;
+      var element, rightInitialSeparator, widthInitialBoundary, widthInitialText, xInitial;
       this.style.cursor = "ew-resize";
       xInitial = event.clientX;
       widthInitialBoundary = svg.textPortBoundary.attr('width');
       widthInitialText = svg.textPort.attr('width');
+      rightInitialSeparator = layout.separator.right.x;
       element = d3.select(this);
       window.onmousemove = function(event) {
         var xDiff;
         xDiff = xInitial - event.clientX;
+        layout.separator.right.x = rightInitialSeparator - xDiff;
         svg.textPortBoundary.attr('width', widthInitialBoundary - xDiff);
-        layout.separator.right.x = event.clientX;
         svg.textPort.attr('width', widthInitialText - xDiff);
         textporting(tokens);
-        return svg.rightPane.redraw();
+        svg.rightPane.redraw();
+        return svg.downButton.redraw();
       };
       window.onmouseup = function(event) {
         window.onmousemove = null;
@@ -163,16 +165,16 @@ sceneDefine = function(categories) {
   });
   svg.downButton = {};
   svg.downButton.geometry = {
-    'width': 500,
-    'height': 40,
-    'paddingY': 15
+    'paddingY': 15,
+    'paddingX': 10,
+    'height': 35
   };
   return svg.downButton.element = svg.main.append('svg:image').attr('xlink:href', 'images/downScroll4.svg').attr('preserveAspectRatio', 'none').on('mouseover', function() {
     console.log('hover');
-    return svg.downButton.element.transition().ease('bounce').duration(200).attr('y', svg.downButton.geometry.y + (svg.downButton.geometry.paddingY / 3));
+    return svg.downButton.element.transition().ease('sin').duration(200).attr('height', svg.downButton.geometry.height + (svg.downButton.geometry.paddingY * 2 / 3));
   }).on('mouseout', function() {
     console.log('hover');
-    return svg.downButton.element.transition().duration(400).attr('y', svg.downButton.geometry.y);
+    return svg.downButton.element.transition().duration(400).attr('height', svg.downButton.geometry.height);
   }).on('mousedown', function() {
     console.log('scroll');
     return textporting(tokens, 0, true);
@@ -228,8 +230,13 @@ sceneSync = function() {
     svg.boxes[i].element.attr('x', svg.boxes[i].x1).attr('width', width).attr('y', svg.boxes[i].y1).attr('height', height);
     svg.boxes[i].text.attr('x', svg.boxes[i].x1 + width / 2).attr('y', svg.boxes[i].y1 + height / 2);
   }
-  svg.downButton.geometry.y = svg.main.attr('height') - svg.downButton.geometry.height - svg.downButton.geometry.paddingY;
-  svg.downButton.element.attr('x', (svg.main.attr('width') - svg.downButton.geometry.width) / 2).attr('width', svg.downButton.geometry.width).attr('y', svg.downButton.geometry.y).attr('height', svg.downButton.geometry.height);
+  svg.downButton.redraw = function() {
+    svg.downButton.geometry.x = layout.separator.left.x + svg.downButton.geometry.paddingX;
+    svg.downButton.geometry.width = layout.separator.right.x - layout.separator.left.x - (2 * svg.downButton.geometry.paddingX);
+    svg.downButton.geometry.y = svg.main.attr('height') - svg.downButton.geometry.height - svg.downButton.geometry.paddingY;
+    return svg.downButton.element.attr('x', svg.downButton.geometry.x).attr('width', svg.downButton.geometry.width).attr('y', svg.downButton.geometry.y).attr('height', svg.downButton.geometry.height);
+  };
+  svg.downButton.redraw();
   return svg.rightPane.redraw();
 };
 

@@ -51,10 +51,10 @@ module.exports = function(tokens, fontSizeChange, scroll) {
     console.log(token.mark);
     switch (token.mark) {
       case 1:
-        tokenViewable.svg.style('fill', 'rgb(100,200,200)');
+        tokenViewable.svg.style('fill', 'rgb(120,240,240)');
         break;
       case 2:
-        tokenViewable.svg.style('fill', 'rgb(120,240,240)');
+        tokenViewable.svg.style('fill', 'rgb(100,200,200)');
         break;
     }
     if (x + tokenViewable.width < textPortInnerSVG.attr('width')) {

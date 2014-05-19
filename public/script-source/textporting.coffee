@@ -85,11 +85,11 @@ module.exports = (tokens, fontSizeChange, scroll) ->
     #
     switch token.mark
       when 1
-        tokenViewable.svg.style('fill', 'rgb(100,200,200)')
+        tokenViewable.svg.style('fill', 'rgb(120,240,240)')
         break
       when 2
         #tokenViewable.svg.style('fill', 'rgb(70,140,140)')
-        tokenViewable.svg.style('fill', 'rgb(120,240,240)')
+        tokenViewable.svg.style('fill', 'rgb(100,200,200)')
         break
 
     if x + tokenViewable.width < textPortInnerSVG.attr('width')
