@@ -1,3 +1,23 @@
 {"type": "TOC with links",
- "entries": [[text, level, hyperlink]]
+ "entries": [
+              [1, "Abstract & Intorudction"],
+              [1, "RBT, Human Capital, and Performance"],
+              [1, "Contingencies Surrounding the Human Capital–Performance Relationship"],
+              [2, "Path Dependence and Longitudinal Relationships"],
+              [2, "Path Dependency, Imperfect Strategic Factor Markets, and Firm-Specific Human Capital"],
+              [2, "Appropriability and the Choice of Dependent Variable"],
+              [1, "Method"],
+              [2, "Sample"],              
+              [2, "Meta-Analytic Procedures"],              
+              [1, "Results"],              
+              [2, "Post Hoc Robustness Tests"],              
+              [1, "Discussion"],              
+              [2, "Implications of Main Effects"],              
+              [2, "Implications of Resource-Based Moderators for Study Design Decisions"],              
+              [3, "Path dependency and longitudinal designs"],              
+              [3, "Imperfect strategic factor markets and firm-specific human capital"],              
+              [3, "Appropriability and the choice of dependent variable"],              
+              [3, "Implications of post hoc test results"],              
+              [2, "Conclusion"]           
+ ]
 }

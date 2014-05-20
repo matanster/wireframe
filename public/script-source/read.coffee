@@ -2,6 +2,8 @@ util        = require './util'
 data        = require './data'
 tokenize    = require './tokenize'
 textporting = require './textporting'
+textDraw    = require './textDraw'
+svgUtil     = require './svgUtil'
 
 # Import global geometry
 globalDims = require './globalDims'
@@ -12,6 +14,7 @@ console.log 'read.js main started'
 
 # Globals
 viewport = null
+states = {}
 tokens = undefined
 
 calcStart = () -> 90
@@ -20,7 +23,11 @@ calcEnd   = () -> 90
 layout =
   'separator':
     'left':
-      'x': 300
+      'x':
+        'current': 300
+
+layout.separator.left.x.revertsTo = layout.separator.left.x.current
+layout.separator.top = {}
 
 totalH = null
 boxH   = null
@@ -78,7 +85,8 @@ sceneDefine = (categories) ->
   
   textPort = () ->
 
-    svg.textPortBoundary = svg.main.append('rect')
+    svg.textPortBoundary = {}
+    svg.textPortBoundary.element = svg.main.append('rect')
                            .style('stroke', '#999999')
                            .style('fill', '#999999')   
 
@@ -97,8 +105,8 @@ sceneDefine = (categories) ->
                               #console.log('click')
                               this.style.cursor = "ew-resize"
                               xInitial = event.clientX
-                              widthInitialBoundary = svg.textPortBoundary.attr('width')
-                              widthInitialText = svg.textPort.attr('width')
+                              widthInitialBoundary = svg.textPortBoundary.element.attr('width')
+                              widthInitialText = svg.textPort.element.attr('width')
                               rightInitialSeparator = layout.separator.right.x
                               element = d3.select(this)
                               # monitor mouse movement till click is released
@@ -107,8 +115,11 @@ sceneDefine = (categories) ->
 
                                 layout.separator.right.x = rightInitialSeparator - xDiff 
 
-                                svg.textPortBoundary.attr('width', widthInitialBoundary - xDiff)
-                                svg.textPort.attr('width', widthInitialText - xDiff)
+                                layout.separator.right.y = rightInitialSeparator - xDiff 
+
+
+                                svg.textPortBoundary.element.attr('width', widthInitialBoundary - xDiff)
+                                svg.textPort.element.attr('width', widthInitialText - xDiff)
 
                                 textporting(tokens)
                                 svg.rightPane.redraw()
@@ -130,13 +141,13 @@ sceneDefine = (categories) ->
                               element = d3.select(this)
                               element.transition().duration(900).style('stroke', '#FFEEBB')
                               xInitial = event.changedTouches[0].clientX
-                              widthInitialBoundary = svg.textPortBoundary.attr('width')
-                              widthInitialText = svg.textPort.attr('width')
+                              widthInitialBoundary = svg.textPortBoundary.element.attr('width')
+                              widthInitialText = svg.textPort.element.attr('width')
 
                               window.ontouchmove = (event) -> 
                                 xDiff = xInitial - event.changedTouches[0].clientX
-                                svg.textPortBoundary.attr('width', widthInitialBoundary - xDiff)
-                                svg.textPort.attr('width', widthInitialText - xDiff)
+                                svg.textPortBoundary.element.attr('width', widthInitialBoundary - xDiff)
+                                svg.textPort.element.attr('width', widthInitialText - xDiff)
                                 textporting(tokens)
 
                               window.ontouchcancel = () ->
@@ -154,7 +165,8 @@ sceneDefine = (categories) ->
                                 #window.alert 'touch end')
                               )
     
-    svg.textPort = svg.main.append('rect')
+    svg.textPort = {}
+    svg.textPort.element = svg.main.append('rect')
                            .style('stroke', '#222222')
                            .style('fill', '#222222')   
 
@@ -166,7 +178,7 @@ sceneDefine = (categories) ->
     svg.title = svg.main.append('text').text("Something Something Something")
                                        .style("text-anchor", "middle")
 
-  rightPane = () ->
+  rightPane = ->
     svg.rightPane = {}
     svg.rightPane.element = svg.main.append('rect')
                                     .style('fill', '#ccccff')
@@ -174,12 +186,52 @@ sceneDefine = (categories) ->
                                     .style('stroke', '#bbbbee')
                                     .style('fill-opacity', '1')
 
-    svg.rightPane.redraw = () ->
-      svg.rightPane.element.attr('x', layout.separator.right.x)
-                   .attr('width', viewport.width - (layout.separator.right.x - layout.separator.left.x))
-                   .attr('y', layout.start.y)
-                   .attr('height', totalH)
-                                  
+    svg.rightPane.geometry = {}
+    svg.rightPane.geometry = 
+      'hoverIgnoreAreaX': 30, # need to adjust to Y value, per screen aspect ratio
+      'hoverIgnoreAreaY': 30  # need to adjust to X value, per screen aspect ratio
+                                    
+    svg.rightPane.element.on('mouseover', () ->
+
+      svg.rightPane.element.on('mousemove', () -> # to do: replace with a more circular area of tolerance
+        if event.x > layout.separator.right.x + svg.rightPane.geometry.hoverIgnoreAreaX
+          if event.y > layout.separator.top.y + svg.rightPane.geometry.hoverIgnoreAreaY and
+             event.y < viewport.height - svg.rightPane.geometry.hoverIgnoreAreaY 
+
+#            unless zoneEntry?
+#              zoneEntry = new Date().getMilliseconds() # todo: switch to performance.now() if supported on all applicable browsers 
+#            else 
+#              now = new Date().getMilliseconds()
+#              if now - zoneEntry > 1000 # 1 second within activation zone
+
+            #console.log new Date().getMilliseconds() - hoverStart # > 1500 # 1.5 seconds
+
+            svg.rightPane.element.on('mousemove', null)
+            svg.rightPane.mode = 'animate'
+            svg.textPortBoundary.mode = 'animate'
+            svg.textPort.mode = 'animate'
+            layout.separator.right.x = viewport.width - svg.TOC.geometry.width
+            states.showTOC = 'in progress'
+            sceneSync('animate')
+            #svg.rightPane.element.transition().duration(300).attr('x', layout.separator.right.x)
+            #svg.rightPane.element.transition().duration(300).attr('width', svg.TOC.geometry.width)
+        )
+      )
+
+    svg.rightPane.redraw = ->
+
+      console.log 'right pane redraw'
+
+      if states.showTOC is 'in progress'
+        svg.rightPane.geometry.width = svg.TOC.geometry.width
+      else 
+        svg.rightPane.geometry.width = viewport.width - (layout.separator.right.x - layout.separator.left.x.current)
+
+      svg.rightPane.geometry.x = layout.separator.right.x
+      svg.rightPane.geometry.y = layout.separator.top.y
+      svg.rightPane.geometry.height = totalH
+
+      svgUtil.sync(svg.rightPane)
 
   main()
   boxBlock(categories)
@@ -234,44 +286,55 @@ sceneDefine = (categories) ->
 # Keep everything harmonized with the viewport size
 #
 ######################################################
-sceneSync = () ->
+sceneSync = (mode) ->
 
   viewport = util.getViewport()
   console.dir viewport
 
-  layout.start = { 'y' : calcStart()}
+  layout.separator.top = { 'y' : calcStart()}
   end   = 0 # calcEnd()
 
-  totalH = viewport.height - layout.start.y - end
+  totalH = viewport.height - layout.separator.top.y - end
   boxH = totalH / svg.boxes.length
 
   # draw main svg
   svg.main.attr('width', viewport.width)
           .attr('height', viewport.height)
 
-  layout.separator.right = { 'x': viewport.width - layout.separator.left.x }
+  unless layout.separator.right?
+    layout.separator.right = { 'x': viewport.width - layout.separator.left.x.current } # initial value only
+
 
   # draw text port
-  svg.textPortBoundary.attr('x', layout.separator.left.x)
-              .attr('width', layout.separator.right.x - layout.separator.left.x)
-              .attr('height', totalH)
-              .attr('y', layout.start.y + 5)
-              .style('stroke-width', '25px')
-              #.attr('rx', 10)
-              #.attr('rx', 10)
 
-  svg.textPort.attr('x', layout.separator.left.x + 5)
-              .attr('width', layout.separator.right.x - layout.separator.left.x - 10)
-              .attr('height', totalH) # this is a hack - it ends below viewport bottom, otherwise curved edge shows
-              .attr('y', layout.start.y + 5 + 10)
-              .style('stroke-width', '15px')
-              .attr('rx', 10)
-              .attr('rx', 10)
+  svg.textPortBoundary.geometry = 
+    'x':            layout.separator.left.x.current,
+    'width':        layout.separator.right.x - layout.separator.left.x.current,
+    'y':            layout.separator.top.y + 5,
+    'height':       totalH
 
+  svg.textPortBoundary.style = 
+    'stroke-width': '25px'
+
+  svgUtil.sync(svg.textPortBoundary)
+
+  svg.textPort.geometry = 
+              'x'      : layout.separator.left.x.current + 5,
+              'width'  : layout.separator.right.x - layout.separator.left.x.current - 10,
+              'height' : totalH, # this is a hack - it ends below viewport bottom, otherwise curved edge shows
+              'y'      : layout.separator.top.y + 5 + 10,
+              'rx'     : 10,
+              'rx'     : 10
+  svg.textPort.style = 
+    'stroke-width': '15px'
+
+  svgUtil.sync(svg.textPort)
+  console.log svg.textPort.element.attr('width')
+  console.log svg.textPort.geometry.width
 
   # draw title port 
   svg.titlePort.attr('width', viewport.width - 5 - 5)
-               .attr('height', layout.start.y - 5 - 5)
+               .attr('height', layout.separator.top.y - 5 - 5)
                .attr('x', 5)
                .attr('y', 5)
                .style('stroke-width', '7px')
@@ -279,7 +342,7 @@ sceneSync = () ->
                .attr('rx', 10)              
 
   svg.title.attr('x', viewport.width / 2)
-           .attr('y', layout.start.y / 2)
+           .attr('y', layout.separator.top.y / 2)
            .style('fill', "#999999")
            .style('font-family', 'Helvetica')
            .style("font-weight", "bold")
@@ -287,7 +350,24 @@ sceneSync = () ->
            .attr("dominant-baseline", "central")
 
   # show text if source tokens already loaded
-  if tokens? then textporting(tokens)
+  console.log 'before textporting from scenesync'
+  if tokens? 
+    #console.log mode
+    switch mode
+      when 'animate' 
+        console.log 'in animate'
+        update = 0
+        autoUpdate = setInterval((()-> 
+          textporting(tokens)
+          if update > 8 then setTimeout(window.clearInterval(autoUpdate), 400)
+          update += 1
+        ), 50)  
+      else
+        console.log 'without animate'
+        textporting(tokens)
+
+    
+  
 
   #
   # taking care of font size buttons geometry - 
@@ -302,12 +382,12 @@ sceneSync = () ->
     'height': 624 * 0.08  # source image pixel height * scaling factor
   svg.fontDecreaseButton
     .attr('x', viewport.width - (fontButtonGeometry.width * 2) - 7)
-    .attr('y', layout.start.y - (fontButtonGeometry.height) - 7)
+    .attr('y', layout.separator.top.y - (fontButtonGeometry.height) - 7)
     .attr('width', fontButtonGeometry.width)
     .attr('height', fontButtonGeometry.height)
   svg.fontIncreaseButton
     .attr('x', viewport.width - (fontButtonGeometry.width) - 7 - 1)
-    .attr('y', layout.start.y - (fontButtonGeometry.height) - 7)
+    .attr('y', layout.separator.top.y - (fontButtonGeometry.height) - 7)
     .attr('width', fontButtonGeometry.width)
     .attr('height', fontButtonGeometry.height)
 
@@ -315,12 +395,12 @@ sceneSync = () ->
   for i in [0..svg.boxes.length-1]
 
     svg.boxes[i].x1 = 0
-    svg.boxes[i].y1 = layout.start.y + Math.floor(boxH * i) - 0.5
-    svg.boxes[i].x2 = layout.separator.left.x
+    svg.boxes[i].y1 = layout.separator.top.y + Math.floor(boxH * i) - 0.5
+    svg.boxes[i].x2 = layout.separator.left.x.current
     if i is svg.boxes.length-1 # occupy last pixel
-      svg.boxes[i].y2 = layout.start.y + totalH + 0.5    
+      svg.boxes[i].y2 = layout.separator.top.y + totalH + 0.5    
     else # leave last pixel to next box
-      svg.boxes[i].y2 = layout.start.y + Math.floor((boxH * (i+1))) - 0.5
+      svg.boxes[i].y2 = layout.separator.top.y + Math.floor((boxH * (i+1))) - 0.5
 
     width =  util.calcLength(svg.boxes[i].x1, svg.boxes[i].x2)
     height = util.calcLength(svg.boxes[i].y1, svg.boxes[i].y2)    
@@ -343,8 +423,8 @@ sceneSync = () ->
 
   # draw down button
   svg.downButton.redraw = () ->
-    svg.downButton.geometry.x = layout.separator.left.x + svg.downButton.geometry.paddingX
-    svg.downButton.geometry.width = layout.separator.right.x - layout.separator.left.x - (2 * svg.downButton.geometry.paddingX)
+    svg.downButton.geometry.x = layout.separator.left.x.current + svg.downButton.geometry.paddingX
+    svg.downButton.geometry.width = layout.separator.right.x - layout.separator.left.x.current - (2 * svg.downButton.geometry.paddingX)
 
     svg.downButton.geometry.y = svg.main.attr('height') - svg.downButton.geometry.height - svg.downButton.geometry.paddingY # stick near bottom
 
@@ -360,7 +440,7 @@ sceneSync = () ->
 
     
 syncInit = () ->
-  sceneSync()                          # initial sync
+  sceneSync()  # initial sync
   window.onresize = () -> sceneSync()  # keep sync forever
 
 ##################
@@ -374,7 +454,7 @@ data.get('categories', (response) ->
   sceneDefine(categories.names)
   syncInit()
   document.body.style.cursor = "default" # needed because of https://code.google.com/p/chromium/issues/detail?id=3a69986&thanks=369986&ts=1399291013
-  )
+)
 
 data.get('abstract', (response) -> 
   
@@ -382,5 +462,33 @@ data.get('abstract', (response) ->
   tokens = tokenize(response)
   console.dir tokens
   textporting(tokens)
-  )
+)
 
+data.get('TOC', (response) -> 
+  console.log(response)
+  rawTOC = JSON.parse(response)
+  console.dir rawTOC
+
+  fontSize  = '14px' # temporarily
+  fontFamily = 'Helvetica' # for now
+
+  TOC = {}
+  TOC.element = svg.main.append('g')
+                         .style('text-anchor', 'start')
+                         .style('fill', 'rgb(255,255,220)')                                                                                                                                            
+                         .style('font-family',fontFamily)
+                         .style('font-size',fontSize)
+
+  TOCTokens = []
+  maxLen = 0
+  for rawToken in rawTOC.entries
+    token =
+      'level': rawToken[0]  # per current structure of dummy data file
+      'text':  rawToken[1]  # per current structure of dummy data file
+    tokenViewable = textDraw.tokenToViewable(token.text, TOC.element)
+    if tokenViewable.width > maxLen then maxLen = tokenViewable.width
+    TOCTokens.push token
+
+  TOC.geometry = {'width': maxLen}
+  svg.TOC = TOC
+)

@@ -3,14 +3,15 @@ globalDims = require './globalDims'
 svg    = globalDims.svg
 layout = globalDims.layout
 
+textDraw = require './textDraw'
+
 # module static variables
 fontSize  = '36px' # temporarily
 fontFamily = 'Helvetica' # for now
-textPortInnerSVG = undefined # module static
 
-module.exports = (tokens, fontSizeChange, scroll) ->
+module.exports = (tokens, fontSizeChange, scroll, mode) ->
   
-  console.log 'textPorting started'
+  console.log 'textPorting started ' + '(mode ' + mode + ')'
 
   if fontSizeChange?
     fontSize = parseFloat(fontSize) + fontSizeChange + 'px'
@@ -19,104 +20,85 @@ module.exports = (tokens, fontSizeChange, scroll) ->
   # Create or reset an SVG element to host the text inside the text port,
   # passing it on as a closures
   #
-  if textPortInnerSVG? # discard existing text if already drawn
-    textPortInnerSVG.remove()
 
-  textPortInnerSVG = svg.main.append('svg')
-                            .style('text-anchor', 'start')
-                            .style('fill', 'rgb(255,255,220)')                                                                                                                                            
-                            .style('font-family',fontFamily)
-                            .style('font-size',fontSize)
+  if svg.textPortInnerSVG? # discard existing text if already drawn
+    svg.textPortInnerSVG.element.remove()
 
-  visibleGroup = textPortInnerSVG.append('g')
+  svg.textPortInnerSVG = {}
+  svg.textPortInnerSVG.element = svg.main.append('svg')
 
-  #
-  # return svg text element text for an input token, 
-  # along with its dimensions through having drawn it invisibly
-  #
-  tokenToViewable = (token) ->
+  svg.textPortInnerSVG.subElement = svg.textPortInnerSVG.element.append('g')
+                                 .style('text-anchor', 'start')
+                                 .style('fill', 'rgb(255,255,220)')                                                                                                                                            
+                                 .style('font-family',fontFamily)
+                                 .style('font-size',fontSize)
 
-    visualToken = {}
-    svgText = visibleGroup.append('text') # draw the text invisibly, to get its dimensions
-                          .attr('y', -500)
-                          .attr('x', -500)
-                          .style("dominant-baseline", "hanging")
-    
-    svgText.text(token)
-    #width  = svg.node().getComputedTextLength() 
-    width  = svgText.node().getBBox().width
-    height = svgText.node().getBBox().height
-    #console.log visualToken.node().getBBox() 
-    
-    # return viewable properties as a token
-    visualToken.svg    = svgText
-    visualToken.height = height
-    visualToken.width  = width
-    #console.dir visualToken
-    return visualToken
-
-  
   # get the width of a space character
-  spaceWidth = tokenToViewable('a a').width - tokenToViewable('aa').width
+  spaceWidth = textDraw.tokenToViewable('a a', svg.textPortInnerSVG.subElement).width - textDraw.tokenToViewable('aa', svg.textPortInnerSVG.subElement).width
   # get the maximum character height in the font
-  lHeight    = tokenToViewable('l').height
+  lHeight    = textDraw.tokenToViewable('l', svg.textPortInnerSVG.subElement).height
 
   paddingX = 10
   paddingY = 10
 
-  textPortInnerSVG
-    .attr('x',      parseFloat(svg.textPort.attr('x')) + paddingX)
-    .attr('width',  parseFloat svg.textPort.attr('width')  - (paddingX * 2))
-    .attr('y',      parseFloat(svg.textPort.attr('y')) + paddingY)
-    .attr('height', parseFloat svg.textPort.attr('height') - (paddingY * 2) - 50)
+  console.log svg.textPort.element.attr('width')  - (paddingX * 2)
+  svg.textPortInnerSVG.element
+    .attr('x',      parseFloat(svg.textPort.element.attr('x')) + paddingX)
+    .attr('width',  parseFloat svg.textPort.element.attr('width')  - (paddingX * 2))
+    .attr('y',      parseFloat(svg.textPort.element.attr('y')) + paddingY)
+    .attr('height', parseFloat svg.textPort.element.attr('height') - (paddingY * 2) - 50)
 
-  #
-  # redraw text
-  #
-  viewPortFull = false
-  x = 0
-  y = 0
-  for token in tokens
-
-    tokenViewable = tokenToViewable(token.text)
-    console.log token.mark
+  redraw = () ->
     #
-    # Apply word semantic styling
+    # redraw text
     #
-    switch token.mark
-      when 1
-        tokenViewable.svg.style('fill', 'rgb(120,240,240)')
-        break
-      when 2
-        #tokenViewable.svg.style('fill', 'rgb(70,140,140)')
-        tokenViewable.svg.style('fill', 'rgb(100,200,200)')
-        break
+    viewPortFull = false
+    x = 0
+    y = 0
+    for token in tokens
 
-    if x + tokenViewable.width < textPortInnerSVG.attr('width')
-      #console.log 'adding to line'
-      tokenViewable.svg.attr('x', x)
-      tokenViewable.svg.attr('y', y)
-      x += tokenViewable.width
-    else  
-      if y + tokenViewable.height + lHeight < textPortInnerSVG.attr('height')
-        #console.log 'adding to new line'
-        x = 0
-        y += tokenViewable.height
+      tokenViewable = textDraw.tokenToViewable(token.text, svg.textPortInnerSVG.subElement)
+      #console.log token.mark
+      
+      #
+      # Apply word semantic styling
+      #
+      switch token.mark
+        when 1
+          tokenViewable.svg.style('fill', 'rgb(120,240,240)')
+          break
+        when 2
+          #tokenViewable.svg.style('fill', 'rgb(70,140,140)')
+          tokenViewable.svg.style('fill', 'rgb(100,200,200)')
+          break
+
+      if x + tokenViewable.width < svg.textPortInnerSVG.element.attr('width')
+        #console.log 'adding to line'
         tokenViewable.svg.attr('x', x)
         tokenViewable.svg.attr('y', y)
-        x += tokenViewable.width  
-        #console.log y  
-        #console.dir textPort  
-      else
-        console.log 'text port full'
-        viewPortFull = true
-        break
+        x += tokenViewable.width
+      else  
+        if y + tokenViewable.height + lHeight < svg.textPortInnerSVG.element.attr('height')
+          #console.log 'adding to new line'
+          x = 0
+          y += tokenViewable.height
+          tokenViewable.svg.attr('x', x)
+          tokenViewable.svg.attr('y', y)
+          x += tokenViewable.width  
+          #console.log y  
+          #console.dir textPort  
+        else
+          console.log 'text port full'
+          viewPortFull = true
+          break
+      
+      # add word space unless end of line
+      if x + spaceWidth < svg.textPortInnerSVG.element.attr('width')
+        x += spaceWidth
+        #console.log "x after space adding = " + x
     
-    # add word space unless end of line
-    if x + spaceWidth < textPortInnerSVG.attr('width')
-      x += spaceWidth
-      #console.log "x after space adding = " + x
-  
+  redraw()  
+
   #
   # Scroll the text - to do:
   # 
@@ -126,5 +108,5 @@ module.exports = (tokens, fontSizeChange, scroll) ->
   # Add Up button after initial scroll
   #
   #if scroll?
-  #  visibleGroup.transition().duration(...)
+  #  svg.textPortInnerSVG.subElement.transition().duration(...)
  
