@@ -25,6 +25,11 @@ module.exports = (tokens, fontSizeChange, scroll, mode) ->
     svg.textPortInnerSVG.element.remove()
 
   svg.textPortInnerSVG = {}
+
+  #
+  # Create top SVG for all this, for easy relative positioning,
+  # and a 'g' element to afford treating the whole bunch as one group
+  #
   svg.textPortInnerSVG.element = svg.main.append('svg')
 
   svg.textPortInnerSVG.subElement = svg.textPortInnerSVG.element.append('g')
@@ -34,7 +39,9 @@ module.exports = (tokens, fontSizeChange, scroll, mode) ->
                                  .style('font-size',fontSize)
 
   # get the width of a space character
-  spaceWidth = textDraw.tokenToViewable('a a', svg.textPortInnerSVG.subElement).width - textDraw.tokenToViewable('aa', svg.textPortInnerSVG.subElement).width
+  spaceWidth = textDraw.tokenToViewable('a a', svg.textPortInnerSVG.subElement).width - 
+               textDraw.tokenToViewable('aa', svg.textPortInnerSVG.subElement).width
+  spaceWidth *= 1.4  # to make it more spacious akin to line justified text spacing 
   # get the maximum character height in the font
   lHeight    = textDraw.tokenToViewable('l', svg.textPortInnerSVG.subElement).height
 

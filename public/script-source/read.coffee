@@ -12,10 +12,15 @@ layout = globalDims.layout
 
 console.log 'read.js main started'
 
+firstEntry = true
+
 # Globals
-viewport = null
-states = {}
-tokens = undefined
+viewport  = null
+states    = {}
+
+tokens    = undefined
+TOCTokens = []
+categories = undefined
 
 calcStart = () -> 90
 calcEnd   = () -> 90
@@ -44,6 +49,38 @@ sceneDefine = (categories) ->
   main = () ->
     svg.main = d3.select('body').append('svg').style('background-color', '#999999')   
 
+  TOC = () -> 
+
+    svg.TOC = {} 
+
+    fontSize  = '14px' # temporarily
+    fontFamily = 'verdana' # for now
+    svg.TOC.element = svg.main.append('svg')
+                        
+    svg.TOC.subElement = svg.TOC.element.append('g')
+                                 .style('text-anchor', 'start')
+                                 .style('fill', 'rgb(50,50,240)')                                                                                                                                            
+                                 .style('font-family',fontFamily)
+                                 .style('font-size',fontSize)
+
+
+    # derive tokens we can work with, and and get ready to display them 
+    # (create svg elements, get needed overall width)
+    maxLen = 0
+    for token in TOCTokens 
+      tokenViewable = textDraw.tokenToViewable(token.text, svg.TOC.element)
+      if tokenViewable.width > maxLen 
+        maxLen = tokenViewable.width
+  
+    #
+    # set geometry
+    #
+    svg.TOC.geometry = 
+      paddingX : 30  # to do: make adaptive
+      
+    svg.TOC.geometry.width = maxLen + (2 * svg.TOC.geometry.paddingX)   
+
+
   boxBlock = (categories) ->
 
     console.log categories
@@ -71,7 +108,7 @@ sceneDefine = (categories) ->
       text = categoryBox.append('text').text(categories[box])
                                        .style("text-anchor", "middle")
                                        .attr("dominant-baseline", "central")
-                                       .style("font-family", "Helvetica")
+                                       .style("font-family", "verdana")
                                        .style("font-weight", "bold")
                                        .style('fill', '#EEEEEE')                                                                                                               
 
@@ -130,7 +167,7 @@ sceneDefine = (categories) ->
                                 element.transition().duration(500).style('stroke', '#999999')
                                 #console.log 'mouse up'
 
-                              element.transition().duration(300).style('stroke', '#FFEEBB')
+                              element.transition().duration(300).style('stroke', '#2F72FF') #FFEEBB
                               return
                               ) 
                             # To be merged with the mouse interaction code for the same.
@@ -172,18 +209,20 @@ sceneDefine = (categories) ->
 
   titlePort = () ->
     svg.titlePort = svg.main.append('rect')
-                            #.style('stroke', '#999999')
-                            .style('fill', '#FFEEBB')   
+                            .style('fill', '#2F72FF')   
 
-    svg.title = svg.main.append('text').text("Something Something Something")
+    svg.title = svg.main.append('text').text("Something Something Something Title")
                                        .style("text-anchor", "middle")
+                                       .style('fill', "#eeeeee")
+
 
   rightPane = ->
     svg.rightPane = {}
     svg.rightPane.element = svg.main.append('rect')
-                                    .style('fill', '#ccccff')
-                                    .style('stroke-width', '1px')
-                                    .style('stroke', '#bbbbee')
+                                    #.style('fill', '#ccccff')
+                                    .style('fill', '#888888')
+                                    #.style('stroke-width', '1px')
+                                    #.style('stroke', '#bbbbee')
                                     .style('fill-opacity', '1')
 
     svg.rightPane.geometry = {}
@@ -231,13 +270,17 @@ sceneDefine = (categories) ->
       svg.rightPane.geometry.y = layout.separator.top.y
       svg.rightPane.geometry.height = totalH
 
-      svgUtil.sync(svg.rightPane)
+      if states.showTOC is 'in progress'
+        svgUtil.sync(svg.rightPane, svg.TOC.redraw)
+      else
+        svgUtil.sync(svg.rightPane)
 
   main()
   boxBlock(categories)
   rightPane()
   textPort()
   titlePort()
+  TOC()
 
   # font buttons
   svg.fontSize = svg.main.append("g")
@@ -295,7 +338,6 @@ sceneSync = (mode) ->
   end   = 0 # calcEnd()
 
   totalH = viewport.height - layout.separator.top.y - end
-  boxH = totalH / svg.boxes.length
 
   # draw main svg
   svg.main.attr('width', viewport.width)
@@ -342,19 +384,30 @@ sceneSync = (mode) ->
                .attr('rx', 10)              
 
   svg.title.attr('x', viewport.width / 2)
-           .attr('y', layout.separator.top.y / 2)
-           .style('fill', "#999999")
+           .attr('y', 0)
            .style('font-family', 'Helvetica')
            .style("font-weight", "bold")
-           .attr("font-size", "25px")
+           .attr("font-size", "30px")
            .attr("dominant-baseline", "central")
+
+  if firstEntry
+    svg.title.transition().duration(1000).ease('bounce')
+                                        .attr('x', viewport.width / 2)
+                                        .attr('y', layout.separator.top.y / 2)
+  else 
+    svg.title
+       .attr('x', viewport.width / 2)
+       .attr('y', layout.separator.top.y / 2)
+
+  firstEntry = false
 
   # show text if source tokens already loaded
   console.log 'before textporting from scenesync'
   if tokens? 
     #console.log mode
     switch mode
-      when 'animate' 
+      when 'animate' # redraw every small interval, while the d3 transition for the right pane is in progress. 
+                     # to do: this can be interleaved in the code more gracefully
         console.log 'in animate'
         update = 0
         autoUpdate = setInterval((()-> 
@@ -392,15 +445,25 @@ sceneSync = (mode) ->
     .attr('height', fontButtonGeometry.height)
 
   # calculate for boxes
+
+  boxH = (totalH / 2) / (svg.boxes.length - 1)
+
   for i in [0..svg.boxes.length-1]
 
     svg.boxes[i].x1 = 0
-    svg.boxes[i].y1 = layout.separator.top.y + Math.floor(boxH * i) - 0.5
-    svg.boxes[i].x2 = layout.separator.left.x.current
-    if i is svg.boxes.length-1 # occupy last pixel
-      svg.boxes[i].y2 = layout.separator.top.y + totalH + 0.5    
-    else # leave last pixel to next box
-      svg.boxes[i].y2 = layout.separator.top.y + Math.floor((boxH * (i+1))) - 0.5
+    svg.boxes[i].x2 = layout.separator.left.x.current    
+
+    if i is 0
+      svg.boxes[i].y1 = layout.separator.top.y - 0.5
+      svg.boxes[i].y2 = layout.separator.top.y + (totalH/2) + 0.5
+    else
+      svg.boxes[i].y1 = layout.separator.top.y + (totalH / 2) + Math.floor(boxH * (i-1)) - 0.5
+      svg.boxes[i].y2 = layout.separator.top.y + (totalH / 2) + Math.floor((boxH * (i))) + 0.5    
+
+    #if i is svg.boxes.length-1 # occupy last pixel
+    #  svg.boxes[i].y2 = layout.separator.top.y + totalH + 0.5    
+    #else # leave last pixel to next box
+    #  svg.boxes[i].y2 = layout.separator.top.y + Math.floor((boxH * (i+1))) - 0.5
 
     width =  util.calcLength(svg.boxes[i].x1, svg.boxes[i].x2)
     height = util.calcLength(svg.boxes[i].y1, svg.boxes[i].y2)    
@@ -411,9 +474,9 @@ sceneSync = (mode) ->
     console.log '---'
     ###
 
-  # draw for boxes
-  for i in [0..svg.boxes.length-1]
-    svg.boxes[i].element.attr('x', svg.boxes[i].x1)
+    # draw for boxes
+    svg.boxes[i].element
+       .attr('x', svg.boxes[i].x1)
        .attr('width', width)
        .attr('y', svg.boxes[i].y1) 
        .attr('height', height)
@@ -438,57 +501,111 @@ sceneSync = (mode) ->
 
   svg.rightPane.redraw()
 
+  svg.TOC.redraw = () ->
+
+    console.log 'starting TOC redraw'
+    # get the width of a space character
+    spaceWidth = textDraw.tokenToViewable('a a', svg.TOC.subElement).width - textDraw.tokenToViewable('aa', svg.TOC.subElement).width
+    # get the maximum character height in the font
+    lHeight    = textDraw.tokenToViewable('l', svg.TOC.subElement).height
+
+    paddingX = 30
+    paddingY = 10
+
+    svg.TOC.element
+      .attr('x',      parseFloat(svg.rightPane.element.attr('x')) + paddingX)
+      .attr('width',  parseFloat svg.rightPane.element.attr('width')  - (paddingX * 2))
+      .attr('y',      parseFloat(svg.rightPane.element.attr('y')) + paddingY)
+      .attr('height', parseFloat svg.rightPane.element.attr('height') - (paddingY * 2))
+
+
+    viewPortFull = false
+    y = 0
+    for TOCToken in TOCTokens
+
+      x = paddingX
+
+      tokenViewable = textDraw.tokenToViewable(TOCToken.text, svg.TOC.subElement)
+      
+      #
+      # Apply word semantic styling
+      #
+      switch TOCToken.level
+        when 1
+          x += 0
+        when 2
+          x += 15 
+        when 3
+          x += 30
+
+      if y + tokenViewable.height + lHeight < svg.TOC.element.attr('y') + svg.TOC.element.attr('height')
+        y += tokenViewable.height
+        tokenViewable.svg.attr('x', x)
+        tokenViewable.svg.attr('y', y)
+        x += tokenViewable.width  
+      else
+        console.log 'text port full'
+        viewPortFull = true
+        break
     
+      # add word space 
+      x += spaceWidth
+    
+  if states.showTOC is 'drawn'
+    svg.TOC.redraw()
+  
+
+#
+# Get the data for getting started
+#
+data.get('abstract', (response) ->   
+  console.log(response)
+  tokens = tokenize(response)
+  console.dir tokens
+)
+
+data.get('categories', (response) -> 
+  console.log(response)
+  categories = JSON.parse(response).names
+)
+
+data.get('TOC', (response) -> 
+  # get the TOC data
+  console.log(response)
+  rawTOC = JSON.parse(response)
+  console.dir rawTOC
+
+  # restructure into tokens we can work with
+  for rawToken in rawTOC.entries
+    token =
+      'level': rawToken[0]  # per current structure of dummy data file
+      'text':  rawToken[1]  # per current structure of dummy data file
+    TOCTokens.push token
+)
+
+
+#
+# initialize the scene and maintain layout reactivity
+#    
 syncInit = () ->
   sceneSync()  # initial sync
   window.onresize = () -> sceneSync()  # keep sync forever
+
 
 ##################
 #                #
 #  Start it all  #
 #                #
 ##################
-data.get('categories', (response) -> 
-  console.log(response)
-  categories = JSON.parse(response)
-  sceneDefine(categories.names)
+
+start = () ->
+  sceneDefine(categories)
   syncInit()
-  document.body.style.cursor = "default" # needed because of https://code.google.com/p/chromium/issues/detail?id=3a69986&thanks=369986&ts=1399291013
-)
-
-data.get('abstract', (response) -> 
-  
-  console.log(response)
-  tokens = tokenize(response)
-  console.dir tokens
   textporting(tokens)
-)
+  document.body.style.cursor = "default" # needed because of https://code.google.com/p/chromium/issues/detail?id=3a69986&thanks=369986&ts=1399291013
 
-data.get('TOC', (response) -> 
-  console.log(response)
-  rawTOC = JSON.parse(response)
-  console.dir rawTOC
-
-  fontSize  = '14px' # temporarily
-  fontFamily = 'Helvetica' # for now
-
-  TOC = {}
-  TOC.element = svg.main.append('g')
-                         .style('text-anchor', 'start')
-                         .style('fill', 'rgb(255,255,220)')                                                                                                                                            
-                         .style('font-family',fontFamily)
-                         .style('font-size',fontSize)
-
-  TOCTokens = []
-  maxLen = 0
-  for rawToken in rawTOC.entries
-    token =
-      'level': rawToken[0]  # per current structure of dummy data file
-      'text':  rawToken[1]  # per current structure of dummy data file
-    tokenViewable = textDraw.tokenToViewable(token.text, TOC.element)
-    if tokenViewable.width > maxLen then maxLen = tokenViewable.width
-    TOCTokens.push token
-
-  TOC.geometry = {'width': maxLen}
-  svg.TOC = TOC
-)
+waitForData = setInterval((()-> 
+                if categories? and tokens? and TOCTokens?
+                  window.clearInterval(waitForData)
+                  start()), 50)
+                

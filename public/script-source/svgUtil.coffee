@@ -1,4 +1,4 @@
-exports.sync = (item) ->
+exports.sync = (item, callback) ->
 
   console.log item.mode
 
@@ -24,8 +24,11 @@ exports.sync = (item) ->
         stylesToTransition[key] = val 
       
     # animate
-    item.element.transition().duration(400).attr(attributesToTransition).style(stylesToTransition)
-
+    if callback?
+      item.element.transition().duration(400).attr(attributesToTransition).style(stylesToTransition).each('end', callback)
+    else      
+      item.element.transition().duration(400).attr(attributesToTransition).style(stylesToTransition)
+      
   # do not animate
   else
     for key, val of item.geometry

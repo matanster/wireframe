@@ -26,6 +26,7 @@ module.exports = function(tokens, fontSizeChange, scroll, mode) {
   svg.textPortInnerSVG.element = svg.main.append('svg');
   svg.textPortInnerSVG.subElement = svg.textPortInnerSVG.element.append('g').style('text-anchor', 'start').style('fill', 'rgb(255,255,220)').style('font-family', fontFamily).style('font-size', fontSize);
   spaceWidth = textDraw.tokenToViewable('a a', svg.textPortInnerSVG.subElement).width - textDraw.tokenToViewable('aa', svg.textPortInnerSVG.subElement).width;
+  spaceWidth *= 1.4;
   lHeight = textDraw.tokenToViewable('l', svg.textPortInnerSVG.subElement).height;
   paddingX = 10;
   paddingY = 10;
