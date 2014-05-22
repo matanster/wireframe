@@ -179,7 +179,7 @@ sceneDefine = function(categories) {
   };
   rightPane = function() {
     svg.rightPane = {};
-    svg.rightPane.element = svg.main.append('rect').style('fill', '#888888').style('fill-opacity', '1');
+    svg.rightPane.element = svg.main.append('rect').style('fill', '#999999').style('fill-opacity', '1');
     svg.rightPane.geometry = {};
     svg.rightPane.geometry = {
       'hoverIgnoreAreaX': 30,
@@ -241,7 +241,7 @@ sceneDefine = function(categories) {
   svg.downButton = {};
   svg.downButton.geometry = {
     'paddingY': 15,
-    'paddingX': 10,
+    'paddingX': 30,
     'height': 35
   };
   return svg.downButton.element = svg.main.append('svg:image').attr('xlink:href', 'images/downScroll4.svg').attr('preserveAspectRatio', 'none').on('mouseover', function() {
@@ -358,7 +358,7 @@ sceneSync = function(mode) {
   };
   svg.downButton.redraw();
   svg.rightPane.redraw();
-  svg.TOC.redraw = function() {
+  return svg.TOC.redraw = function() {
     var TOCToken, lHeight, paddingX, paddingY, spaceWidth, tokenViewable, viewPortFull, x, y, _j, _len, _results;
     console.log('starting TOC redraw');
     spaceWidth = textDraw.tokenToViewable('a a', svg.TOC.subElement).width - textDraw.tokenToViewable('aa', svg.TOC.subElement).width;
@@ -397,9 +397,6 @@ sceneSync = function(mode) {
     }
     return _results;
   };
-  if (states.showTOC === 'drawn') {
-    return svg.TOC.redraw();
-  }
 };
 
 data.get('abstract', function(response) {

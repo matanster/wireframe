@@ -220,7 +220,7 @@ sceneDefine = (categories) ->
     svg.rightPane = {}
     svg.rightPane.element = svg.main.append('rect')
                                     #.style('fill', '#ccccff')
-                                    .style('fill', '#888888')
+                                    .style('fill', '#999999') #888888
                                     #.style('stroke-width', '1px')
                                     #.style('stroke', '#bbbbee')
                                     .style('fill-opacity', '1')
@@ -272,6 +272,7 @@ sceneDefine = (categories) ->
 
       if states.showTOC is 'in progress'
         svgUtil.sync(svg.rightPane, svg.TOC.redraw)
+        #svg.rightPane.element.transition().delay(400).duration(250).style('fill', '#888888') 
       else
         svgUtil.sync(svg.rightPane)
 
@@ -306,7 +307,7 @@ sceneDefine = (categories) ->
 
   svg.downButton.geometry = 
     'paddingY': 15,
-    'paddingX': 10, # to do: adjust per screen aspect ratio
+    'paddingX': 30, 
     'height': 35
 
   svg.downButton.element = svg.main.append('svg:image')
@@ -551,8 +552,8 @@ sceneSync = (mode) ->
       # add word space 
       x += spaceWidth
     
-  if states.showTOC is 'drawn'
-    svg.TOC.redraw()
+  #if states.showTOC is 'drawn'
+  #  svg.TOC.redraw()
   
 
 #
