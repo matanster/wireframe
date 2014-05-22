@@ -45,13 +45,13 @@ module.exports = (tokens, fontSizeChange, scroll, mode) ->
   # get the maximum character height in the font
   lHeight    = textDraw.tokenToViewable('l', svg.textPortInnerSVG.subElement).height
 
-  paddingX = 10
-  paddingY = 10
+  paddingX = 20
+  paddingY = 18
 
   console.log svg.textPort.element.attr('width')  - (paddingX * 2)
   svg.textPortInnerSVG.element
-    .attr('x',      parseFloat(svg.textPort.element.attr('x')) + paddingX)
-    .attr('width',  parseFloat svg.textPort.element.attr('width')  - (paddingX * 2))
+    .attr('x',      parseFloat(svg.textPort.element.attr('x')) + paddingX + 3)
+    .attr('width',  parseFloat svg.textPort.element.attr('width')  - (paddingX * 2) - 3)
     .attr('y',      parseFloat(svg.textPort.element.attr('y')) + paddingY)
     .attr('height', parseFloat svg.textPort.element.attr('height') - (paddingY * 2) - 50)
 

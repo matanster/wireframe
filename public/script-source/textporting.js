@@ -28,10 +28,10 @@ module.exports = function(tokens, fontSizeChange, scroll, mode) {
   spaceWidth = textDraw.tokenToViewable('a a', svg.textPortInnerSVG.subElement).width - textDraw.tokenToViewable('aa', svg.textPortInnerSVG.subElement).width;
   spaceWidth *= 1.4;
   lHeight = textDraw.tokenToViewable('l', svg.textPortInnerSVG.subElement).height;
-  paddingX = 10;
-  paddingY = 10;
+  paddingX = 20;
+  paddingY = 18;
   console.log(svg.textPort.element.attr('width') - (paddingX * 2));
-  svg.textPortInnerSVG.element.attr('x', parseFloat(svg.textPort.element.attr('x')) + paddingX).attr('width', parseFloat(svg.textPort.element.attr('width') - (paddingX * 2))).attr('y', parseFloat(svg.textPort.element.attr('y')) + paddingY).attr('height', parseFloat(svg.textPort.element.attr('height') - (paddingY * 2) - 50));
+  svg.textPortInnerSVG.element.attr('x', parseFloat(svg.textPort.element.attr('x')) + paddingX + 3).attr('width', parseFloat(svg.textPort.element.attr('width') - (paddingX * 2) - 3)).attr('y', parseFloat(svg.textPort.element.attr('y')) + paddingY).attr('height', parseFloat(svg.textPort.element.attr('height') - (paddingY * 2) - 50));
   redraw = function() {
     var token, tokenViewable, viewPortFull, x, y, _i, _len, _results;
     viewPortFull = false;
