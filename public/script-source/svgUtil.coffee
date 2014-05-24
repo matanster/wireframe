@@ -1,6 +1,7 @@
 exports.sync = (item, callback) ->
 
-  console.log item.mode
+  if item.mode 
+    console.log item.mode
 
   # animate if requested
   if item.mode is 'animate'

@@ -2,6 +2,7 @@ util        = require './util'
 data        = require './data'
 tokenize    = require './tokenize'
 textporting = require './textporting'
+textportingAbstract = require './textportingAbstract'
 textDraw    = require './textDraw'
 svgUtil     = require './svgUtil'
 
@@ -20,7 +21,8 @@ states    = {}
 
 tokens    = undefined
 TOCTokens = []
-categories = undefined
+categoriesOfSummary = undefined
+segments = undefined
 
 calcStart = () -> 90
 calcEnd   = () -> 90
@@ -44,7 +46,7 @@ end    = null
 # that won't change with subsequent window resizing
 #
 #####################################################################
-sceneDefine = (categories) ->
+sceneDefine = (categoriesOfSummary) ->
 
   main = () ->
     svg.main = d3.select('body').append('svg').style('background-color', '#999999')   
@@ -81,10 +83,10 @@ sceneDefine = (categories) ->
     svg.TOC.geometry.width = maxLen + (2 * svg.TOC.geometry.paddingX)   
 
 
-  boxBlock = (categories) ->
+  boxBlock = (categoriesOfSummary) ->
 
-    console.log categories
-    numberOfBoxes = categories.length
+    console.log categoriesOfSummary
+    numberOfBoxes = categoriesOfSummary.length
 
     #colorScale = d3.scale.linear().domain([0, numberOfBoxes-1]).range(['#87CEFA', '#00BFFF'])
     colorScale = d3.scale.linear().domain([0, numberOfBoxes-1]).range(['#CCCCE0','#AAAABE'])
@@ -105,7 +107,7 @@ sceneDefine = (categories) ->
                            .style('stroke-width', '0px')
                            .style('fill-opacity', '1')
 
-      text = categoryBox.append('text').text(categories[box])
+      text = categoryBox.append('text').text(categoriesOfSummary[box])
                                        .style("text-anchor", "middle")
                                        .attr("dominant-baseline", "central")
                                        .style("font-family", "verdana")
@@ -277,7 +279,7 @@ sceneDefine = (categories) ->
         svgUtil.sync(svg.rightPane)
 
   main()
-  boxBlock(categories)
+  boxBlock(categoriesOfSummary)
   rightPane()
   textPort()
   titlePort()
@@ -559,15 +561,31 @@ sceneSync = (mode) ->
 #
 # Get the data for getting started
 #
-data.get('abstract', (response) ->   
+data.get('introduction', (response) ->   
   console.log(response)
   tokens = tokenize(response)
   console.dir tokens
 )
 
-data.get('categories', (response) -> 
+#
+# Get the abstract data and restructure it
+#
+data.get('abstract', (response) ->   
+  console.dir(response)
+  rawSegments = JSON.parse(response).segments
+  segments = []
+  for rawSegment in rawSegments
+    segment = new Object
+    segment.category = rawSegment.category
+    segment.tokens     = rawSegment.text.split(' ')
+    segments.push segment
+
+  console.dir segments
+)
+
+data.get('categoriesOfSummary', (response) -> 
   console.log(response)
-  categories = JSON.parse(response).names
+  categoriesOfSummary = JSON.parse(response).names
 )
 
 data.get('TOC', (response) -> 
@@ -600,13 +618,16 @@ syncInit = () ->
 ##################
 
 start = () ->
-  sceneDefine(categories)
+  sceneDefine(categoriesOfSummary)
   syncInit()
-  textporting(tokens)
+  #textporting(tokens)
+  textportingAbstract(segments)
   document.body.style.cursor = "default" # needed because of https://code.google.com/p/chromium/issues/detail?id=3a69986&thanks=369986&ts=1399291013
 
-waitForData = setInterval((()-> 
-                if categories? and tokens? and TOCTokens?
+waitForData = setInterval((()->  # can replace this with https://github.com/mbostock/queue
+                                 # to do: make it possible to troubleshoot which ajax call didn't return,
+                                 #        and log time taken with the new browser performance javascript api
+                if categoriesOfSummary? and tokens? and TOCTokens? and segments?
                   window.clearInterval(waitForData)
                   start()), 50)
                 

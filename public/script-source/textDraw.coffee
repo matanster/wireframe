@@ -1,3 +1,7 @@
+#
+# draw text invisibly for obtaining it's geometry which depends on font family, size.
+#
+
 # import global geometry
 globalDims = require './globalDims'
 svg    = globalDims.svg

@@ -1,16 +1,12 @@
 {"type": "abstract",
- "text": "Maximizing the impact and efficiency of human capital in organizations is one of the cornerstones of industrial and organizational psychology inquiry. It is commonly believed that such maximization benefits individuals as well as the organizations in which they work. Indeed, research in applied psychology and strategic human resource management clearly indicates that investing in human capital can yield positive individual - as well as organization-level performance outcomes (e.g., Becker & Huselid, 2006; Bowen & Ostroff, 2004; Huselid, 1995; Le, Oh, Shaffer, & Schmidt, 2007; Subramony, Krause, Norton, & Burns, 2008). Thus, a key tenet within micro organizational inquiry is that the human capital available to an organization has potentially important performance implications (Takeuchi, Lepak, Wang, & Takeuchi, 2007).",
- "marks": [0,0,0,0,0,0,0,0,0,0,
-          0,0,0,0,0,0,0,0,0,0,
-          0,0,2,2,2,2,0,0,0,0,
-          0,0,0,0,0,0,0,0,0,0,
-          0,0,0,0,0,0,0,0,0,2,
-          2,2,0,0,0,0,0,0,0,0,
-          0,0,0,0,0,0,0,0,0,0,
-          0,0,0,0,0,0,0,0,0,0,
-          0,0,0,0,0,0,0,0,0,0,
-          0,0,0,0,0,0,0,0,0,0,
-          0,0,0,0,0,0,0,0,0,0,
-          0,0,0,0,0,0,0
- ]
+  "segments": [
+    {"category": "background", 
+     "text":     "Theory at both the micro and macro level predicts that investments in superior human capital generate better firm-level performance. However, human capital takes time and money to develop or acquire, which potentially offsets its positive benefits. Indeed, extant tests appear equivocal regarding its impact."},
+    {"category": "purpose", 
+     "text":     "To clarify what is known, we meta-analyzed effects drawn from 66 studies of the human capital–firm performance relationship and investigated 3 moderators suggested by resource-based theory."},
+    {"category": "findings", 
+     "text":     "We found that human capital relates strongly to performance, especially when the human capital in question is not readily tradable in labor markets and when researchers use operational performance measures that are not subject to profit appropriation."},
+    {"category": "recommendation", 
+     "text":     "Our results suggest that managers should invest in programs that increase and retain firm-specific human capital."}
+  ]
 }
