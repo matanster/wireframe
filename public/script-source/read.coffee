@@ -22,6 +22,7 @@ states    = {}
 tokens    = undefined
 TOCTokens = []
 categoriesOfSummary = undefined
+mainCategories = undefined
 segments = undefined
 
 calcStart = () -> 90
@@ -50,6 +51,7 @@ sceneDefine = (categoriesOfSummary) ->
 
   main = () ->
     svg.main = d3.select('body').append('svg').style('background-color', '#999999')   
+    svg.categories = {} # can move this elsewhere
 
   TOC = () -> 
 
@@ -83,31 +85,29 @@ sceneDefine = (categoriesOfSummary) ->
     svg.TOC.geometry.width = maxLen + (2 * svg.TOC.geometry.paddingX)   
 
 
-  categoriesBlock = (categoriesOfSummary) ->
+  categoriesOfSummaryPanes = (categories) ->
 
-    console.log categoriesOfSummary
-    numberOfBoxes = categoriesOfSummary.length
+    console.log categories
+    numberOfBoxes = categories.length
 
     colorScale = d3.scale.linear().domain([0, numberOfBoxes-1]).range(['#87CEFA', '#00BFFF'])
     #colorScale = d3.scale.linear().domain([0, numberOfBoxes-1]).range(['#CCCCE0','#AAAABE']) # ['#CCCCE0','#AAAABE']
     colorTransition = (i) -> (() -> d3.select(this).transition().duration(25).ease('circle').style('fill', colorScale(i)))
     
-    svg.categories = []
+    svg.categories.level2 = []
+
     for box in [0..numberOfBoxes-1]
-      categoryBox = svg.main.append('g')
+      group = svg.main.append('g')
+                            .style('-webkit-user-select', 'none')      # avoid standard text handling of the category texts (selection, touch callouts)
+                            .style('-webkit-touch-callout', 'none')    # avoid standard text handling of the category texts (selection, touch callouts) 
+                            .style('user-select', 'none') # future compatibility
 
-      # avoid standard text handling of the category texts (selection, touch callouts)
-      categoryBox.style('-webkit-user-select', 'none') 
-                 .style('-webkit-touch-callout', 'none')      
-                 .style('user-select', 'none') # future compatibility
-
-
-      rectangle = categoryBox.append('rect')
+      rectangle = group.append('rect')
                            .style('fill', colorScale(box))   
                            .style('stroke-width', '0px')
                            .style('fill-opacity', '1')
 
-      text = categoryBox.append('text').text(categoriesOfSummary[box])
+      text = group.append('text').text(categories[box])
                                        .style("text-anchor", "middle")
                                        .attr("dominant-baseline", "central")
                                        .style("font-family", "verdana")
@@ -117,10 +117,48 @@ sceneDefine = (categoriesOfSummary) ->
       rectangle.on('mouseover', () -> d3.select(this).transition().duration(200).ease('circle').style('fill', '#999999')) #0086B2 #FAF2DA
                .on('mouseout', colorTransition(box))
 
-      svg.categories[box] = {}
-      svg.categories[box].element = rectangle
-      svg.categories[box].text = text
+      svg.categories.level2[box] = {}
+      svg.categories.level2[box].group = group
+      svg.categories.level2[box].element = rectangle
+      svg.categories.level2[box].text = text
 
+
+  mainPanes = (categories) ->
+
+    console.log categories
+    numberOfBoxes = categories.length
+
+    colorScale = d3.scale.linear().domain([0, numberOfBoxes-1]).range(['#87CEFA', '#00BFFF'])
+    #colorScale = d3.scale.linear().domain([0, numberOfBoxes-1]).range(['#CCCCE0','#AAAABE']) # ['#CCCCE0','#AAAABE']
+    colorTransition = (i) -> (() -> d3.select(this).transition().duration(25).ease('circle').style('fill', colorScale(i)))
+    
+    svg.categories.level1 = []
+
+    for box in [0..numberOfBoxes-1]
+      group = svg.main.append('g')
+                            .style('-webkit-user-select', 'none')      # avoid standard text handling of the category texts (selection, touch callouts)
+                            .style('-webkit-touch-callout', 'none')    # avoid standard text handling of the category texts (selection, touch callouts) 
+                            .style('user-select', 'none') # future compatibility
+
+      rectangle = group.append('rect')
+                           .style('fill', colorScale(box))   
+                           .style('stroke-width', '0px')
+                           .style('fill-opacity', '1')
+
+      text = group.append('text').text(categories[box])
+                                       .style("text-anchor", "middle")
+                                       .attr("dominant-baseline", "central")
+                                       .style("font-family", "verdana")
+                                       .style("font-weight", "bold")
+                                       .style('fill', '#EEEEEE')                                                                                                               
+
+      rectangle.on('mouseover', () -> d3.select(this).transition().duration(200).ease('circle').style('fill', '#999999')) #0086B2 #FAF2DA
+               .on('mouseout', colorTransition(box))
+
+      svg.categories.level1[box] = {}
+      svg.categories.level1[box].group = group
+      svg.categories.level1[box].element = rectangle
+      svg.categories.level1[box].text = text
   
   textPort = () ->
 
@@ -279,7 +317,8 @@ sceneDefine = (categoriesOfSummary) ->
         svgUtil.sync(svg.rightPane)
 
   main()
-  categoriesBlock(categoriesOfSummary)
+  categoriesOfSummaryPanes(categoriesOfSummary)
+  mainPanes(mainCategories)
   rightPane()
   textPort()
   titlePort()
@@ -447,40 +486,76 @@ sceneSync = (mode) ->
     .attr('width', fontButtonGeometry.width)
     .attr('height', fontButtonGeometry.height)
 
-  # calculate for boxes
+  panes = (groupY, groupH, borderX, elements) ->
 
-  #boxH = (totalH / 2) / (svg.categories.length - 1)
-  boxH = (totalH) / (svg.categories.length)
+    #boxH = (totalH / 2) / (svg.categories.length - 1)
 
-  for i in [0..svg.categories.length-1]
+    boxH = (groupH) / (elements.length)
 
-    svg.categories[i].x1 = 0
-    svg.categories[i].x2 = layout.separator.left.x.current    
+    for i in [0..elements.length-1]
 
-    ###
-    if i is 0
-      svg.categories[i].y1 = layout.separator.top.y - 0.5
-      svg.categories[i].y2 = layout.separator.top.y + (totalH/2) + 0.5
-    else ###
-    svg.categories[i].y1 = layout.separator.top.y + Math.floor(boxH * (i)) - 0.5
-    svg.categories[i].y2 = layout.separator.top.y + Math.floor((boxH * (i+1))) + 0.5    
+      elements[i].x1 = 0
+      elements[i].x2 = borderX
 
-    #if i is svg.categories.length-1 # occupy last pixel
-    #  svg.categories[i].y2 = layout.separator.top.y + totalH + 0.5    
-    #else # leave last pixel to next box
-    #  svg.categories[i].y2 = layout.separator.top.y + Math.floor((boxH * (i+1))) - 0.5
+      ###
+      if i is 0
+        elements[i].y1 = layout.separator.top.y - 0.5
+        elements[i].y2 = layout.separator.top.y + (groupH/2) + 0.5
+      else ###
+      elements[i].y1 = groupY + Math.floor(boxH * (i)) - 0.5
+      elements[i].y2 = groupY + Math.floor((boxH * (i+1))) + 0.5    
 
-    width =  util.calcLength(svg.categories[i].x1, svg.categories[i].x2)
-    height = util.calcLength(svg.categories[i].y1, svg.categories[i].y2)    
+      #if i is elements.length-1 # occupy last pixel
+      #  elements[i].y2 = layout.separator.top.y + groupH + 0.5    
+      #else # leave last pixel to next box
+      #  elements[i].y2 = layout.separator.top.y + Math.floor((boxH * (i+1))) - 0.5
 
-    svg.categories[i].element
-       .attr('x', svg.categories[i].x1)
-       .attr('width', width)
-       .attr('y', svg.categories[i].y1) 
-       .attr('height', height)
+      width =  util.calcLength(elements[i].x1, elements[i].x2)
+      height = util.calcLength(elements[i].y1, elements[i].y2)    
 
-    svg.categories[i].text.attr('x', svg.categories[i].x1 + width / 2)  
-                     .attr('y', svg.categories[i].y1 + height / 2)
+      elements[i].element
+         .attr('x', elements[i].x1)
+         .attr('width', width)
+         .attr('y', elements[i].y1) 
+         .attr('height', height)
+
+      elements[i].text.attr('x', elements[i].x1 + width / 2)  
+                      .attr('y', elements[i].y1 + height / 2)
+
+
+
+  #
+  # Show left panes and make them change on clicks (hackish style)
+  #
+
+  groupY = layout.separator.top.y - 0.5
+  panes(groupY, totalH, layout.separator.left.x.current, svg.categories.level1)
+
+  svg.categories.level1[0].element.style('fill', '#999999')
+
+  groupY = totalH/2 + layout.separator.top.y - 0.5
+  panes(groupY, totalH/2, layout.separator.left.x.current, svg.categories.level2)
+  
+  svg.categories.level1[1].element.on('mousedown', () -> 
+      svg.categories.level1[1].group.attr('visibility', 'hidden')
+    )
+
+  svg.categories.level1[0].element.on('mousedown', () -> 
+      svg.categories.level1[1].group.attr('visibility', 'visible')
+      
+    )
+
+  svg.categories.level2[1].element.on('mousedown', () -> 
+      textporting(tokens)
+      #svg.rightPane.redraw()
+      svg.downButton.redraw()
+    )
+
+  svg.categories.level1[0].element.on('mousedown', () -> 
+      textportingAbstract(segments)
+      #svg.rightPane.redraw()
+      svg.downButton.redraw()
+    )
 
   # draw down button
   svg.downButton.redraw = () ->
@@ -580,7 +655,7 @@ data.get('abstract', (response) ->
 
 data.get('categories', (response) -> 
   console.log(response)
-  categories           = JSON.parse(response).level1
+  mainCategories       = JSON.parse(response).level1
   categoriesOfSummary  = JSON.parse(response).level2
 )
 
@@ -623,7 +698,7 @@ start = () ->
 waitForData = setInterval((()->  # can replace this with https://github.com/mbostock/queue
                                  # to do: make it possible to troubleshoot which ajax call didn't return,
                                  #        and log time taken with the new browser performance javascript api
-                if categoriesOfSummary? and tokens? and TOCTokens? and segments?
+                if categoriesOfSummary? and tokens? and TOCTokens? and segments? and mainCategories?
                   window.clearInterval(waitForData)
                   start()), 50)
                 
