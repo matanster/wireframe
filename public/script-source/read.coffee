@@ -83,16 +83,16 @@ sceneDefine = (categoriesOfSummary) ->
     svg.TOC.geometry.width = maxLen + (2 * svg.TOC.geometry.paddingX)   
 
 
-  boxBlock = (categoriesOfSummary) ->
+  categoriesBlock = (categoriesOfSummary) ->
 
     console.log categoriesOfSummary
     numberOfBoxes = categoriesOfSummary.length
 
-    #colorScale = d3.scale.linear().domain([0, numberOfBoxes-1]).range(['#87CEFA', '#00BFFF'])
-    colorScale = d3.scale.linear().domain([0, numberOfBoxes-1]).range(['#CCCCE0','#AAAABE'])
+    colorScale = d3.scale.linear().domain([0, numberOfBoxes-1]).range(['#87CEFA', '#00BFFF'])
+    #colorScale = d3.scale.linear().domain([0, numberOfBoxes-1]).range(['#CCCCE0','#AAAABE']) # ['#CCCCE0','#AAAABE']
     colorTransition = (i) -> (() -> d3.select(this).transition().duration(25).ease('circle').style('fill', colorScale(i)))
     
-    svg.boxes = []
+    svg.categories = []
     for box in [0..numberOfBoxes-1]
       categoryBox = svg.main.append('g')
 
@@ -114,12 +114,12 @@ sceneDefine = (categoriesOfSummary) ->
                                        .style("font-weight", "bold")
                                        .style('fill', '#EEEEEE')                                                                                                               
 
-      rectangle.on('mouseover', () -> d3.select(this).transition().duration(300).ease('circle').style('fill', '#999999')) #0086B2 #FAF2DA
+      rectangle.on('mouseover', () -> d3.select(this).transition().duration(200).ease('circle').style('fill', '#999999')) #0086B2 #FAF2DA
                .on('mouseout', colorTransition(box))
 
-      svg.boxes[box] = {}
-      svg.boxes[box].element = rectangle
-      svg.boxes[box].text = text
+      svg.categories[box] = {}
+      svg.categories[box].element = rectangle
+      svg.categories[box].text = text
 
   
   textPort = () ->
@@ -215,7 +215,7 @@ sceneDefine = (categoriesOfSummary) ->
 
     svg.title = svg.main.append('text').text("Something Something Something Title")
                                        .style("text-anchor", "middle")
-                                       .style('fill', "#eeeeee")
+                                       .style('fill', "#666666")
 
 
   rightPane = ->
@@ -279,7 +279,7 @@ sceneDefine = (categoriesOfSummary) ->
         svgUtil.sync(svg.rightPane)
 
   main()
-  boxBlock(categoriesOfSummary)
+  categoriesBlock(categoriesOfSummary)
   rightPane()
   textPort()
   titlePort()
@@ -313,7 +313,7 @@ sceneDefine = (categoriesOfSummary) ->
     'height': 35
 
   svg.downButton.element = svg.main.append('svg:image')
-    .attr('xlink:href','images/downScroll4.svg')
+    .attr('xlink:href','images/downScroll5.svg')
     .attr('preserveAspectRatio', 'none')
     .on('mouseover', () -> 
       console.log('hover')
@@ -449,43 +449,38 @@ sceneSync = (mode) ->
 
   # calculate for boxes
 
-  boxH = (totalH / 2) / (svg.boxes.length - 1)
+  #boxH = (totalH / 2) / (svg.categories.length - 1)
+  boxH = (totalH) / (svg.categories.length)
 
-  for i in [0..svg.boxes.length-1]
+  for i in [0..svg.categories.length-1]
 
-    svg.boxes[i].x1 = 0
-    svg.boxes[i].x2 = layout.separator.left.x.current    
+    svg.categories[i].x1 = 0
+    svg.categories[i].x2 = layout.separator.left.x.current    
 
+    ###
     if i is 0
-      svg.boxes[i].y1 = layout.separator.top.y - 0.5
-      svg.boxes[i].y2 = layout.separator.top.y + (totalH/2) + 0.5
-    else
-      svg.boxes[i].y1 = layout.separator.top.y + (totalH / 2) + Math.floor(boxH * (i-1)) - 0.5
-      svg.boxes[i].y2 = layout.separator.top.y + (totalH / 2) + Math.floor((boxH * (i))) + 0.5    
+      svg.categories[i].y1 = layout.separator.top.y - 0.5
+      svg.categories[i].y2 = layout.separator.top.y + (totalH/2) + 0.5
+    else ###
+    svg.categories[i].y1 = layout.separator.top.y + Math.floor(boxH * (i)) - 0.5
+    svg.categories[i].y2 = layout.separator.top.y + Math.floor((boxH * (i+1))) + 0.5    
 
-    #if i is svg.boxes.length-1 # occupy last pixel
-    #  svg.boxes[i].y2 = layout.separator.top.y + totalH + 0.5    
+    #if i is svg.categories.length-1 # occupy last pixel
+    #  svg.categories[i].y2 = layout.separator.top.y + totalH + 0.5    
     #else # leave last pixel to next box
-    #  svg.boxes[i].y2 = layout.separator.top.y + Math.floor((boxH * (i+1))) - 0.5
+    #  svg.categories[i].y2 = layout.separator.top.y + Math.floor((boxH * (i+1))) - 0.5
 
-    width =  util.calcLength(svg.boxes[i].x1, svg.boxes[i].x2)
-    height = util.calcLength(svg.boxes[i].y1, svg.boxes[i].y2)    
+    width =  util.calcLength(svg.categories[i].x1, svg.categories[i].x2)
+    height = util.calcLength(svg.categories[i].y1, svg.categories[i].y2)    
 
-    ###
-    console.log svg.boxes[i].y1
-    console.log svg.boxes[i].y2
-    console.log '---'
-    ###
-
-    # draw for boxes
-    svg.boxes[i].element
-       .attr('x', svg.boxes[i].x1)
+    svg.categories[i].element
+       .attr('x', svg.categories[i].x1)
        .attr('width', width)
-       .attr('y', svg.boxes[i].y1) 
+       .attr('y', svg.categories[i].y1) 
        .attr('height', height)
 
-    svg.boxes[i].text.attr('x', svg.boxes[i].x1 + width / 2)  
-                     .attr('y', svg.boxes[i].y1 + height / 2)
+    svg.categories[i].text.attr('x', svg.categories[i].x1 + width / 2)  
+                     .attr('y', svg.categories[i].y1 + height / 2)
 
   # draw down button
   svg.downButton.redraw = () ->
@@ -583,9 +578,10 @@ data.get('abstract', (response) ->
   console.dir segments
 )
 
-data.get('categoriesOfSummary', (response) -> 
+data.get('categories', (response) -> 
   console.log(response)
-  categoriesOfSummary = JSON.parse(response).names
+  categories           = JSON.parse(response).level1
+  categoriesOfSummary  = JSON.parse(response).level2
 )
 
 data.get('TOC', (response) -> 

@@ -45,9 +45,9 @@ module.exports = function(segments, fontSizeChange, scroll, mode) {
     _results = [];
     for (_i = 0, _len = segments.length; _i < _len; _i++) {
       segment = segments[_i];
-      segment.element = svg.textPortInnerSVG.subElement.append('g').style('text-anchor', 'start').style('fill', '#DDDDDD').style('font-family', fontFamily).style('font-size', fontSize);
+      segment.element = svg.textPortInnerSVG.subElement.append('g').style('text-anchor', 'start').style('fill', '#EEEEEE').style('font-family', fontFamily).style('font-size', fontSize);
       segment.enclosure = {};
-      segment.enclosure.element = segment.element.append('rect').style('opacity', 1).style('fill', '#888888');
+      segment.enclosure.element = segment.element.append('rect').style('opacity', 0.9).style('fill', '#87CEFA');
       segmentTokens = [];
       x = enclosing.paddingX;
       segment.enclosure.geometry = {

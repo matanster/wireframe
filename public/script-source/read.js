@@ -66,7 +66,7 @@ boxH = null;
 end = null;
 
 sceneDefine = function(categoriesOfSummary) {
-  var TOC, boxBlock, main, rightPane, textPort, titlePort;
+  var TOC, categoriesBlock, main, rightPane, textPort, titlePort;
   main = function() {
     return svg.main = d3.select('body').append('svg').style('background-color', '#999999');
   };
@@ -90,17 +90,17 @@ sceneDefine = function(categoriesOfSummary) {
     };
     return svg.TOC.geometry.width = maxLen + (2 * svg.TOC.geometry.paddingX);
   };
-  boxBlock = function(categoriesOfSummary) {
+  categoriesBlock = function(categoriesOfSummary) {
     var box, categoryBox, colorScale, colorTransition, numberOfBoxes, rectangle, text, _i, _ref, _results;
     console.log(categoriesOfSummary);
     numberOfBoxes = categoriesOfSummary.length;
-    colorScale = d3.scale.linear().domain([0, numberOfBoxes - 1]).range(['#CCCCE0', '#AAAABE']);
+    colorScale = d3.scale.linear().domain([0, numberOfBoxes - 1]).range(['#87CEFA', '#00BFFF']);
     colorTransition = function(i) {
       return function() {
         return d3.select(this).transition().duration(25).ease('circle').style('fill', colorScale(i));
       };
     };
-    svg.boxes = [];
+    svg.categories = [];
     _results = [];
     for (box = _i = 0, _ref = numberOfBoxes - 1; 0 <= _ref ? _i <= _ref : _i >= _ref; box = 0 <= _ref ? ++_i : --_i) {
       categoryBox = svg.main.append('g');
@@ -108,11 +108,11 @@ sceneDefine = function(categoriesOfSummary) {
       rectangle = categoryBox.append('rect').style('fill', colorScale(box)).style('stroke-width', '0px').style('fill-opacity', '1');
       text = categoryBox.append('text').text(categoriesOfSummary[box]).style("text-anchor", "middle").attr("dominant-baseline", "central").style("font-family", "verdana").style("font-weight", "bold").style('fill', '#EEEEEE');
       rectangle.on('mouseover', function() {
-        return d3.select(this).transition().duration(300).ease('circle').style('fill', '#999999');
+        return d3.select(this).transition().duration(200).ease('circle').style('fill', '#999999');
       }).on('mouseout', colorTransition(box));
-      svg.boxes[box] = {};
-      svg.boxes[box].element = rectangle;
-      _results.push(svg.boxes[box].text = text);
+      svg.categories[box] = {};
+      svg.categories[box].element = rectangle;
+      _results.push(svg.categories[box].text = text);
     }
     return _results;
   };
@@ -179,7 +179,7 @@ sceneDefine = function(categoriesOfSummary) {
   };
   titlePort = function() {
     svg.titlePort = svg.main.append('rect').style('fill', '#2F72FF');
-    return svg.title = svg.main.append('text').text("Something Something Something Title").style("text-anchor", "middle").style('fill', "#eeeeee");
+    return svg.title = svg.main.append('text').text("Something Something Something Title").style("text-anchor", "middle").style('fill', "#666666");
   };
   rightPane = function() {
     svg.rightPane = {};
@@ -222,7 +222,7 @@ sceneDefine = function(categoriesOfSummary) {
     };
   };
   main();
-  boxBlock(categoriesOfSummary);
+  categoriesBlock(categoriesOfSummary);
   rightPane();
   textPort();
   titlePort();
@@ -248,7 +248,7 @@ sceneDefine = function(categoriesOfSummary) {
     'paddingX': 30,
     'height': 35
   };
-  return svg.downButton.element = svg.main.append('svg:image').attr('xlink:href', 'images/downScroll4.svg').attr('preserveAspectRatio', 'none').on('mouseover', function() {
+  return svg.downButton.element = svg.main.append('svg:image').attr('xlink:href', 'images/downScroll5.svg').attr('preserveAspectRatio', 'none').on('mouseover', function() {
     console.log('hover');
     return svg.downButton.element.transition().ease('sin').duration(200).attr('height', svg.downButton.geometry.height + (svg.downButton.geometry.paddingY * 2 / 3));
   }).on('mouseout', function() {
@@ -332,27 +332,23 @@ sceneSync = function(mode) {
   };
   svg.fontDecreaseButton.attr('x', viewport.width - (fontButtonGeometry.width * 2) - 7).attr('y', layout.separator.top.y - fontButtonGeometry.height - 7).attr('width', fontButtonGeometry.width).attr('height', fontButtonGeometry.height);
   svg.fontIncreaseButton.attr('x', viewport.width - fontButtonGeometry.width - 7 - 1).attr('y', layout.separator.top.y - fontButtonGeometry.height - 7).attr('width', fontButtonGeometry.width).attr('height', fontButtonGeometry.height);
-  boxH = (totalH / 2) / (svg.boxes.length - 1);
-  for (i = _i = 0, _ref = svg.boxes.length - 1; 0 <= _ref ? _i <= _ref : _i >= _ref; i = 0 <= _ref ? ++_i : --_i) {
-    svg.boxes[i].x1 = 0;
-    svg.boxes[i].x2 = layout.separator.left.x.current;
-    if (i === 0) {
-      svg.boxes[i].y1 = layout.separator.top.y - 0.5;
-      svg.boxes[i].y2 = layout.separator.top.y + (totalH / 2) + 0.5;
-    } else {
-      svg.boxes[i].y1 = layout.separator.top.y + (totalH / 2) + Math.floor(boxH * (i - 1)) - 0.5;
-      svg.boxes[i].y2 = layout.separator.top.y + (totalH / 2) + Math.floor(boxH * i) + 0.5;
-    }
-    width = util.calcLength(svg.boxes[i].x1, svg.boxes[i].x2);
-    height = util.calcLength(svg.boxes[i].y1, svg.boxes[i].y2);
+  boxH = totalH / svg.categories.length;
+  for (i = _i = 0, _ref = svg.categories.length - 1; 0 <= _ref ? _i <= _ref : _i >= _ref; i = 0 <= _ref ? ++_i : --_i) {
+    svg.categories[i].x1 = 0;
+    svg.categories[i].x2 = layout.separator.left.x.current;
     /*
-    console.log svg.boxes[i].y1
-    console.log svg.boxes[i].y2
-    console.log '---'
+    if i is 0
+      svg.categories[i].y1 = layout.separator.top.y - 0.5
+      svg.categories[i].y2 = layout.separator.top.y + (totalH/2) + 0.5
+    else
     */
 
-    svg.boxes[i].element.attr('x', svg.boxes[i].x1).attr('width', width).attr('y', svg.boxes[i].y1).attr('height', height);
-    svg.boxes[i].text.attr('x', svg.boxes[i].x1 + width / 2).attr('y', svg.boxes[i].y1 + height / 2);
+    svg.categories[i].y1 = layout.separator.top.y + Math.floor(boxH * i) - 0.5;
+    svg.categories[i].y2 = layout.separator.top.y + Math.floor(boxH * (i + 1)) + 0.5;
+    width = util.calcLength(svg.categories[i].x1, svg.categories[i].x2);
+    height = util.calcLength(svg.categories[i].y1, svg.categories[i].y2);
+    svg.categories[i].element.attr('x', svg.categories[i].x1).attr('width', width).attr('y', svg.categories[i].y1).attr('height', height);
+    svg.categories[i].text.attr('x', svg.categories[i].x1 + width / 2).attr('y', svg.categories[i].y1 + height / 2);
   }
   svg.downButton.redraw = function() {
     svg.downButton.geometry.x = layout.separator.left.x.current + svg.downButton.geometry.paddingX;
@@ -424,9 +420,11 @@ data.get('abstract', function(response) {
   return console.dir(segments);
 });
 
-data.get('categoriesOfSummary', function(response) {
+data.get('categories', function(response) {
+  var categories;
   console.log(response);
-  return categoriesOfSummary = JSON.parse(response).names;
+  categories = JSON.parse(response).level1;
+  return categoriesOfSummary = JSON.parse(response).level2;
 });
 
 data.get('TOC', function(response) {

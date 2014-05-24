@@ -74,13 +74,13 @@ module.exports = (segments, fontSizeChange, scroll, mode) ->
       # add an svg group element for the segment
       segment.element = svg.textPortInnerSVG.subElement.append('g')
                                  .style('text-anchor', 'start')
-                                 .style('fill', '#DDDDDD')                                                                                                                                            
+                                 .style('fill', '#EEEEEE')
                                  .style('font-family',fontFamily)
                                  .style('font-size',fontSize)
 
       # add curvy rectangle for the group
       segment.enclosure = {}
-      segment.enclosure.element = segment.element.append('rect').style('opacity', 1).style('fill', '#888888')                             
+      segment.enclosure.element = segment.element.append('rect').style('opacity', 0.9).style('fill', '#87CEFA')  # 888888
 
       segmentTokens = []
       x = enclosing.paddingX
