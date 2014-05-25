@@ -251,14 +251,18 @@ sceneDefine = (categoriesOfSummary) ->
     svg.titlePort = svg.main.append('rect')
                             .style('fill', '#2F72FF')   
 
-    svg.titleSVG = d3.select('body').append('svg') # required for later 3d transform, as a direct 3d transform can only be done over html or top svg element
-    #svg.titleSVG = svg.titlePort.append('svg') # required for later 3d transform, as a direct 3d transform can only be done over html or top svg element
+    #svg.titleForeignContainer = d3.select('body').append('svg') # required for later 3d transform, as a direct 3d transform can only be done over html or top svg element
+    #svg.titleForeignContainer = svg.titlePort.append('svg') # required for later 3d transform, as a direct 3d transform can only be done over html or top svg element
+    #svg.titleForeignContainer.style('-webkit-transform', 'perspective(8px) rotateX(1deg)')
+    svg.titleForeignContainer = svg.main.append('foreignObject')
+                           .append('xhtml:body')
+                           .html("<svg style='-webkit-transform: perspective(40px) rotateX(2deg)' id='title'></svg>")
 
-    svg.titleSVG.style('-webkit-transform', 'perspective(8px) rotateX(1deg)')
-
-    svg.title = svg.titleSVG.append('text').text("Something Something Something Title")
+    svg.title = d3.select('#title').append('text').text("Something Something Something Title")
+                                       .attr("id", "title")
+                                       .attr("dominant-baseline", "central")
                                        .style("text-anchor", "middle")
-                                       .style('fill', "#666666")
+                                       .style('fill', "#EEEEEE")
 
   rightPane = ->
     svg.rightPane = {}
@@ -429,29 +433,22 @@ sceneSync = (mode) ->
                .attr('rx', 10)
                .attr('rx', 10)              
 
-  svg.titleSVG.attr('width', viewport.width - 5 - 5)
+  svg.titleForeignContainer.attr('width', viewport.width - 5 - 5)
               .attr('height', layout.separator.top.y - 5 - 5)
               .attr('x', 5)
               .attr('y', 5)
               .style('stroke-width', '7px')
-              .attr('rx', 10)
-              .attr('rx', 10)              
-             .style('font-family', 'Helvetica')
-             .style("font-weight", "bold")
-             .attr("font-size", "30px")
-             .attr("dominant-baseline", "central")
 
+  d3.select('#title')
+           .attr('width', viewport.width - 5 - 5)
+           .attr('height', layout.separator.top.y - 5 - 5)           
 
-  ###
   svg.title.attr('x', viewport.width / 2)
            .attr('y', 0)
            .style('font-family', 'Helvetica')
            .style("font-weight", "bold")
            .attr("font-size", "30px")
-           .attr("dominant-baseline", "central")
-   ###
 
-  ###
   if firstEntry
     svg.title.transition().duration(1000).ease('bounce')
                                         .attr('x', viewport.width / 2)
@@ -460,12 +457,12 @@ sceneSync = (mode) ->
     svg.title
        .attr('x', viewport.width / 2)
        .attr('y', layout.separator.top.y / 2)
-  ###
 
+  ###
   svg.title
      .attr('x', viewport.width / 2)
      .attr('y', layout.separator.top.y / 2)
-
+  ###
 
   firstEntry = false
 
