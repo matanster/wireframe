@@ -207,9 +207,10 @@ sceneDefine = function(categoriesOfSummary) {
     return svg.textPort.element = svg.main.append('rect').style('stroke', '#222222').style('fill', '#222222');
   };
   titlePort = function() {
-    svg.titlePort = svg.main.append('rect').style('fill', '#2F72FF');
-    svg.titleForeignContainer = svg.main.append('foreignObject').append('xhtml:body').html("<svg style='-webkit-transform: perspective(40px) rotateX(2deg)' id='title'></svg>");
-    return svg.title = d3.select('#title').append('text').text("Something Something Something Title").attr("id", "title").attr("dominant-baseline", "central").style("text-anchor", "middle").style('fill', "#EEEEEE");
+    svg.titlePort = svg.main.append('g');
+    svg.titlePortRect = svg.titlePort.append('rect').style('fill', '#2F72FF');
+    svg.titleForeignContainer = svg.titlePort.append('foreignObject').append('xhtml:body').html("<svg style='-webkit-transform: perspective(40px) rotateX(2deg)' id='titleSVG'></svg>");
+    return svg.title = d3.select('#titleSVG').append('text').text("Something Something Something Title").attr("id", "title").attr("dominant-baseline", "central").style("text-anchor", "middle").style('fill', "#EEEEEE");
   };
   rightPane = function() {
     svg.rightPane = {};
@@ -330,21 +331,16 @@ sceneSync = function(mode) {
   svgUtil.sync(svg.textPort);
   console.log(svg.textPort.element.attr('width'));
   console.log(svg.textPort.geometry.width);
-  svg.titlePort.attr('width', viewport.width - 5 - 5).attr('height', layout.separator.top.y - 5 - 5).attr('x', 5).attr('y', 5).style('stroke-width', '7px').attr('rx', 10).attr('rx', 10);
-  svg.titleForeignContainer.attr('width', viewport.width - 5 - 5).attr('height', layout.separator.top.y - 5 - 5).attr('x', 5).attr('y', 5).style('stroke-width', '7px');
-  d3.select('#title').attr('width', viewport.width - 5 - 5).attr('height', layout.separator.top.y - 5 - 5);
+  svg.titlePortRect.attr('width', viewport.width - 5 - 5).attr('height', layout.separator.top.y - 5 - 5).attr('x', 5).attr('y', -50).style('stroke-width', '7px').attr('rx', 10).attr('rx', 10);
+  d3.select('#titleSVG').attr('width', viewport.width - 5 - 5).attr('height', layout.separator.top.y - 5 - 5);
   svg.title.attr('x', viewport.width / 2).attr('y', 0).style('font-family', 'Helvetica').style("font-weight", "bold").attr("font-size", "30px");
   if (firstEntry) {
-    svg.title.transition().duration(1000).ease('bounce').attr('x', viewport.width / 2).attr('y', layout.separator.top.y / 2);
+    svg.title.transition().duration(300).ease('sin').attr('y', layout.separator.top.y / 2);
+    svg.titlePortRect.transition().duration(300).ease('sin').attr('y', 5);
   } else {
-    svg.title.attr('x', viewport.width / 2).attr('y', layout.separator.top.y / 2);
+    svg.title.attr('y', layout.separator.top.y / 2);
+    svg.titlePortRect.attr('y', 5);
   }
-  /*
-  svg.title
-     .attr('x', viewport.width / 2)
-     .attr('y', layout.separator.top.y / 2)
-  */
-
   firstEntry = false;
   console.log('before textporting from scenesync');
   if (tokens != null) {

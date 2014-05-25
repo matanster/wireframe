@@ -248,21 +248,23 @@ sceneDefine = (categoriesOfSummary) ->
                            .style('fill', '#222222')   
 
   titlePort = () ->
-    svg.titlePort = svg.main.append('rect')
-                            .style('fill', '#2F72FF')   
+    svg.titlePort = svg.main.append('g') # for now this grouping isn't used for anything, but a best practice anyway
 
-    #svg.titleForeignContainer = d3.select('body').append('svg') # required for later 3d transform, as a direct 3d transform can only be done over html or top svg element
-    #svg.titleForeignContainer = svg.titlePort.append('svg') # required for later 3d transform, as a direct 3d transform can only be done over html or top svg element
-    #svg.titleForeignContainer.style('-webkit-transform', 'perspective(8px) rotateX(1deg)')
-    svg.titleForeignContainer = svg.main.append('foreignObject')
+    svg.titlePortRect = svg.titlePort.append('rect')
+                                     .style('fill', '#2F72FF')   
+
+    # nest an html element containing an svg, inside the topmost svg hook, so we can use a non-svg transform on it
+    svg.titleForeignContainer = svg.titlePort.append('foreignObject')
                            .append('xhtml:body')
-                           .html("<svg style='-webkit-transform: perspective(40px) rotateX(2deg)' id='title'></svg>")
+                           .html("<svg style='-webkit-transform: perspective(40px) rotateX(2deg)' id='titleSVG'></svg>")
+    
+    # modify the svg nested inside the html just created
+    svg.title = d3.select('#titleSVG').append('text').text("Something Something Something Title")
+                                      .attr("id", "title")
+                                      .attr("dominant-baseline", "central")
+                                      .style("text-anchor", "middle")
+                                      .style('fill', "#EEEEEE")
 
-    svg.title = d3.select('#title').append('text').text("Something Something Something Title")
-                                       .attr("id", "title")
-                                       .attr("dominant-baseline", "central")
-                                       .style("text-anchor", "middle")
-                                       .style('fill', "#EEEEEE")
 
   rightPane = ->
     svg.rightPane = {}
@@ -425,21 +427,16 @@ sceneSync = (mode) ->
   console.log svg.textPort.geometry.width
 
   # draw title port 
-  svg.titlePort.attr('width', viewport.width - 5 - 5)
+  svg.titlePortRect.attr('width', viewport.width - 5 - 5)
                .attr('height', layout.separator.top.y - 5 - 5)
                .attr('x', 5)
-               .attr('y', 5)
+               .attr('y', -50)
                .style('stroke-width', '7px')
                .attr('rx', 10)
                .attr('rx', 10)              
 
-  svg.titleForeignContainer.attr('width', viewport.width - 5 - 5)
-              .attr('height', layout.separator.top.y - 5 - 5)
-              .attr('x', 5)
-              .attr('y', 5)
-              .style('stroke-width', '7px')
-
-  d3.select('#title')
+  #svg.titleForeignContainer.style('stroke-width', '7px')
+  d3.select('#titleSVG')
            .attr('width', viewport.width - 5 - 5)
            .attr('height', layout.separator.top.y - 5 - 5)           
 
@@ -450,19 +447,16 @@ sceneSync = (mode) ->
            .attr("font-size", "30px")
 
   if firstEntry
-    svg.title.transition().duration(1000).ease('bounce')
-                                        .attr('x', viewport.width / 2)
-                                        .attr('y', layout.separator.top.y / 2)
+    svg.title.transition().duration(300).ease('sin')
+                                         .attr('y', layout.separator.top.y / 2)
+    svg.titlePortRect.transition().duration(300).ease('sin')
+                                         .attr('y', 5)
+
   else 
     svg.title
-       .attr('x', viewport.width / 2)
        .attr('y', layout.separator.top.y / 2)
-
-  ###
-  svg.title
-     .attr('x', viewport.width / 2)
-     .attr('y', layout.separator.top.y / 2)
-  ###
+    svg.titlePortRect
+       .attr('y', 5)       
 
   firstEntry = false
 
