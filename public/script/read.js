@@ -225,7 +225,9 @@ sceneDefine = function(categoriesOfSummary) {
   };
   titlePort = function() {
     svg.titlePort = svg.main.append('rect').style('fill', '#2F72FF');
-    return svg.title = svg.main.append('text').text("Something Something Something Title").style("text-anchor", "middle").style('fill', "#666666");
+    svg.titleSVG = d3.select('body').append('svg');
+    svg.titleSVG.style('-webkit-transform', 'perspective(8px) rotateX(1deg)');
+    return svg.title = svg.titleSVG.append('text').text("Something Something Something Title").style("text-anchor", "middle").style('fill', "#666666");
   };
   rightPane = function() {
     svg.rightPane = {};
@@ -347,12 +349,28 @@ sceneSync = function(mode) {
   console.log(svg.textPort.element.attr('width'));
   console.log(svg.textPort.geometry.width);
   svg.titlePort.attr('width', viewport.width - 5 - 5).attr('height', layout.separator.top.y - 5 - 5).attr('x', 5).attr('y', 5).style('stroke-width', '7px').attr('rx', 10).attr('rx', 10);
-  svg.title.attr('x', viewport.width / 2).attr('y', 0).style('font-family', 'Helvetica').style("font-weight", "bold").attr("font-size", "30px").attr("dominant-baseline", "central");
-  if (firstEntry) {
-    svg.title.transition().duration(1000).ease('bounce').attr('x', viewport.width / 2).attr('y', layout.separator.top.y / 2);
-  } else {
-    svg.title.attr('x', viewport.width / 2).attr('y', layout.separator.top.y / 2);
-  }
+  svg.titleSVG.attr('width', viewport.width - 5 - 5).attr('height', layout.separator.top.y - 5 - 5).attr('x', 5).attr('y', 5).style('stroke-width', '7px').attr('rx', 10).attr('rx', 10).style('font-family', 'Helvetica').style("font-weight", "bold").attr("font-size", "30px").attr("dominant-baseline", "central");
+  /*
+  svg.title.attr('x', viewport.width / 2)
+           .attr('y', 0)
+           .style('font-family', 'Helvetica')
+           .style("font-weight", "bold")
+           .attr("font-size", "30px")
+           .attr("dominant-baseline", "central")
+  */
+
+  /*
+  if firstEntry
+    svg.title.transition().duration(1000).ease('bounce')
+                                        .attr('x', viewport.width / 2)
+                                        .attr('y', layout.separator.top.y / 2)
+  else 
+    svg.title
+       .attr('x', viewport.width / 2)
+       .attr('y', layout.separator.top.y / 2)
+  */
+
+  svg.title.attr('x', viewport.width / 2).attr('y', layout.separator.top.y / 2);
   firstEntry = false;
   console.log('before textporting from scenesync');
   if (tokens != null) {
