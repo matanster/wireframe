@@ -21,13 +21,13 @@ svg = globalDims.svg;
 
 layout = globalDims.layout;
 
-console.log('read.js main started');
-
 firstEntry = true;
 
 viewport = null;
 
 states = {};
+
+states.userChoice = 'Shortest summary';
 
 tokens = void 0;
 
@@ -95,7 +95,6 @@ sceneDefine = function(categoriesOfSummary) {
   };
   categoriesOfSummaryPanes = function(categories) {
     var box, colorScale, colorTransition, group, numberOfBoxes, rectangle, text, _i, _ref, _results;
-    console.log(categories);
     numberOfBoxes = categories.length;
     colorScale = d3.scale.linear().domain([0, numberOfBoxes - 1]).range(['#87CEFA', '#00BFFF']);
     colorTransition = function(i) {
@@ -115,13 +114,14 @@ sceneDefine = function(categoriesOfSummary) {
       svg.categories.level2[box] = {};
       svg.categories.level2[box].group = group;
       svg.categories.level2[box].element = rectangle;
-      _results.push(svg.categories.level2[box].text = text);
+      svg.categories.level2[box].text = text;
+      svg.categories.level2[box].neutralColor = colorTransition(box);
+      _results.push(svg.categories.level2[box].state = 'hidden');
     }
     return _results;
   };
   mainPanes = function(categories) {
-    var box, colorScale, colorTransition, group, numberOfBoxes, rectangle, text, _i, _ref, _results;
-    console.log(categories);
+    var box, colorScale, colorTransition, group, numberOfBoxes, rectangle, text, _i, _ref;
     numberOfBoxes = categories.length;
     colorScale = d3.scale.linear().domain([0, numberOfBoxes - 1]).range(['#87CEFA', '#00BFFF']);
     colorTransition = function(i) {
@@ -130,20 +130,43 @@ sceneDefine = function(categoriesOfSummary) {
       };
     };
     svg.categories.level1 = [];
-    _results = [];
     for (box = _i = 0, _ref = numberOfBoxes - 1; 0 <= _ref ? _i <= _ref : _i >= _ref; box = 0 <= _ref ? ++_i : --_i) {
       group = svg.main.append('g').style('-webkit-user-select', 'none').style('-webkit-touch-callout', 'none').style('user-select', 'none');
       rectangle = group.append('rect').style('fill', colorScale(box)).style('stroke-width', '0px').style('fill-opacity', '1');
       text = group.append('text').text(categories[box]).style("text-anchor", "middle").attr("dominant-baseline", "central").style("font-family", "verdana").style("font-weight", "bold").style('fill', '#EEEEEE');
-      rectangle.on('mouseover', function() {
-        return d3.select(this).transition().duration(200).ease('circle').style('fill', '#999999');
-      }).on('mouseout', colorTransition(box));
       svg.categories.level1[box] = {};
       svg.categories.level1[box].group = group;
       svg.categories.level1[box].element = rectangle;
-      _results.push(svg.categories.level1[box].text = text);
+      console.dir(svg.categories.level1[box].element);
+      svg.categories.level1[box].text = text;
+      svg.categories.level1[box].state = 'neutral';
+      svg.categories.level1[box].element.__sceneLink__ = svg.categories.level1[box];
+      console.dir(svg.categories.level1[box].element);
+      svg.categories.level1[box].recolor = function() {
+        switch (this.state) {
+          case 'selected':
+            return this.element.style('fill', '#999999');
+          case 'neutral':
+            return this.element.style('fill', colorTransition(box));
+        }
+      };
+      rectangle.on('mouseover', function() {
+        return console.dir(d3.select(this));
+      });
+      /*
+      rectangle.on('mouseover', () -> 
+        dataHolder = d3.select(this)
+        console.dir dataHolder
+        unless dataHolder.__sceneLink__.state is 'selected'
+          d3.select(this).attr('data-pre-hover-color', d3.select(this).style('fill')) # store current color
+          d3.select(this).transition().duration(200).ease('circle').style('fill', '#AAAAAA'))
+      */
+
+      rectangle.on('mouseout', function() {
+        return d3.select(this).transition().duration(200).ease('circle').style('fill', d3.select(this).attr('data-pre-hover-color'));
+      });
     }
-    return _results;
+    return svg.categories.level1[0].state = 'selected';
   };
   textPort = function() {
     svg.textPortBoundary = {};
@@ -236,7 +259,6 @@ sceneDefine = function(categoriesOfSummary) {
       });
     });
     return svg.rightPane.redraw = function() {
-      console.log('right pane redraw');
       if (states.showTOC === 'in progress') {
         svg.rightPane.geometry.width = svg.TOC.geometry.width;
       } else {
@@ -262,16 +284,10 @@ sceneDefine = function(categoriesOfSummary) {
   svg.fontSize = svg.main.append("g");
   svg.fontDecreaseButton = svg.fontSize.append("svg:image").attr("xlink:href", "fontSmall.svg");
   svg.fontIncreaseButton = svg.fontSize.append("svg:image").attr("xlink:href", "fontLarge.svg");
-  svg.fontDecreaseButton.on('mouseover', function() {
-    return console.log('hover');
-  }).on('mousedown', function() {
-    console.log('click font decrease');
+  svg.fontDecreaseButton.on('mousedown', function() {
     return textporting(tokens, -2);
   });
-  svg.fontIncreaseButton.on('mouseover', function() {
-    return console.log('hover');
-  }).on('mousedown', function() {
-    console.log('click font increase');
+  svg.fontIncreaseButton.on('mousedown', function() {
     return textporting(tokens, 2);
   });
   svg.downButton = {};
@@ -281,21 +297,17 @@ sceneDefine = function(categoriesOfSummary) {
     'height': 35
   };
   return svg.downButton.element = svg.main.append('svg:image').attr('xlink:href', 'images/downScroll5.svg').attr('preserveAspectRatio', 'none').on('mouseover', function() {
-    console.log('hover');
     return svg.downButton.element.transition().ease('sin').duration(200).attr('height', svg.downButton.geometry.height + (svg.downButton.geometry.paddingY * 2 / 3));
   }).on('mouseout', function() {
-    console.log('hover');
     return svg.downButton.element.transition().duration(400).attr('height', svg.downButton.geometry.height);
   }).on('mousedown', function() {
-    console.log('scroll');
     return textporting(tokens, 0, true);
   });
 };
 
 sceneSync = function(mode) {
-  var autoUpdate, fontButtonGeometry, groupY, panes, update;
+  var autoUpdate, fontButtonGeometry, groupY, pane, panes, update, _i, _len, _ref;
   viewport = util.getViewport();
-  console.dir(viewport);
   layout.separator.top = {
     'y': calcStart()
   };
@@ -329,8 +341,6 @@ sceneSync = function(mode) {
     'stroke-width': '15px'
   };
   svgUtil.sync(svg.textPort);
-  console.log(svg.textPort.element.attr('width'));
-  console.log(svg.textPort.geometry.width);
   svg.titlePortRect.attr('width', viewport.width - 5 - 5).attr('height', layout.separator.top.y - 5 - 5).attr('x', 5).attr('y', -50).style('stroke-width', '7px').attr('rx', 10).attr('rx', 10);
   d3.select('#titleSVG').attr('width', viewport.width - 5 - 5).attr('height', layout.separator.top.y - 5 - 5);
   svg.title.attr('x', viewport.width / 2).attr('y', 0).style('font-family', 'Helvetica').style("font-weight", "bold").attr("font-size", "30px");
@@ -342,11 +352,9 @@ sceneSync = function(mode) {
     svg.titlePortRect.attr('y', 5);
   }
   firstEntry = false;
-  console.log('before textporting from scenesync');
   if (tokens != null) {
     switch (mode) {
       case 'animate':
-        console.log('in animate');
         update = 0;
         autoUpdate = setInterval((function() {
           textporting(tokens);
@@ -357,7 +365,6 @@ sceneSync = function(mode) {
         }), 50);
         break;
       default:
-        console.log('without animate');
         textporting(tokens);
     }
   }
@@ -392,21 +399,26 @@ sceneSync = function(mode) {
   };
   groupY = layout.separator.top.y - 0.5;
   panes(groupY, totalH, layout.separator.left.x.current, svg.categories.level1);
-  svg.categories.level1[0].element.style('fill', '#999999');
   groupY = totalH / 2 + layout.separator.top.y - 0.5;
   panes(groupY, totalH / 2, layout.separator.left.x.current, svg.categories.level2);
+  _ref = svg.categories.level1;
+  for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+    pane = _ref[_i];
+    pane.recolor();
+  }
   svg.categories.level1[1].element.on('mousedown', function() {
     return svg.categories.level1[1].group.attr('visibility', 'hidden');
   });
   svg.categories.level1[0].element.on('mousedown', function() {
     return svg.categories.level1[1].group.attr('visibility', 'visible');
   });
-  svg.categories.level2[1].element.on('mousedown', function() {
-    textporting(tokens);
+  svg.categories.level1[0].element.on('mousedown', function() {
+    states.menuChoice = 'Shortest summary';
+    textportingAbstract(segments);
     return svg.downButton.redraw();
   });
-  svg.categories.level1[0].element.on('mousedown', function() {
-    textportingAbstract(segments);
+  svg.categories.level2[1].element.on('mousedown', function() {
+    textporting(tokens);
     return svg.downButton.redraw();
   });
   svg.downButton.redraw = function() {
@@ -418,8 +430,7 @@ sceneSync = function(mode) {
   svg.downButton.redraw();
   svg.rightPane.redraw();
   return svg.TOC.redraw = function() {
-    var TOCToken, lHeight, paddingX, paddingY, spaceWidth, tokenViewable, viewPortFull, x, y, _i, _len, _results;
-    console.log('starting TOC redraw');
+    var TOCToken, lHeight, paddingX, paddingY, spaceWidth, tokenViewable, viewPortFull, x, y, _j, _len1, _results;
     spaceWidth = textDraw.tokenToViewable('a a', svg.TOC.subElement).width - textDraw.tokenToViewable('aa', svg.TOC.subElement).width;
     lHeight = textDraw.tokenToViewable('l', svg.TOC.subElement).height;
     paddingX = 30;
@@ -428,8 +439,8 @@ sceneSync = function(mode) {
     viewPortFull = false;
     y = 0;
     _results = [];
-    for (_i = 0, _len = TOCTokens.length; _i < _len; _i++) {
-      TOCToken = TOCTokens[_i];
+    for (_j = 0, _len1 = TOCTokens.length; _j < _len1; _j++) {
+      TOCToken = TOCTokens[_j];
       x = paddingX;
       tokenViewable = textDraw.tokenToViewable(TOCToken.text, svg.TOC.subElement);
       switch (TOCToken.level) {
@@ -448,7 +459,6 @@ sceneSync = function(mode) {
         tokenViewable.svg.attr('y', y);
         x += tokenViewable.width;
       } else {
-        console.log('text port full');
         viewPortFull = true;
         break;
       }
@@ -459,37 +469,32 @@ sceneSync = function(mode) {
 };
 
 data.get('introduction', function(response) {
-  console.log(response);
-  tokens = tokenize(response);
-  return console.dir(tokens);
+  return tokens = tokenize(response);
 });
 
 data.get('abstract', function(response) {
-  var rawSegment, rawSegments, segment, _i, _len;
-  console.dir(response);
+  var rawSegment, rawSegments, segment, _i, _len, _results;
   rawSegments = JSON.parse(response).segments;
   segments = [];
+  _results = [];
   for (_i = 0, _len = rawSegments.length; _i < _len; _i++) {
     rawSegment = rawSegments[_i];
     segment = new Object;
     segment.category = rawSegment.category;
     segment.tokens = rawSegment.text.split(' ');
-    segments.push(segment);
+    _results.push(segments.push(segment));
   }
-  return console.dir(segments);
+  return _results;
 });
 
-data.get('categories', function(response) {
-  console.log(response);
-  mainCategories = JSON.parse(response).level1;
-  return categoriesOfSummary = JSON.parse(response).level2;
+data.get('categories - old', function(response) {
+  mainCategories = JSON.parse(response).Top;
+  return categoriesOfSummary = JSON.parse(response).More;
 });
 
 data.get('TOC', function(response) {
   var rawTOC, rawToken, token, _i, _len, _ref, _results;
-  console.log(response);
   rawTOC = JSON.parse(response);
-  console.dir(rawTOC);
   _ref = rawTOC.entries;
   _results = [];
   for (_i = 0, _len = _ref.length; _i < _len; _i++) {

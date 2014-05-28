@@ -1,14 +1,22 @@
-{ "level1":
+{ "Introduction": 
+  [],
+  "What were the article goals?":
   [
-    "Shortest summary",
-    "More"
+    "problem definition",
+    "purpose",
+    "hypotheses"
   ],
-  "level2":
+  "How was the research accomplished?":
+  [],    
+  "What were the findings?":
   [
-    "hypotheses",
-    "introduction",
-    "conclusions",
-    "article purpose",
-    "article limitations"
+    "findings",
+    "conclusions"
+  ],
+  "So what?":
+  [
+    "contribution",
+    "implications",
+    "recommendation"
   ]
 }

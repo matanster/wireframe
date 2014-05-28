@@ -1,0 +1,28 @@
+{ "Top":
+  [
+    "Shortest summary",
+    "More"
+  ],
+  "More":
+  [
+    "goals",
+    "introduction",
+    "method",
+    "outcomes"
+  ],
+  "goals":
+  [
+    "problem definition",
+    "purpose",
+    "hypothesis"
+  ],
+  "outcomes":
+  [
+    "findings",
+    "conclusions",
+    "contribution",
+    "implications",
+    "recommendation",
+    "limitations"
+  ]  
+}

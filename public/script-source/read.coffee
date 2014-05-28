@@ -11,14 +11,16 @@ globalDims = require './globalDims'
 svg    = globalDims.svg
 layout = globalDims.layout
 
-console.log 'read.js main started'
+#console.log 'read.js main started'
 
 firstEntry = true
 
 # Globals
 viewport  = null
 states    = {}
+states.userChoice = 'Shortest summary'
 
+# Convenience globals - this can be refactored
 tokens    = undefined
 TOCTokens = []
 categoriesOfSummary = undefined
@@ -87,7 +89,7 @@ sceneDefine = (categoriesOfSummary) ->
 
   categoriesOfSummaryPanes = (categories) ->
 
-    console.log categories
+    #console.log categories
     numberOfBoxes = categories.length
 
     colorScale = d3.scale.linear().domain([0, numberOfBoxes-1]).range(['#87CEFA', '#00BFFF'])
@@ -121,11 +123,12 @@ sceneDefine = (categoriesOfSummary) ->
       svg.categories.level2[box].group = group
       svg.categories.level2[box].element = rectangle
       svg.categories.level2[box].text = text
-
+      svg.categories.level2[box].neutralColor = colorTransition(box)
+      svg.categories.level2[box].state = 'hidden'
 
   mainPanes = (categories) ->
 
-    console.log categories
+    #console.log categories
     numberOfBoxes = categories.length
 
     colorScale = d3.scale.linear().domain([0, numberOfBoxes-1]).range(['#87CEFA', '#00BFFF'])
@@ -152,14 +155,39 @@ sceneDefine = (categoriesOfSummary) ->
                                        .style("font-weight", "bold")
                                        .style('fill', '#EEEEEE')                                                                                                               
 
-      rectangle.on('mouseover', () -> d3.select(this).transition().duration(200).ease('circle').style('fill', '#999999')) #0086B2 #FAF2DA
-               .on('mouseout', colorTransition(box))
-
       svg.categories.level1[box] = {}
       svg.categories.level1[box].group = group
       svg.categories.level1[box].element = rectangle
+      console.dir svg.categories.level1[box].element
       svg.categories.level1[box].text = text
-  
+      svg.categories.level1[box].state = 'neutral'
+      svg.categories.level1[box].element.__sceneLink__ = svg.categories.level1[box]
+      console.dir svg.categories.level1[box].element
+
+      svg.categories.level1[box].recolor = () ->
+        #window.alert(box)
+        switch this.state
+          when 'selected'
+            this.element.style('fill', '#999999')
+          when 'neutral'
+            this.element.style('fill', colorTransition(box))
+
+
+      rectangle.on('mouseover', () -> console.dir(d3.select(this)))
+      ###
+      rectangle.on('mouseover', () -> 
+        dataHolder = d3.select(this)
+        console.dir dataHolder
+        unless dataHolder.__sceneLink__.state is 'selected'
+          d3.select(this).attr('data-pre-hover-color', d3.select(this).style('fill')) # store current color
+          d3.select(this).transition().duration(200).ease('circle').style('fill', '#AAAAAA')) 
+      ###
+      rectangle.on('mouseout', () ->
+        d3.select(this).transition().duration(200).ease('circle').style('fill', d3.select(this).attr('data-pre-hover-color')))
+
+    # initialize status of first one as selected
+    svg.categories.level1[0].state = 'selected'
+
   textPort = () ->
 
     svg.textPortBoundary = {}
@@ -259,7 +287,7 @@ sceneDefine = (categoriesOfSummary) ->
                            .html("<svg style='-webkit-transform: perspective(40px) rotateX(2deg)' id='titleSVG'></svg>")
     
     # modify the svg nested inside the html just created
-    svg.title = d3.select('#titleSVG').append('text').text("Something Something Something Title")
+    svg.title = d3.select('#titleSVG').append('text').text("Something Something Something Title") # "the Relationship Between Human Capital and Firm Performance"
                                       .attr("id", "title")
                                       .attr("dominant-baseline", "central")
                                       .style("text-anchor", "middle")
@@ -309,7 +337,7 @@ sceneDefine = (categoriesOfSummary) ->
 
     svg.rightPane.redraw = ->
 
-      console.log 'right pane redraw'
+      #console.log 'right pane redraw'
 
       if states.showTOC is 'in progress'
         svg.rightPane.geometry.width = svg.TOC.geometry.width
@@ -343,14 +371,14 @@ sceneDefine = (categoriesOfSummary) ->
     .attr("xlink:href","fontLarge.svg")
 
   svg.fontDecreaseButton
-    .on('mouseover', () -> console.log('hover'))
+    #.on('mouseover', () -> #console.log('hover'))
     .on('mousedown', () -> 
-      console.log('click font decrease')
+      #console.log('click font decrease')
       textporting(tokens, -2))
   svg.fontIncreaseButton 
-    .on('mouseover', () -> console.log('hover'))
+    #.on('mouseover', () -> #console.log('hover'))
     .on('mousedown', () -> 
-      console.log('click font increase')
+      #console.log('click font increase')
       textporting(tokens, 2)) 
 
   # viewport down button 
@@ -365,13 +393,13 @@ sceneDefine = (categoriesOfSummary) ->
     .attr('xlink:href','images/downScroll5.svg')
     .attr('preserveAspectRatio', 'none')
     .on('mouseover', () -> 
-      console.log('hover')
+      #console.log('hover')
       svg.downButton.element.transition().ease('sin').duration(200).attr('height', svg.downButton.geometry.height + (svg.downButton.geometry.paddingY *2/3)))
     .on('mouseout', () -> 
-      console.log('hover')
+      #console.log('hover')
       svg.downButton.element.transition().duration(400).attr('height', svg.downButton.geometry.height))
     .on('mousedown', () -> 
-      console.log('scroll')
+      #console.log('scroll')
       textporting(tokens, 0, true)) 
 
 
@@ -384,7 +412,7 @@ sceneDefine = (categoriesOfSummary) ->
 sceneSync = (mode) ->
 
   viewport = util.getViewport()
-  console.dir viewport
+  #console.dir viewport
 
   layout.separator.top = { 'y' : calcStart()}
   end   = 0 # calcEnd()
@@ -423,8 +451,8 @@ sceneSync = (mode) ->
     'stroke-width': '15px'
 
   svgUtil.sync(svg.textPort)
-  console.log svg.textPort.element.attr('width')
-  console.log svg.textPort.geometry.width
+  #console.log svg.textPort.element.attr('width')
+  #console.log svg.textPort.geometry.width
 
   # draw title port 
   svg.titlePortRect.attr('width', viewport.width - 5 - 5)
@@ -461,13 +489,13 @@ sceneSync = (mode) ->
   firstEntry = false
 
   # show text if source tokens already loaded
-  console.log 'before textporting from scenesync'
+  #console.log 'before textporting from scenesync'
   if tokens? 
     #console.log mode
     switch mode
       when 'animate' # redraw every small interval, while the d3 transition for the right pane is in progress. 
                      # to do: this can be interleaved in the code more gracefully
-        console.log 'in animate'
+        #console.log 'in animate'
         update = 0
         autoUpdate = setInterval((()-> 
           textporting(tokens)
@@ -475,7 +503,7 @@ sceneSync = (mode) ->
           update += 1
         ), 50)  
       else
-        console.log 'without animate'
+        #console.log 'without animate'
         textporting(tokens)
 
     
@@ -548,10 +576,12 @@ sceneSync = (mode) ->
   groupY = layout.separator.top.y - 0.5
   panes(groupY, totalH, layout.separator.left.x.current, svg.categories.level1)
 
-  svg.categories.level1[0].element.style('fill', '#999999')
-
   groupY = totalH/2 + layout.separator.top.y - 0.5
   panes(groupY, totalH/2, layout.separator.left.x.current, svg.categories.level2)
+
+  for pane in svg.categories.level1
+    #window.alert('pane')
+    pane.recolor()
   
   svg.categories.level1[1].element.on('mousedown', () -> 
       svg.categories.level1[1].group.attr('visibility', 'hidden')
@@ -559,17 +589,18 @@ sceneSync = (mode) ->
 
   svg.categories.level1[0].element.on('mousedown', () -> 
       svg.categories.level1[1].group.attr('visibility', 'visible')
-      
-    )
-
-  svg.categories.level2[1].element.on('mousedown', () -> 
-      textporting(tokens)
-      #svg.rightPane.redraw()
-      svg.downButton.redraw()
     )
 
   svg.categories.level1[0].element.on('mousedown', () -> 
+      states.menuChoice = 'Shortest summary'
       textportingAbstract(segments)
+      svg.downButton.redraw()
+      #svg.rightPane.redraw()      
+  )      
+
+
+  svg.categories.level2[1].element.on('mousedown', () -> 
+      textporting(tokens)
       #svg.rightPane.redraw()
       svg.downButton.redraw()
     )
@@ -593,7 +624,7 @@ sceneSync = (mode) ->
 
   svg.TOC.redraw = () ->
 
-    console.log 'starting TOC redraw'
+    #console.log 'starting TOC redraw'
     # get the width of a space character
     spaceWidth = textDraw.tokenToViewable('a a', svg.TOC.subElement).width - textDraw.tokenToViewable('aa', svg.TOC.subElement).width
     # get the maximum character height in the font
@@ -634,7 +665,7 @@ sceneSync = (mode) ->
         tokenViewable.svg.attr('y', y)
         x += tokenViewable.width  
       else
-        console.log 'text port full'
+        #console.log 'text port full'
         viewPortFull = true
         break
     
@@ -649,16 +680,16 @@ sceneSync = (mode) ->
 # Get the data for getting started
 #
 data.get('introduction', (response) ->   
-  console.log(response)
+  #console.log(response)
   tokens = tokenize(response)
-  console.dir tokens
+  #console.dir tokens
 )
 
 #
 # Get the abstract data and restructure it
 #
 data.get('abstract', (response) ->   
-  console.dir(response)
+  #console.dir(response)
   rawSegments = JSON.parse(response).segments
   segments = []
   for rawSegment in rawSegments
@@ -667,20 +698,20 @@ data.get('abstract', (response) ->
     segment.tokens     = rawSegment.text.split(' ')
     segments.push segment
 
-  console.dir segments
+  #console.dir segments
 )
 
-data.get('categories', (response) -> 
-  console.log(response)
-  mainCategories       = JSON.parse(response).level1
-  categoriesOfSummary  = JSON.parse(response).level2
+data.get('categories - old', (response) -> 
+  #console.log(response)
+  mainCategories       = JSON.parse(response).Top
+  categoriesOfSummary  = JSON.parse(response).More
 )
 
 data.get('TOC', (response) -> 
   # get the TOC data
-  console.log(response)
+  #console.log(response)
   rawTOC = JSON.parse(response)
-  console.dir rawTOC
+  #console.dir rawTOC
 
   # restructure into tokens we can work with
   for rawToken in rawTOC.entries

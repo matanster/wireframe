@@ -60,24 +60,19 @@ module.exports = function(segments, fontSizeChange, scroll, mode) {
       _ref = segment.tokens;
       for (_j = 0, _len1 = _ref.length; _j < _len1; _j++) {
         textToken = _ref[_j];
-        console.log(textToken);
         tokenViewable = textDraw.tokenToViewable(textToken, segment.element);
         if (x + tokenViewable.width < svg.textPortInnerSVG.element.attr('width') - enclosing.paddingX) {
-          console.log('adding to line');
           tokenViewable.svg.attr('x', x);
           tokenViewable.svg.attr('y', y);
           x += tokenViewable.width;
-          console.log(svg.textPortInnerSVG.element.attr('width') + ' ' + x);
         } else {
           if (y + tokenViewable.height + lHeight < svg.textPortInnerSVG.element.attr('height')) {
-            console.log('adding to new line');
             x = enclosing.paddingX;
             y += tokenViewable.height;
             tokenViewable.svg.attr('x', x);
             tokenViewable.svg.attr('y', y);
             x += tokenViewable.width;
           } else {
-            console.log('text port full');
             viewPortFull = true;
             break;
           }
@@ -86,7 +81,6 @@ module.exports = function(segments, fontSizeChange, scroll, mode) {
           x += spaceWidth;
         }
       }
-      console.log(y);
       y += lHeight + enclosing.paddingY;
       segment.enclosure.geometry.height = y - segment.enclosure.geometry.y;
       svgUtil.sync(segment.enclosure);

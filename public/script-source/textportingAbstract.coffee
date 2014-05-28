@@ -95,26 +95,26 @@ module.exports = (segments, fontSizeChange, scroll, mode) ->
       # Calculate as if building the segment withing the text port
       for textToken in segment.tokens
 
-        console.log textToken
+        #console.log textToken
 
         tokenViewable = textDraw.tokenToViewable(textToken, segment.element)
 
         if x + tokenViewable.width < svg.textPortInnerSVG.element.attr('width') - enclosing.paddingX
-          console.log 'adding to line'
+          #console.log 'adding to line'
           tokenViewable.svg.attr('x', x)
           tokenViewable.svg.attr('y', y)
           x += tokenViewable.width
-          console.log svg.textPortInnerSVG.element.attr('width') + ' ' + x
+          #console.log svg.textPortInnerSVG.element.attr('width') + ' ' + x
         else  
           if y + tokenViewable.height + lHeight < svg.textPortInnerSVG.element.attr('height') 
-            console.log 'adding to new line'
+            #console.log 'adding to new line'
             x = enclosing.paddingX
             y += tokenViewable.height
             tokenViewable.svg.attr('x', x)
             tokenViewable.svg.attr('y', y)
             x += tokenViewable.width  
           else
-            console.log 'text port full'
+            #console.log 'text port full'
             viewPortFull = true
             break
         
@@ -123,7 +123,7 @@ module.exports = (segments, fontSizeChange, scroll, mode) ->
           x += spaceWidth
         #console.log "x after space adding = " + x
 
-      console.log y
+      #console.log y
       y += lHeight + enclosing.paddingY
 
       # size segment's svg rectangle proportionally to the text dimensions detected
