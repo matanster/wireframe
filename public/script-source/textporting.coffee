@@ -1,6 +1,6 @@
 # import global geometry
 globalDims = require './globalDims'
-svg    = globalDims.svg
+sceneObject    = globalDims.sceneObject
 layout = globalDims.layout
 
 textDraw = require './textDraw'
@@ -21,39 +21,39 @@ module.exports = (tokens, fontSizeChange, scroll, mode) ->
   # passing it on as a closures
   #
 
-  if svg.textPortInnerSVG? # discard existing text if already drawn
-    svg.textPortInnerSVG.element.remove()
+  if sceneObject.textPortInnerSVG? # discard existing text if already drawn
+    sceneObject.textPortInnerSVG.element.remove()
 
-  svg.textPortInnerSVG = {}
+  sceneObject.textPortInnerSVG = {}
 
   #
   # Create top SVG for all this, for easy relative positioning,
   # and a 'g' element to afford treating the whole bunch as one group
   #
-  svg.textPortInnerSVG.element = svg.main.append('svg')
+  sceneObject.textPortInnerSVG.element = sceneObject.main.append('svg')
 
-  svg.textPortInnerSVG.subElement = svg.textPortInnerSVG.element.append('g')
+  sceneObject.textPortInnerSVG.subElement = sceneObject.textPortInnerSVG.element.append('g')
                                  .style('text-anchor', 'start')
                                  .style('fill', 'rgb(255,255,220)')                                                                                                                                            
                                  .style('font-family',fontFamily)
                                  .style('font-size',fontSize)
 
   # get the width of a space character
-  spaceWidth = textDraw.tokenToViewable('a a', svg.textPortInnerSVG.subElement).width - 
-               textDraw.tokenToViewable('aa', svg.textPortInnerSVG.subElement).width
+  spaceWidth = textDraw.tokenToViewable('a a', sceneObject.textPortInnerSVG.subElement).width - 
+               textDraw.tokenToViewable('aa', sceneObject.textPortInnerSVG.subElement).width
   spaceWidth *= 1.4  # to make it more spacious akin to line justified text spacing 
   # get the maximum character height in the font
-  lHeight    = textDraw.tokenToViewable('l', svg.textPortInnerSVG.subElement).height
+  lHeight    = textDraw.tokenToViewable('l', sceneObject.textPortInnerSVG.subElement).height
 
   paddingX = 20
   paddingY = 18
 
-  console.log svg.textPort.element.attr('width')  - (paddingX * 2)
-  svg.textPortInnerSVG.element
-    .attr('x',      parseFloat(svg.textPort.element.attr('x')) + paddingX + 3)
-    .attr('width',  parseFloat svg.textPort.element.attr('width')  - (paddingX * 2) - 3)
-    .attr('y',      parseFloat(svg.textPort.element.attr('y')) + paddingY)
-    .attr('height', parseFloat svg.textPort.element.attr('height') - (paddingY * 2) - 50)
+  console.log sceneObject.textPort.element.attr('width')  - (paddingX * 2)
+  sceneObject.textPortInnerSVG.element
+    .attr('x',      parseFloat(sceneObject.textPort.element.attr('x')) + paddingX + 3)
+    .attr('width',  parseFloat sceneObject.textPort.element.attr('width')  - (paddingX * 2) - 3)
+    .attr('y',      parseFloat(sceneObject.textPort.element.attr('y')) + paddingY)
+    .attr('height', parseFloat sceneObject.textPort.element.attr('height') - (paddingY * 2) - 50)
 
   redraw = () ->
     #
@@ -64,7 +64,7 @@ module.exports = (tokens, fontSizeChange, scroll, mode) ->
     y = 0
     for token in tokens
 
-      tokenViewable = textDraw.tokenToViewable(token.text, svg.textPortInnerSVG.subElement)
+      tokenViewable = textDraw.tokenToViewable(token.text, sceneObject.textPortInnerSVG.subElement)
       #console.log token.mark
       
       #
@@ -79,13 +79,13 @@ module.exports = (tokens, fontSizeChange, scroll, mode) ->
           tokenViewable.svg.style('fill', 'rgb(100,200,200)')
           break
 
-      if x + tokenViewable.width < svg.textPortInnerSVG.element.attr('width')
+      if x + tokenViewable.width < sceneObject.textPortInnerSVG.element.attr('width')
         #console.log 'adding to line'
         tokenViewable.svg.attr('x', x)
         tokenViewable.svg.attr('y', y)
         x += tokenViewable.width
       else  
-        if y + tokenViewable.height + lHeight < svg.textPortInnerSVG.element.attr('height')
+        if y + tokenViewable.height + lHeight < sceneObject.textPortInnerSVG.element.attr('height')
           #console.log 'adding to new line'
           x = 0
           y += tokenViewable.height
@@ -100,7 +100,7 @@ module.exports = (tokens, fontSizeChange, scroll, mode) ->
           break
       
       # add word space unless end of line
-      if x + spaceWidth < svg.textPortInnerSVG.element.attr('width')
+      if x + spaceWidth < sceneObject.textPortInnerSVG.element.attr('width')
         x += spaceWidth
         #console.log "x after space adding = " + x
     
@@ -115,5 +115,5 @@ module.exports = (tokens, fontSizeChange, scroll, mode) ->
   # Add Up button after initial scroll
   #
   #if scroll?
-  #  svg.textPortInnerSVG.subElement.transition().duration(...)
+  #  sceneObject.textPortInnerSVG.subElement.transition().duration(...)
  

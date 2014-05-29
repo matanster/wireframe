@@ -4,7 +4,7 @@
 
 # import global geometry
 globalDims = require './globalDims'
-svg    = globalDims.svg
+sceneObject    = globalDims.sceneObject
 layout = globalDims.layout
 
 #
@@ -20,7 +20,7 @@ exports.tokenToViewable = (token, visibleGroup) ->
                           .style("dominant-baseline", "hanging")
     
     svgText.text(token)
-    #width  = svg.node().getComputedTextLength() 
+    #width  = sceneObject.node().getComputedTextLength() 
     width  = svgText.node().getBBox().width
     height = svgText.node().getBBox().height
     #console.log visualToken.node().getBBox() 

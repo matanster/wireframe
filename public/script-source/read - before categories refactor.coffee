@@ -8,7 +8,7 @@ svgUtil     = require './svgUtil'
 
 # Import global geometry
 globalDims = require './globalDims'
-sceneObject = globalDims.sceneObject
+svg    = globalDims.svg
 layout = globalDims.layout
 
 #console.log 'read.js main started'
@@ -18,6 +18,7 @@ firstEntry = true
 # Globals
 viewport  = null
 states    = {}
+states.userChoice = 'Shortest summary'
 
 # Convenience globals - this can be refactored
 tokens    = undefined
@@ -51,18 +52,18 @@ end    = null
 sceneDefine = (categoriesOfSummary) ->
 
   main = () ->
-    sceneObject.main = d3.select('body').append('svg').style('background-color', '#999999')   
-    sceneObject.categories = {} # can move this elsewhere
+    svg.main = d3.select('body').append('svg').style('background-color', '#999999')   
+    svg.categories = {} # can move this elsewhere
 
   TOC = () -> 
 
-    sceneObject.TOC = {} 
+    svg.TOC = {} 
 
     fontSize  = '14px' # temporarily
     fontFamily = 'verdana' # for now
-    sceneObject.TOC.element = sceneObject.main.append('svg')
+    svg.TOC.element = svg.main.append('svg')
                         
-    sceneObject.TOC.subElement = sceneObject.TOC.element.append('g')
+    svg.TOC.subElement = svg.TOC.element.append('g')
                                  .style('text-anchor', 'start')
                                  .style('fill', 'rgb(50,50,240)')                                                                                                                                            
                                  .style('font-family',fontFamily)
@@ -73,19 +74,20 @@ sceneDefine = (categoriesOfSummary) ->
     # (create svg elements, get needed overall width)
     maxLen = 0
     for token in TOCTokens 
-      tokenViewable = textDraw.tokenToViewable(token.text, sceneObject.TOC.element)
+      tokenViewable = textDraw.tokenToViewable(token.text, svg.TOC.element)
       if tokenViewable.width > maxLen 
         maxLen = tokenViewable.width
   
     #
     # set geometry
     #
-    sceneObject.TOC.geometry = 
+    svg.TOC.geometry = 
       paddingX : 30  # to do: make adaptive
       
-    sceneObject.TOC.geometry.width = maxLen + (2 * sceneObject.TOC.geometry.paddingX)   
+    svg.TOC.geometry.width = maxLen + (2 * svg.TOC.geometry.paddingX)   
 
-  mainPanes = (categories) ->
+
+  categoriesOfSummaryPanes = (categories) ->
 
     #console.log categories
     numberOfBoxes = categories.length
@@ -94,10 +96,10 @@ sceneDefine = (categoriesOfSummary) ->
     #colorScale = d3.scale.linear().domain([0, numberOfBoxes-1]).range(['#CCCCE0','#AAAABE']) # ['#CCCCE0','#AAAABE']
     colorTransition = (i) -> (() -> d3.select(this).transition().duration(25).ease('circle').style('fill', colorScale(i)))
     
-    sceneObject.categories.level1 = []
+    svg.categories.level2 = []
 
     for box in [0..numberOfBoxes-1]
-      group = sceneObject.main.append('g')
+      group = svg.main.append('g')
                             .style('-webkit-user-select', 'none')      # avoid standard text handling of the category texts (selection, touch callouts)
                             .style('-webkit-touch-callout', 'none')    # avoid standard text handling of the category texts (selection, touch callouts) 
                             .style('user-select', 'none') # future compatibility
@@ -114,15 +116,82 @@ sceneDefine = (categoriesOfSummary) ->
                                        .style("font-weight", "bold")
                                        .style('fill', '#EEEEEE')                                                                                                               
 
-      sceneObject.categories.level1[box] = {}
-      sceneObject.categories.level1[box].group = group
-      sceneObject.categories.level1[box].element = rectangle
-      sceneObject.categories.level1[box].text = text
+      rectangle.on('mouseover', () -> d3.select(this).transition().duration(200).ease('circle').style('fill', '#999999')) #0086B2 #FAF2DA
+               .on('mouseout', colorTransition(box))
+
+      svg.categories.level2[box] = {}
+      svg.categories.level2[box].group = group
+      svg.categories.level2[box].element = rectangle
+      svg.categories.level2[box].text = text
+      svg.categories.level2[box].neutralColor = colorTransition(box)
+      svg.categories.level2[box].state = 'hidden'
+
+  mainPanes = (categories) ->
+
+    #console.log categories
+    numberOfBoxes = categories.length
+
+    colorScale = d3.scale.linear().domain([0, numberOfBoxes-1]).range(['#87CEFA', '#00BFFF'])
+    #colorScale = d3.scale.linear().domain([0, numberOfBoxes-1]).range(['#CCCCE0','#AAAABE']) # ['#CCCCE0','#AAAABE']
+    colorTransition = (i) -> (() -> d3.select(this).transition().duration(25).ease('circle').style('fill', colorScale(i)))
+    
+    svg.categories.level1 = []
+
+    for box in [0..numberOfBoxes-1]
+      group = svg.main.append('g')
+                            .style('-webkit-user-select', 'none')      # avoid standard text handling of the category texts (selection, touch callouts)
+                            .style('-webkit-touch-callout', 'none')    # avoid standard text handling of the category texts (selection, touch callouts) 
+                            .style('user-select', 'none') # future compatibility
+
+      rectangle = group.append('rect')
+                           .style('fill', colorScale(box))   
+                           .style('stroke-width', '0px')
+                           .style('fill-opacity', '1')
+
+      text = group.append('text').text(categories[box])
+                                       .style("text-anchor", "middle")
+                                       .attr("dominant-baseline", "central")
+                                       .style("font-family", "verdana")
+                                       .style("font-weight", "bold")
+                                       .style('fill', '#EEEEEE')                                                                                                               
+
+      svg.categories.level1[box] = {}
+      svg.categories.level1[box].group = group
+      svg.categories.level1[box].element = rectangle
+      console.dir svg.categories.level1[box].element
+      svg.categories.level1[box].text = text
+      svg.categories.level1[box].state = 'neutral'
+      svg.categories.level1[box].element.__sceneLink__ = svg.categories.level1[box]
+      console.dir svg.categories.level1[box].element
+
+      svg.categories.level1[box].recolor = () ->
+        #window.alert(box)
+        switch this.state
+          when 'selected'
+            this.element.style('fill', '#999999')
+          when 'neutral'
+            this.element.style('fill', colorTransition(box))
+
+
+      rectangle.on('mouseover', () -> console.dir(d3.select(this)))
+      ###
+      rectangle.on('mouseover', () -> 
+        dataHolder = d3.select(this)
+        console.dir dataHolder
+        unless dataHolder.__sceneLink__.state is 'selected'
+          d3.select(this).attr('data-pre-hover-color', d3.select(this).style('fill')) # store current color
+          d3.select(this).transition().duration(200).ease('circle').style('fill', '#AAAAAA')) 
+      ###
+      rectangle.on('mouseout', () ->
+        d3.select(this).transition().duration(200).ease('circle').style('fill', d3.select(this).attr('data-pre-hover-color')))
+
+    # initialize status of first one as selected
+    svg.categories.level1[0].state = 'selected'
 
   textPort = () ->
 
-    sceneObject.textPortBoundary = {}
-    sceneObject.textPortBoundary.element = sceneObject.main.append('rect')
+    svg.textPortBoundary = {}
+    svg.textPortBoundary.element = svg.main.append('rect')
                            .style('stroke', '#999999')
                            .style('fill', '#999999')   
 
@@ -141,8 +210,8 @@ sceneDefine = (categoriesOfSummary) ->
                               #console.log('click')
                               this.style.cursor = "ew-resize"
                               xInitial = event.clientX
-                              widthInitialBoundary = sceneObject.textPortBoundary.element.attr('width')
-                              widthInitialText = sceneObject.textPort.element.attr('width')
+                              widthInitialBoundary = svg.textPortBoundary.element.attr('width')
+                              widthInitialText = svg.textPort.element.attr('width')
                               rightInitialSeparator = layout.separator.right.x
                               element = d3.select(this)
                               # monitor mouse movement till click is released
@@ -154,12 +223,12 @@ sceneDefine = (categoriesOfSummary) ->
                                 layout.separator.right.y = rightInitialSeparator - xDiff 
 
 
-                                sceneObject.textPortBoundary.element.attr('width', widthInitialBoundary - xDiff)
-                                sceneObject.textPort.element.attr('width', widthInitialText - xDiff)
+                                svg.textPortBoundary.element.attr('width', widthInitialBoundary - xDiff)
+                                svg.textPort.element.attr('width', widthInitialText - xDiff)
 
                                 textporting(tokens)
-                                sceneObject.rightPane.redraw()
-                                sceneObject.downButton.redraw()
+                                svg.rightPane.redraw()
+                                svg.downButton.redraw()
                               window.onmouseup = (event) ->
                                 window.onmousemove = null
                                 event.target.style.cursor = "default"
@@ -177,13 +246,13 @@ sceneDefine = (categoriesOfSummary) ->
                               element = d3.select(this)
                               element.transition().duration(900).style('stroke', '#FFEEBB')
                               xInitial = event.changedTouches[0].clientX
-                              widthInitialBoundary = sceneObject.textPortBoundary.element.attr('width')
-                              widthInitialText = sceneObject.textPort.element.attr('width')
+                              widthInitialBoundary = svg.textPortBoundary.element.attr('width')
+                              widthInitialText = svg.textPort.element.attr('width')
 
                               window.ontouchmove = (event) -> 
                                 xDiff = xInitial - event.changedTouches[0].clientX
-                                sceneObject.textPortBoundary.element.attr('width', widthInitialBoundary - xDiff)
-                                sceneObject.textPort.element.attr('width', widthInitialText - xDiff)
+                                svg.textPortBoundary.element.attr('width', widthInitialBoundary - xDiff)
+                                svg.textPort.element.attr('width', widthInitialText - xDiff)
                                 textporting(tokens)
 
                               window.ontouchcancel = () ->
@@ -201,24 +270,24 @@ sceneDefine = (categoriesOfSummary) ->
                                 #window.alert 'touch end')
                               )
     
-    sceneObject.textPort = {}
-    sceneObject.textPort.element = sceneObject.main.append('rect')
+    svg.textPort = {}
+    svg.textPort.element = svg.main.append('rect')
                            .style('stroke', '#222222')
                            .style('fill', '#222222')   
 
   titlePort = () ->
-    sceneObject.titlePort = sceneObject.main.append('g') # for now this grouping isn't used for anything, but a best practice anyway
+    svg.titlePort = svg.main.append('g') # for now this grouping isn't used for anything, but a best practice anyway
 
-    sceneObject.titlePortRect = sceneObject.titlePort.append('rect')
+    svg.titlePortRect = svg.titlePort.append('rect')
                                      .style('fill', '#2F72FF')   
 
     # nest an html element containing an svg, inside the topmost svg hook, so we can use a non-svg transform on it
-    sceneObject.titleForeignContainer = sceneObject.titlePort.append('foreignObject')
+    svg.titleForeignContainer = svg.titlePort.append('foreignObject')
                            .append('xhtml:body')
                            .html("<svg style='-webkit-transform: perspective(40px) rotateX(2deg)' id='titleSVG'></svg>")
     
     # modify the svg nested inside the html just created
-    sceneObject.title = d3.select('#titleSVG').append('text').text("  Something Something Something Title") # "the Relationship Between Human Capital and Firm Performance"
+    svg.title = d3.select('#titleSVG').append('text').text("  Something Something Something Title") # "the Relationship Between Human Capital and Firm Performance"
                                       .attr("id", "title")
                                       .attr("dominant-baseline", "central")
                                       .style("text-anchor", "middle")
@@ -226,25 +295,25 @@ sceneDefine = (categoriesOfSummary) ->
 
 
   rightPane = ->
-    sceneObject.rightPane = {}
-    sceneObject.rightPane.element = sceneObject.main.append('rect')
+    svg.rightPane = {}
+    svg.rightPane.element = svg.main.append('rect')
                                     #.style('fill', '#ccccff')
                                     .style('fill', '#999999') #888888
                                     #.style('stroke-width', '1px')
                                     #.style('stroke', '#bbbbee')
                                     .style('fill-opacity', '1')
 
-    sceneObject.rightPane.geometry = {}
-    sceneObject.rightPane.geometry = 
+    svg.rightPane.geometry = {}
+    svg.rightPane.geometry = 
       'hoverIgnoreAreaX': 30, # need to adjust to Y value, per screen aspect ratio
       'hoverIgnoreAreaY': 30  # need to adjust to X value, per screen aspect ratio
                                     
-    sceneObject.rightPane.element.on('mouseover', () ->
+    svg.rightPane.element.on('mouseover', () ->
 
-      sceneObject.rightPane.element.on('mousemove', () -> # to do: replace with a more circular area of tolerance
-        if event.x > layout.separator.right.x + sceneObject.rightPane.geometry.hoverIgnoreAreaX
-          if event.y > layout.separator.top.y + sceneObject.rightPane.geometry.hoverIgnoreAreaY and
-             event.y < viewport.height - sceneObject.rightPane.geometry.hoverIgnoreAreaY 
+      svg.rightPane.element.on('mousemove', () -> # to do: replace with a more circular area of tolerance
+        if event.x > layout.separator.right.x + svg.rightPane.geometry.hoverIgnoreAreaX
+          if event.y > layout.separator.top.y + svg.rightPane.geometry.hoverIgnoreAreaY and
+             event.y < viewport.height - svg.rightPane.geometry.hoverIgnoreAreaY 
 
 #            unless zoneEntry?
 #              zoneEntry = new Date().getMilliseconds() # todo: switch to performance.now() if supported on all applicable browsers 
@@ -254,80 +323,82 @@ sceneDefine = (categoriesOfSummary) ->
 
             #console.log new Date().getMilliseconds() - hoverStart # > 1500 # 1.5 seconds
 
-            sceneObject.rightPane.element.on('mousemove', null)
-            sceneObject.rightPane.mode = 'animate'
-            sceneObject.textPortBoundary.mode = 'animate'
-            sceneObject.textPort.mode = 'animate'
-            layout.separator.right.x = viewport.width - sceneObject.TOC.geometry.width
+            svg.rightPane.element.on('mousemove', null)
+            svg.rightPane.mode = 'animate'
+            svg.textPortBoundary.mode = 'animate'
+            svg.textPort.mode = 'animate'
+            layout.separator.right.x = viewport.width - svg.TOC.geometry.width
             states.showTOC = 'in progress'
             sceneSync('animate')
-            #sceneObject.rightPane.element.transition().duration(300).attr('x', layout.separator.right.x)
-            #sceneObject.rightPane.element.transition().duration(300).attr('width', sceneObject.TOC.geometry.width)
+            #svg.rightPane.element.transition().duration(300).attr('x', layout.separator.right.x)
+            #svg.rightPane.element.transition().duration(300).attr('width', svg.TOC.geometry.width)
         )
       )
 
-    sceneObject.rightPane.redraw = ->
+    svg.rightPane.redraw = ->
 
       #console.log 'right pane redraw'
 
       if states.showTOC is 'in progress'
-        sceneObject.rightPane.geometry.width = sceneObject.TOC.geometry.width
+        svg.rightPane.geometry.width = svg.TOC.geometry.width
       else 
-        sceneObject.rightPane.geometry.width = viewport.width - (layout.separator.right.x - layout.separator.left.x.current)
+        svg.rightPane.geometry.width = viewport.width - (layout.separator.right.x - layout.separator.left.x.current)
 
-      sceneObject.rightPane.geometry.x = layout.separator.right.x
-      sceneObject.rightPane.geometry.y = layout.separator.top.y
-      sceneObject.rightPane.geometry.height = totalH
+      svg.rightPane.geometry.x = layout.separator.right.x
+      svg.rightPane.geometry.y = layout.separator.top.y
+      svg.rightPane.geometry.height = totalH
 
       if states.showTOC is 'in progress'
-        svgUtil.sync(sceneObject.rightPane, sceneObject.TOC.redraw)
-        #sceneObject.rightPane.element.transition().delay(400).duration(250).style('fill', '#888888') 
+        svgUtil.sync(svg.rightPane, svg.TOC.redraw)
+        #svg.rightPane.element.transition().delay(400).duration(250).style('fill', '#888888') 
       else
-        svgUtil.sync(sceneObject.rightPane)
+        svgUtil.sync(svg.rightPane)
 
   main()
+  categoriesOfSummaryPanes(categoriesOfSummary)
+  mainPanes(mainCategories)
   rightPane()
   textPort()
   titlePort()
   TOC()
 
   # font buttons
-  sceneObject.fontSize = 
-    element: sceneObject.main.append("g")
+  svg.fontSize = 
+    element: svg.main.append("g")
 
-  sceneObject.fontDecreaseButton = sceneObject.fontSize.element.append("svg:image")
+  svg.fontDecreaseButton = svg.fontSize.element.append("svg:image")
     .attr("xlink:href","fontSmall.svg")
-  sceneObject.fontIncreaseButton = sceneObject.fontSize.element.append("svg:image")
+  svg.fontIncreaseButton = svg.fontSize.element.append("svg:image")
     .attr("xlink:href","fontLarge.svg")
 
-  sceneObject.fontDecreaseButton
+  svg.fontDecreaseButton
     .on('mouseover', () -> console.log('hover'))
     .on('mousedown', () -> 
       console.log('click font decrease')
       textporting(tokens, -2))
-  sceneObject.fontIncreaseButton 
+  svg.fontIncreaseButton 
     .on('mouseover', () -> console.log('hover'))
     .on('mousedown', () -> 
       console.log('click font increase')
       textporting(tokens, 2)) 
 
   # viewport down button 
-  sceneObject.downButton = {}
+  svg.downButton = {}
 
-  sceneObject.downButton.geometry = 
+  svg.downButton.geometry = 
     'paddingY': 15,
     'paddingX': 30, 
     'height': 35
 
-  sceneObject.downButton.element = sceneObject.main.append('svg:image')
+  svg.downButton.element = svg.main.append('svg:image')
     .attr('xlink:href','images/downScroll5.svg')
     .attr('preserveAspectRatio', 'none')
     .on('mouseover', () -> 
       #console.log('hover')
-      sceneObject.downButton.element.transition().ease('sin').duration(200).attr('height', sceneObject.downButton.geometry.height + (sceneObject.downButton.geometry.paddingY *2/3)))
+      svg.downButton.element.transition().ease('sin').duration(200).attr('height', svg.downButton.geometry.height + (svg.downButton.geometry.paddingY *2/3)))
     .on('mouseout', () -> 
       #console.log('hover')
-      sceneObject.downButton.element.transition().duration(400).attr('height', sceneObject.downButton.geometry.height))
+      svg.downButton.element.transition().duration(400).attr('height', svg.downButton.geometry.height))
     .on('mousedown', () -> 
       #console.log('scroll')
       textporting(tokens, 0, true)) 
@@ -350,7 +421,7 @@ sceneSync = (mode) ->
   totalH = viewport.height - layout.separator.top.y - end
 
   # draw main svg
-  sceneObject.main.attr('width', viewport.width)
+  svg.main.attr('width', viewport.width)
           .attr('height', viewport.height)
 
   unless layout.separator.right?
@@ -359,33 +430,33 @@ sceneSync = (mode) ->
 
   # draw text port
 
-  sceneObject.textPortBoundary.geometry = 
+  svg.textPortBoundary.geometry = 
     'x':            layout.separator.left.x.current,
     'width':        layout.separator.right.x - layout.separator.left.x.current,
     'y':            layout.separator.top.y + 5,
     'height':       totalH
 
-  sceneObject.textPortBoundary.style = 
+  svg.textPortBoundary.style = 
     'stroke-width': '25px'
 
-  svgUtil.sync(sceneObject.textPortBoundary)
+  svgUtil.sync(svg.textPortBoundary)
 
-  sceneObject.textPort.geometry = 
+  svg.textPort.geometry = 
               'x'      : layout.separator.left.x.current + 5,
               'width'  : layout.separator.right.x - layout.separator.left.x.current - 10,
               'height' : totalH, # this is a hack - it ends below viewport bottom, otherwise curved edge shows
               'y'      : layout.separator.top.y + 5 + 10,
               'rx'     : 10,
               'rx'     : 10
-  sceneObject.textPort.style = 
+  svg.textPort.style = 
     'stroke-width': '15px'
 
-  svgUtil.sync(sceneObject.textPort)
-  #console.log sceneObject.textPort.element.attr('width')
-  #console.log sceneObject.textPort.geometry.width
+  svgUtil.sync(svg.textPort)
+  #console.log svg.textPort.element.attr('width')
+  #console.log svg.textPort.geometry.width
 
   # draw title port 
-  sceneObject.titlePortRect.attr('width', viewport.width - 5 - 5)
+  svg.titlePortRect.attr('width', viewport.width - 5 - 5)
                .attr('height', layout.separator.top.y - 5 - 5)
                .attr('x', 5)
                .attr('y', -50)
@@ -393,20 +464,20 @@ sceneSync = (mode) ->
                .attr('rx', 10)
                .attr('rx', 10)              
 
-  #sceneObject.titleForeignContainer.style('stroke-width', '7px')
+  #svg.titleForeignContainer.style('stroke-width', '7px')
   d3.select('#titleSVG')
            .attr('width', viewport.width - 5 - 5 - 100) # -100 is intended to keep the buttons on the right above the nested svg, otherwise they don't click
                                                         # this spoils the center alignemnt of the title and is a temporary hack 
                                                         # (for some reason, the 'x' attr won't affect the position of the inline html)
            .attr('height', layout.separator.top.y - 5 - 5)           
 
-  sceneObject.title.attr('x', viewport.width / 2)
+  svg.title.attr('x', viewport.width / 2)
            .attr('y', 0)
            .style('font-family', 'Helvetica')
            .style("font-weight", "bold")
            .attr("font-size", "30px")
 
-  sceneObject.fontSize.redraw = () ->
+  svg.fontSize.redraw = () ->
 
     console.log 'redrawing font size buttons'
     #
@@ -415,36 +486,36 @@ sceneSync = (mode) ->
     # alternative scaling method - nest under new svg element having a viewbox
     #
 
-    #sceneObject.fontSize.attr('transform', 'translate(1000,26) scale(0.08)')
+    #svg.fontSize.attr('transform', 'translate(1000,26) scale(0.08)')
     #.attr("viewBox",'0,0,796,1248')
     fontButtonGeometry = 
       'width':  398 * 0.08, # source image pixel width  * scaling factor
       'height': 624 * 0.08  # source image pixel height * scaling factor
-    sceneObject.fontDecreaseButton
+    svg.fontDecreaseButton
       .attr('x', viewport.width - (fontButtonGeometry.width * 2) - 7)
       .attr('y', layout.separator.top.y - (fontButtonGeometry.height) - 7)
       .attr('width', fontButtonGeometry.width)
       .attr('height', fontButtonGeometry.height)
-    sceneObject.fontIncreaseButton
+    svg.fontIncreaseButton
       .attr('x', viewport.width - (fontButtonGeometry.width) - 7 - 1)
       .attr('y', layout.separator.top.y - (fontButtonGeometry.height) - 7)
       .attr('width', fontButtonGeometry.width)
       .attr('height', fontButtonGeometry.height)
 
-  sceneObject.fontSize.redraw()      
+  svg.fontSize.redraw()      
 
   if firstEntry
-    sceneObject.title.transition().duration(300).ease('sin')
+    svg.title.transition().duration(300).ease('sin')
                                          .attr('y', layout.separator.top.y / 2)
-    sceneObject.titlePortRect.transition().duration(300).ease('sin')
+    svg.titlePortRect.transition().duration(300).ease('sin')
                                          .attr('y', 5)
-    #setTimeout(sceneObject.fontSize.redraw, 2000)                                         
+    #setTimeout(svg.fontSize.redraw, 2000)                                         
     firstEntry = false
 
   else 
-    sceneObject.title
+    svg.title
        .attr('y', layout.separator.top.y / 2)
-    sceneObject.titlePortRect
+    svg.titlePortRect
        .attr('y', 5) 
 
   # show text if source tokens already loaded
@@ -467,7 +538,7 @@ sceneSync = (mode) ->
   
   panes = (groupY, groupH, borderX, elements) ->
 
-    #boxH = (totalH / 2) / (sceneObject.categories.length - 1)
+    #boxH = (totalH / 2) / (svg.categories.length - 1)
 
     boxH = (groupH) / (elements.length)
 
@@ -508,44 +579,70 @@ sceneSync = (mode) ->
   #
 
   groupY = layout.separator.top.y - 0.5
-  panes(groupY, totalH, layout.separator.left.x.current, sceneObject.categories.level1)
+  panes(groupY, totalH, layout.separator.left.x.current, svg.categories.level1)
 
   groupY = totalH/2 + layout.separator.top.y - 0.5
-  panes(groupY, totalH/2, layout.separator.left.x.current, sceneObject.categories.level2)
+  panes(groupY, totalH/2, layout.separator.left.x.current, svg.categories.level2)
+
+  for pane in svg.categories.level1
+    #window.alert('pane')
+    pane.recolor()
+  
+  svg.categories.level1[1].element.on('mousedown', () -> 
+      svg.categories.level1[1].group.attr('visibility', 'hidden')
+    )
+
+  svg.categories.level1[0].element.on('mousedown', () -> 
+      svg.categories.level1[1].group.attr('visibility', 'visible')
+    )
+
+  svg.categories.level1[0].element.on('mousedown', () -> 
+      states.menuChoice = 'Shortest summary'
+      textportingAbstract(segments)
+      svg.downButton.redraw()
+      #svg.rightPane.redraw()      
+  )      
+
+
+  svg.categories.level2[1].element.on('mousedown', () -> 
+      textporting(tokens)
+      #svg.rightPane.redraw()
+      svg.downButton.redraw()
+    )
 
   # draw down button
-  sceneObject.downButton.redraw = () ->
-    sceneObject.downButton.geometry.x = layout.separator.left.x.current + sceneObject.downButton.geometry.paddingX
-    sceneObject.downButton.geometry.width = layout.separator.right.x - layout.separator.left.x.current - (2 * sceneObject.downButton.geometry.paddingX)
+  svg.downButton.redraw = () ->
+    svg.downButton.geometry.x = layout.separator.left.x.current + svg.downButton.geometry.paddingX
+    svg.downButton.geometry.width = layout.separator.right.x - layout.separator.left.x.current - (2 * svg.downButton.geometry.paddingX)
 
-    sceneObject.downButton.geometry.y = sceneObject.main.attr('height') - sceneObject.downButton.geometry.height - sceneObject.downButton.geometry.paddingY # stick near bottom
+    svg.downButton.geometry.y = svg.main.attr('height') - svg.downButton.geometry.height - svg.downButton.geometry.paddingY # stick near bottom
 
-    sceneObject.downButton.element
-      .attr('x', sceneObject.downButton.geometry.x) # center 
-      .attr('width', sceneObject.downButton.geometry.width) 
-      .attr('y', sceneObject.downButton.geometry.y)
-      .attr('height', sceneObject.downButton.geometry.height)
+    svg.downButton.element
+      .attr('x', svg.downButton.geometry.x) # center 
+      .attr('width', svg.downButton.geometry.width) 
+      .attr('y', svg.downButton.geometry.y)
+      .attr('height', svg.downButton.geometry.height)
 
-  sceneObject.downButton.redraw()
+  svg.downButton.redraw()
 
-  sceneObject.rightPane.redraw()
+  svg.rightPane.redraw()
 
-  sceneObject.TOC.redraw = () ->
+  svg.TOC.redraw = () ->
 
     #console.log 'starting TOC redraw'
     # get the width of a space character
-    spaceWidth = textDraw.tokenToViewable('a a', sceneObject.TOC.subElement).width - textDraw.tokenToViewable('aa', sceneObject.TOC.subElement).width
+    spaceWidth = textDraw.tokenToViewable('a a', svg.TOC.subElement).width - textDraw.tokenToViewable('aa', svg.TOC.subElement).width
     # get the maximum character height in the font
-    lHeight    = textDraw.tokenToViewable('l', sceneObject.TOC.subElement).height
+    lHeight    = textDraw.tokenToViewable('l', svg.TOC.subElement).height
 
     paddingX = 30
     paddingY = 10
 
-    sceneObject.TOC.element
-      .attr('x',      parseFloat(sceneObject.rightPane.element.attr('x')) + paddingX)
-      .attr('width',  parseFloat sceneObject.rightPane.element.attr('width')  - (paddingX * 2))
-      .attr('y',      parseFloat(sceneObject.rightPane.element.attr('y')) + paddingY)
-      .attr('height', parseFloat sceneObject.rightPane.element.attr('height') - (paddingY * 2))
+    svg.TOC.element
+      .attr('x',      parseFloat(svg.rightPane.element.attr('x')) + paddingX)
+      .attr('width',  parseFloat svg.rightPane.element.attr('width')  - (paddingX * 2))
+      .attr('y',      parseFloat(svg.rightPane.element.attr('y')) + paddingY)
+      .attr('height', parseFloat svg.rightPane.element.attr('height') - (paddingY * 2))
 
 
     viewPortFull = false
@@ -554,7 +651,7 @@ sceneSync = (mode) ->
 
       x = paddingX
 
-      tokenViewable = textDraw.tokenToViewable(TOCToken.text, sceneObject.TOC.subElement)
+      tokenViewable = textDraw.tokenToViewable(TOCToken.text, svg.TOC.subElement)
       
       #
       # Apply word semantic styling
@@ -567,7 +664,7 @@ sceneSync = (mode) ->
         when 3
           x += 30
 
-      if y + tokenViewable.height + lHeight < sceneObject.TOC.element.attr('y') + sceneObject.TOC.element.attr('height')
+      if y + tokenViewable.height + lHeight < svg.TOC.element.attr('y') + svg.TOC.element.attr('height')
         y += tokenViewable.height
         tokenViewable.svg.attr('x', x)
         tokenViewable.svg.attr('y', y)
@@ -581,7 +678,7 @@ sceneSync = (mode) ->
       x += spaceWidth
     
   #if states.showTOC is 'drawn'
-  #  sceneObject.TOC.redraw()
+  #  svg.TOC.redraw()
   
 
 #

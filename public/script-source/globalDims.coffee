@@ -4,4 +4,4 @@
 #
 
 exports.layout = {} 
-exports.svg = {}
+exports.sceneObject = {}
