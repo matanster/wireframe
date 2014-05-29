@@ -261,6 +261,10 @@ sceneDefine = () ->
         svgUtil.sync(sceneObject.rightPane)
 
   main()
+  
+  navBarHook = sceneHook.svg.append('g')
+  navBars.init(navBarsData, navBarHook)
+
   rightPane()
   textPort()
   titlePort()
@@ -439,54 +443,6 @@ sceneSync = (mode) ->
       else
         #console.log 'without animate'
         textporting(tokens)
-  
-  #
-  # Draw elements to fit vertical segment, equal height to each
-  # this will probably go away
-  #
-  panes = (groupY, groupH, borderX, elements) ->
-
-    #boxH = (totalH / 2) / (sceneObject.categories.length - 1)
-    boxH = (groupH) / (elements.length)
-
-    for i in [0..elements.length-1]
-
-      elements[i].x1 = 0
-      elements[i].x2 = borderX
-      ###
-      if i is 0
-        elements[i].y1 = layout.separator.top.y - 0.5
-        elements[i].y2 = layout.separator.top.y + (groupH/2) + 0.5
-      else ###
-      elements[i].y1 = groupY + Math.floor(boxH * (i)) - 0.5
-      elements[i].y2 = groupY + Math.floor((boxH * (i+1))) + 0.5    
-
-      #if i is elements.length-1 # occupy last pixel
-      #  elements[i].y2 = layout.separator.top.y + groupH + 0.5    
-      #else # leave last pixel to next box
-      #  elements[i].y2 = layout.separator.top.y + Math.floor((boxH * (i+1))) - 0.5
-
-      width =  util.calcLength(elements[i].x1, elements[i].x2)
-      height = util.calcLength(elements[i].y1, elements[i].y2)    
-
-      elements[i].element
-         .attr('x', elements[i].x1)
-         .attr('width', width)
-         .attr('y', elements[i].y1) 
-         .attr('height', height)
-
-      elements[i].text.attr('x', elements[i].x1 + width / 2)  
-                      .attr('y', elements[i].y1 + height / 2)
-
-  #
-  # Show left panes and make them change on clicks (hackish style)
-  #
-
-  groupY = layout.separator.top.y - 0.5
-  panes(groupY, totalH, layout.separator.left.x.current, sceneObject.categories.level1)
-
-  groupY = totalH/2 + layout.separator.top.y - 0.5
-  panes(groupY, totalH/2, layout.separator.left.x.current, sceneObject.categories.level2)
 
   # draw down button
   sceneObject.downButton.redraw = () ->
@@ -500,7 +456,7 @@ sceneSync = (mode) ->
       .attr('width', sceneObject.downButton.geometry.width) 
       .attr('y', sceneObject.downButton.geometry.y)
       .attr('height', sceneObject.downButton.geometry.height)
-
+    
   sceneObject.downButton.redraw()
 
   sceneObject.rightPane.redraw()

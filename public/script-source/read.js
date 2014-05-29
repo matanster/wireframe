@@ -70,7 +70,7 @@ boxH = null;
 end = null;
 
 sceneDefine = function() {
-  var TOC, main, mainPanes, rightPane, textPort, titlePort;
+  var TOC, main, mainPanes, navBarHook, rightPane, textPort, titlePort;
   main = function() {
     sceneHook.svg = d3.select('body').append('svg').style('background-color', '#999999');
     return sceneObject.categories = {};
@@ -212,6 +212,8 @@ sceneDefine = function() {
     };
   };
   main();
+  navBarHook = sceneHook.svg.append('g');
+  navBars.init(navBarsData, navBarHook);
   rightPane();
   textPort();
   titlePort();
@@ -249,7 +251,7 @@ sceneDefine = function() {
 };
 
 sceneSync = function(mode) {
-  var autoUpdate, groupY, panes, update;
+  var autoUpdate, update;
   viewport = util.getViewport();
   layout.separator.top = {
     'y': calcStart()
@@ -322,33 +324,6 @@ sceneSync = function(mode) {
         textporting(tokens);
     }
   }
-  panes = function(groupY, groupH, borderX, elements) {
-    var height, i, width, _i, _ref, _results;
-    boxH = groupH / elements.length;
-    _results = [];
-    for (i = _i = 0, _ref = elements.length - 1; 0 <= _ref ? _i <= _ref : _i >= _ref; i = 0 <= _ref ? ++_i : --_i) {
-      elements[i].x1 = 0;
-      elements[i].x2 = borderX;
-      /*
-      if i is 0
-        elements[i].y1 = layout.separator.top.y - 0.5
-        elements[i].y2 = layout.separator.top.y + (groupH/2) + 0.5
-      else
-      */
-
-      elements[i].y1 = groupY + Math.floor(boxH * i) - 0.5;
-      elements[i].y2 = groupY + Math.floor(boxH * (i + 1)) + 0.5;
-      width = util.calcLength(elements[i].x1, elements[i].x2);
-      height = util.calcLength(elements[i].y1, elements[i].y2);
-      elements[i].element.attr('x', elements[i].x1).attr('width', width).attr('y', elements[i].y1).attr('height', height);
-      _results.push(elements[i].text.attr('x', elements[i].x1 + width / 2).attr('y', elements[i].y1 + height / 2));
-    }
-    return _results;
-  };
-  groupY = layout.separator.top.y - 0.5;
-  panes(groupY, totalH, layout.separator.left.x.current, sceneObject.categories.level1);
-  groupY = totalH / 2 + layout.separator.top.y - 0.5;
-  panes(groupY, totalH / 2, layout.separator.left.x.current, sceneObject.categories.level2);
   sceneObject.downButton.redraw = function() {
     sceneObject.downButton.geometry.x = layout.separator.left.x.current + sceneObject.downButton.geometry.paddingX;
     sceneObject.downButton.geometry.width = layout.separator.right.x - layout.separator.left.x.current - (2 * sceneObject.downButton.geometry.paddingX);
