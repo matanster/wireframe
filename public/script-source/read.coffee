@@ -287,7 +287,7 @@ sceneDefine = (categoriesOfSummary) ->
                            .html("<svg style='-webkit-transform: perspective(40px) rotateX(2deg)' id='titleSVG'></svg>")
     
     # modify the svg nested inside the html just created
-    svg.title = d3.select('#titleSVG').append('text').text("Something Something Something Title") # "the Relationship Between Human Capital and Firm Performance"
+    svg.title = d3.select('#titleSVG').append('text').text("  Something Something Something Title") # "the Relationship Between Human Capital and Firm Performance"
                                       .attr("id", "title")
                                       .attr("dominant-baseline", "central")
                                       .style("text-anchor", "middle")
@@ -363,22 +363,23 @@ sceneDefine = (categoriesOfSummary) ->
   TOC()
 
   # font buttons
-  svg.fontSize = svg.main.append("g")
+  svg.fontSize = 
+    element: svg.main.append("g")
 
-  svg.fontDecreaseButton = svg.fontSize.append("svg:image")
+  svg.fontDecreaseButton = svg.fontSize.element.append("svg:image")
     .attr("xlink:href","fontSmall.svg")
-  svg.fontIncreaseButton = svg.fontSize.append("svg:image")
+  svg.fontIncreaseButton = svg.fontSize.element.append("svg:image")
     .attr("xlink:href","fontLarge.svg")
 
   svg.fontDecreaseButton
-    #.on('mouseover', () -> #console.log('hover'))
+    .on('mouseover', () -> console.log('hover'))
     .on('mousedown', () -> 
-      #console.log('click font decrease')
+      console.log('click font decrease')
       textporting(tokens, -2))
   svg.fontIncreaseButton 
-    #.on('mouseover', () -> #console.log('hover'))
+    .on('mouseover', () -> console.log('hover'))
     .on('mousedown', () -> 
-      #console.log('click font increase')
+      console.log('click font increase')
       textporting(tokens, 2)) 
 
   # viewport down button 
@@ -465,7 +466,9 @@ sceneSync = (mode) ->
 
   #svg.titleForeignContainer.style('stroke-width', '7px')
   d3.select('#titleSVG')
-           .attr('width', viewport.width - 5 - 5)
+           .attr('width', viewport.width - 5 - 5 - 100) # -100 is intended to keep the buttons on the right above the nested svg, otherwise they don't click
+                                                        # this spoils the center alignemnt of the title and is a temporary hack 
+                                                        # (for some reason, the 'x' attr won't affect the position of the inline html)
            .attr('height', layout.separator.top.y - 5 - 5)           
 
   svg.title.attr('x', viewport.width / 2)
@@ -474,19 +477,46 @@ sceneSync = (mode) ->
            .style("font-weight", "bold")
            .attr("font-size", "30px")
 
+  svg.fontSize.redraw = () ->
+
+    console.log 'redrawing font size buttons'
+    #
+    # taking care of font size buttons geometry - 
+    # currently directly scaling the images.
+    # alternative scaling method - nest under new svg element having a viewbox
+    #
+
+    #svg.fontSize.attr('transform', 'translate(1000,26) scale(0.08)')
+    #.attr("viewBox",'0,0,796,1248')
+    fontButtonGeometry = 
+      'width':  398 * 0.08, # source image pixel width  * scaling factor
+      'height': 624 * 0.08  # source image pixel height * scaling factor
+    svg.fontDecreaseButton
+      .attr('x', viewport.width - (fontButtonGeometry.width * 2) - 7)
+      .attr('y', layout.separator.top.y - (fontButtonGeometry.height) - 7)
+      .attr('width', fontButtonGeometry.width)
+      .attr('height', fontButtonGeometry.height)
+    svg.fontIncreaseButton
+      .attr('x', viewport.width - (fontButtonGeometry.width) - 7 - 1)
+      .attr('y', layout.separator.top.y - (fontButtonGeometry.height) - 7)
+      .attr('width', fontButtonGeometry.width)
+      .attr('height', fontButtonGeometry.height)
+
+  svg.fontSize.redraw()      
+
   if firstEntry
     svg.title.transition().duration(300).ease('sin')
                                          .attr('y', layout.separator.top.y / 2)
     svg.titlePortRect.transition().duration(300).ease('sin')
                                          .attr('y', 5)
+    #setTimeout(svg.fontSize.redraw, 2000)                                         
+    firstEntry = false
 
   else 
     svg.title
        .attr('y', layout.separator.top.y / 2)
     svg.titlePortRect
-       .attr('y', 5)       
-
-  firstEntry = false
+       .attr('y', 5) 
 
   # show text if source tokens already loaded
   #console.log 'before textporting from scenesync'
@@ -505,32 +535,7 @@ sceneSync = (mode) ->
       else
         #console.log 'without animate'
         textporting(tokens)
-
-    
   
-
-  #
-  # taking care of font size buttons geometry - 
-  # currently directly scaling the images.
-  # alternative scaling method - nest under new svg element having a viewbox
-  #
-
-  #svg.fontSize.attr('transform', 'translate(1000,26) scale(0.08)')
-  #.attr("viewBox",'0,0,796,1248')
-  fontButtonGeometry = 
-    'width':  398 * 0.08, # source image pixel width  * scaling factor
-    'height': 624 * 0.08  # source image pixel height * scaling factor
-  svg.fontDecreaseButton
-    .attr('x', viewport.width - (fontButtonGeometry.width * 2) - 7)
-    .attr('y', layout.separator.top.y - (fontButtonGeometry.height) - 7)
-    .attr('width', fontButtonGeometry.width)
-    .attr('height', fontButtonGeometry.height)
-  svg.fontIncreaseButton
-    .attr('x', viewport.width - (fontButtonGeometry.width) - 7 - 1)
-    .attr('y', layout.separator.top.y - (fontButtonGeometry.height) - 7)
-    .attr('width', fontButtonGeometry.width)
-    .attr('height', fontButtonGeometry.height)
-
   panes = (groupY, groupH, borderX, elements) ->
 
     #boxH = (totalH / 2) / (svg.categories.length - 1)

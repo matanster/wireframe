@@ -233,7 +233,7 @@ sceneDefine = function(categoriesOfSummary) {
     svg.titlePort = svg.main.append('g');
     svg.titlePortRect = svg.titlePort.append('rect').style('fill', '#2F72FF');
     svg.titleForeignContainer = svg.titlePort.append('foreignObject').append('xhtml:body').html("<svg style='-webkit-transform: perspective(40px) rotateX(2deg)' id='titleSVG'></svg>");
-    return svg.title = d3.select('#titleSVG').append('text').text("Something Something Something Title").attr("id", "title").attr("dominant-baseline", "central").style("text-anchor", "middle").style('fill', "#EEEEEE");
+    return svg.title = d3.select('#titleSVG').append('text').text("  Something Something Something Title").attr("id", "title").attr("dominant-baseline", "central").style("text-anchor", "middle").style('fill', "#EEEEEE");
   };
   rightPane = function() {
     svg.rightPane = {};
@@ -281,13 +281,21 @@ sceneDefine = function(categoriesOfSummary) {
   textPort();
   titlePort();
   TOC();
-  svg.fontSize = svg.main.append("g");
-  svg.fontDecreaseButton = svg.fontSize.append("svg:image").attr("xlink:href", "fontSmall.svg");
-  svg.fontIncreaseButton = svg.fontSize.append("svg:image").attr("xlink:href", "fontLarge.svg");
-  svg.fontDecreaseButton.on('mousedown', function() {
+  svg.fontSize = {
+    element: svg.main.append("g")
+  };
+  svg.fontDecreaseButton = svg.fontSize.element.append("svg:image").attr("xlink:href", "fontSmall.svg");
+  svg.fontIncreaseButton = svg.fontSize.element.append("svg:image").attr("xlink:href", "fontLarge.svg");
+  svg.fontDecreaseButton.on('mouseover', function() {
+    return console.log('hover');
+  }).on('mousedown', function() {
+    console.log('click font decrease');
     return textporting(tokens, -2);
   });
-  svg.fontIncreaseButton.on('mousedown', function() {
+  svg.fontIncreaseButton.on('mouseover', function() {
+    return console.log('hover');
+  }).on('mousedown', function() {
+    console.log('click font increase');
     return textporting(tokens, 2);
   });
   svg.downButton = {};
@@ -306,7 +314,7 @@ sceneDefine = function(categoriesOfSummary) {
 };
 
 sceneSync = function(mode) {
-  var autoUpdate, fontButtonGeometry, groupY, pane, panes, update, _i, _len, _ref;
+  var autoUpdate, groupY, pane, panes, update, _i, _len, _ref;
   viewport = util.getViewport();
   layout.separator.top = {
     'y': calcStart()
@@ -342,16 +350,27 @@ sceneSync = function(mode) {
   };
   svgUtil.sync(svg.textPort);
   svg.titlePortRect.attr('width', viewport.width - 5 - 5).attr('height', layout.separator.top.y - 5 - 5).attr('x', 5).attr('y', -50).style('stroke-width', '7px').attr('rx', 10).attr('rx', 10);
-  d3.select('#titleSVG').attr('width', viewport.width - 5 - 5).attr('height', layout.separator.top.y - 5 - 5);
+  d3.select('#titleSVG').attr('width', viewport.width - 5 - 5 - 100).attr('height', layout.separator.top.y - 5 - 5);
   svg.title.attr('x', viewport.width / 2).attr('y', 0).style('font-family', 'Helvetica').style("font-weight", "bold").attr("font-size", "30px");
+  svg.fontSize.redraw = function() {
+    var fontButtonGeometry;
+    console.log('redrawing font size buttons');
+    fontButtonGeometry = {
+      'width': 398 * 0.08,
+      'height': 624 * 0.08
+    };
+    svg.fontDecreaseButton.attr('x', viewport.width - (fontButtonGeometry.width * 2) - 7).attr('y', layout.separator.top.y - fontButtonGeometry.height - 7).attr('width', fontButtonGeometry.width).attr('height', fontButtonGeometry.height);
+    return svg.fontIncreaseButton.attr('x', viewport.width - fontButtonGeometry.width - 7 - 1).attr('y', layout.separator.top.y - fontButtonGeometry.height - 7).attr('width', fontButtonGeometry.width).attr('height', fontButtonGeometry.height);
+  };
+  svg.fontSize.redraw();
   if (firstEntry) {
     svg.title.transition().duration(300).ease('sin').attr('y', layout.separator.top.y / 2);
     svg.titlePortRect.transition().duration(300).ease('sin').attr('y', 5);
+    firstEntry = false;
   } else {
     svg.title.attr('y', layout.separator.top.y / 2);
     svg.titlePortRect.attr('y', 5);
   }
-  firstEntry = false;
   if (tokens != null) {
     switch (mode) {
       case 'animate':
@@ -368,12 +387,6 @@ sceneSync = function(mode) {
         textporting(tokens);
     }
   }
-  fontButtonGeometry = {
-    'width': 398 * 0.08,
-    'height': 624 * 0.08
-  };
-  svg.fontDecreaseButton.attr('x', viewport.width - (fontButtonGeometry.width * 2) - 7).attr('y', layout.separator.top.y - fontButtonGeometry.height - 7).attr('width', fontButtonGeometry.width).attr('height', fontButtonGeometry.height);
-  svg.fontIncreaseButton.attr('x', viewport.width - fontButtonGeometry.width - 7 - 1).attr('y', layout.separator.top.y - fontButtonGeometry.height - 7).attr('width', fontButtonGeometry.width).attr('height', fontButtonGeometry.height);
   panes = function(groupY, groupH, borderX, elements) {
     var height, i, width, _i, _ref, _results;
     boxH = groupH / elements.length;
