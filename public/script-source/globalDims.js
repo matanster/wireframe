@@ -2,3 +2,5 @@
 exports.layout = {};
 
 exports.sceneObject = {};
+
+exports.sceneHook = {};

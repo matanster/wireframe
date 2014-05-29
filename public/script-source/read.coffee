@@ -5,13 +5,15 @@ textporting = require './textporting'
 textportingAbstract = require './textportingAbstract'
 textDraw    = require './textDraw'
 svgUtil     = require './svgUtil'
+navBars     = require './navBars'
 
-# Import global geometry
-globalDims = require './globalDims'
-sceneObject = globalDims.sceneObject
-layout = globalDims.layout
+# Global geometry 
+globalDims   = require './globalDims'
+sceneObject  = globalDims.sceneObject
+layout       = globalDims.layout
+sceneHook    = globalDims.sceneHook
 
-#console.log 'read.js main started'
+console.log 'read.js main started'
 
 firstEntry = true
 
@@ -22,8 +24,7 @@ states    = {}
 # Convenience globals - this can be refactored
 tokens    = undefined
 TOCTokens = []
-categoriesOfSummary = undefined
-mainCategories = undefined
+navBarsData = undefined
 segments = undefined
 
 calcStart = () -> 90
@@ -48,10 +49,10 @@ end    = null
 # that won't change with subsequent window resizing
 #
 #####################################################################
-sceneDefine = (categoriesOfSummary) ->
+sceneDefine = () ->
 
   main = () ->
-    sceneObject.main = d3.select('body').append('svg').style('background-color', '#999999')   
+    sceneHook.svg = d3.select('body').append('svg').style('background-color', '#999999')   
     sceneObject.categories = {} # can move this elsewhere
 
   TOC = () -> 
@@ -60,7 +61,7 @@ sceneDefine = (categoriesOfSummary) ->
 
     fontSize  = '14px' # temporarily
     fontFamily = 'verdana' # for now
-    sceneObject.TOC.element = sceneObject.main.append('svg')
+    sceneObject.TOC.element = sceneHook.svg.append('svg')
                         
     sceneObject.TOC.subElement = sceneObject.TOC.element.append('g')
                                  .style('text-anchor', 'start')
@@ -86,43 +87,17 @@ sceneDefine = (categoriesOfSummary) ->
     sceneObject.TOC.geometry.width = maxLen + (2 * sceneObject.TOC.geometry.paddingX)   
 
   mainPanes = (categories) ->
-
     #console.log categories
     numberOfBoxes = categories.length
-
     colorScale = d3.scale.linear().domain([0, numberOfBoxes-1]).range(['#87CEFA', '#00BFFF'])
     #colorScale = d3.scale.linear().domain([0, numberOfBoxes-1]).range(['#CCCCE0','#AAAABE']) # ['#CCCCE0','#AAAABE']
     colorTransition = (i) -> (() -> d3.select(this).transition().duration(25).ease('circle').style('fill', colorScale(i)))
     
-    sceneObject.categories.level1 = []
-
-    for box in [0..numberOfBoxes-1]
-      group = sceneObject.main.append('g')
-                            .style('-webkit-user-select', 'none')      # avoid standard text handling of the category texts (selection, touch callouts)
-                            .style('-webkit-touch-callout', 'none')    # avoid standard text handling of the category texts (selection, touch callouts) 
-                            .style('user-select', 'none') # future compatibility
-
-      rectangle = group.append('rect')
-                           .style('fill', colorScale(box))   
-                           .style('stroke-width', '0px')
-                           .style('fill-opacity', '1')
-
-      text = group.append('text').text(categories[box])
-                                       .style("text-anchor", "middle")
-                                       .attr("dominant-baseline", "central")
-                                       .style("font-family", "verdana")
-                                       .style("font-weight", "bold")
-                                       .style('fill', '#EEEEEE')                                                                                                               
-
-      sceneObject.categories.level1[box] = {}
-      sceneObject.categories.level1[box].group = group
-      sceneObject.categories.level1[box].element = rectangle
-      sceneObject.categories.level1[box].text = text
 
   textPort = () ->
 
     sceneObject.textPortBoundary = {}
-    sceneObject.textPortBoundary.element = sceneObject.main.append('rect')
+    sceneObject.textPortBoundary.element = sceneHook.svg.append('rect')
                            .style('stroke', '#999999')
                            .style('fill', '#999999')   
 
@@ -202,12 +177,12 @@ sceneDefine = (categoriesOfSummary) ->
                               )
     
     sceneObject.textPort = {}
-    sceneObject.textPort.element = sceneObject.main.append('rect')
+    sceneObject.textPort.element = sceneHook.svg.append('rect')
                            .style('stroke', '#222222')
                            .style('fill', '#222222')   
 
   titlePort = () ->
-    sceneObject.titlePort = sceneObject.main.append('g') # for now this grouping isn't used for anything, but a best practice anyway
+    sceneObject.titlePort = sceneHook.svg.append('g') # for now this grouping isn't used for anything, but a best practice anyway
 
     sceneObject.titlePortRect = sceneObject.titlePort.append('rect')
                                      .style('fill', '#2F72FF')   
@@ -227,7 +202,7 @@ sceneDefine = (categoriesOfSummary) ->
 
   rightPane = ->
     sceneObject.rightPane = {}
-    sceneObject.rightPane.element = sceneObject.main.append('rect')
+    sceneObject.rightPane.element = sceneHook.svg.append('rect')
                                     #.style('fill', '#ccccff')
                                     .style('fill', '#999999') #888888
                                     #.style('stroke-width', '1px')
@@ -293,7 +268,7 @@ sceneDefine = (categoriesOfSummary) ->
 
   # font buttons
   sceneObject.fontSize = 
-    element: sceneObject.main.append("g")
+    element: sceneHook.svg.append("g")
 
   sceneObject.fontDecreaseButton = sceneObject.fontSize.element.append("svg:image")
     .attr("xlink:href","fontSmall.svg")
@@ -319,7 +294,7 @@ sceneDefine = (categoriesOfSummary) ->
     'paddingX': 30, 
     'height': 35
 
-  sceneObject.downButton.element = sceneObject.main.append('svg:image')
+  sceneObject.downButton.element = sceneHook.svg.append('svg:image')
     .attr('xlink:href','images/downScroll5.svg')
     .attr('preserveAspectRatio', 'none')
     .on('mouseover', () -> 
@@ -350,7 +325,7 @@ sceneSync = (mode) ->
   totalH = viewport.height - layout.separator.top.y - end
 
   # draw main svg
-  sceneObject.main.attr('width', viewport.width)
+  sceneHook.svg.attr('width', viewport.width)
           .attr('height', viewport.height)
 
   unless layout.separator.right?
@@ -465,17 +440,19 @@ sceneSync = (mode) ->
         #console.log 'without animate'
         textporting(tokens)
   
+  #
+  # Draw elements to fit vertical segment, equal height to each
+  # this will probably go away
+  #
   panes = (groupY, groupH, borderX, elements) ->
 
     #boxH = (totalH / 2) / (sceneObject.categories.length - 1)
-
     boxH = (groupH) / (elements.length)
 
     for i in [0..elements.length-1]
 
       elements[i].x1 = 0
       elements[i].x2 = borderX
-
       ###
       if i is 0
         elements[i].y1 = layout.separator.top.y - 0.5
@@ -501,8 +478,6 @@ sceneSync = (mode) ->
       elements[i].text.attr('x', elements[i].x1 + width / 2)  
                       .attr('y', elements[i].y1 + height / 2)
 
-
-
   #
   # Show left panes and make them change on clicks (hackish style)
   #
@@ -518,7 +493,7 @@ sceneSync = (mode) ->
     sceneObject.downButton.geometry.x = layout.separator.left.x.current + sceneObject.downButton.geometry.paddingX
     sceneObject.downButton.geometry.width = layout.separator.right.x - layout.separator.left.x.current - (2 * sceneObject.downButton.geometry.paddingX)
 
-    sceneObject.downButton.geometry.y = sceneObject.main.attr('height') - sceneObject.downButton.geometry.height - sceneObject.downButton.geometry.paddingY # stick near bottom
+    sceneObject.downButton.geometry.y = sceneHook.svg.attr('height') - sceneObject.downButton.geometry.height - sceneObject.downButton.geometry.paddingY # stick near bottom
 
     sceneObject.downButton.element
       .attr('x', sceneObject.downButton.geometry.x) # center 
@@ -609,10 +584,11 @@ data.get('abstract', (response) ->
   #console.dir segments
 )
 
-data.get('categories - old', (response) -> 
+data.get('categories', (response) -> 
   #console.log(response)
-  mainCategories       = JSON.parse(response).Top
-  categoriesOfSummary  = JSON.parse(response).More
+  #mainCategories       = JSON.parse(response).Top
+  #categoriesOfSummary  = JSON.parse(response).More
+  navBarsData = JSON.parse(response)
 )
 
 data.get('TOC', (response) -> 
@@ -645,7 +621,7 @@ syncInit = () ->
 ##################
 
 start = () ->
-  sceneDefine(categoriesOfSummary)
+  sceneDefine()
   syncInit()
   #textporting(tokens)
   textportingAbstract(segments)
@@ -654,7 +630,7 @@ start = () ->
 waitForData = setInterval((()->  # can replace this with https://github.com/mbostock/queue
                                  # to do: make it possible to troubleshoot which ajax call didn't return,
                                  #        and log time taken with the new browser performance javascript api
-                if categoriesOfSummary? and tokens? and TOCTokens? and segments? and mainCategories?
+                if tokens? and TOCTokens? and segments? and navBarsData?
                   window.clearInterval(waitForData)
                   start()), 50)
                 

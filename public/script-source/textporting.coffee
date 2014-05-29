@@ -1,6 +1,7 @@
 # import global geometry
-globalDims = require './globalDims'
-sceneObject    = globalDims.sceneObject
+globalDims   = require './globalDims'
+sceneObject  = globalDims.sceneObject
+sceneHook = globalDims.sceneHook
 layout = globalDims.layout
 
 textDraw = require './textDraw'
@@ -30,7 +31,11 @@ module.exports = (tokens, fontSizeChange, scroll, mode) ->
   # Create top SVG for all this, for easy relative positioning,
   # and a 'g' element to afford treating the whole bunch as one group
   #
-  sceneObject.textPortInnerSVG.element = sceneObject.main.append('svg')
+
+  console.dir sceneObject
+  console.dir sceneHook.svg
+
+  sceneObject.textPortInnerSVG.element = sceneHook.svg.append('svg')
 
   sceneObject.textPortInnerSVG.subElement = sceneObject.textPortInnerSVG.element.append('g')
                                  .style('text-anchor', 'start')
