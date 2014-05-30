@@ -17,6 +17,8 @@ syncBar = (item, callback) ->
   # apply geometry to rectangle
   for key, val of item.geometry
     item.element.rectangle.attr(key, val)
+
+  item.element.rectangle.style('fill', item.color)
   
   # apply rectangle center to text, so it can be centered around the center
   item.element.text.attr('x', item.geometry.x + (item.geometry.width / 2))
@@ -66,7 +68,6 @@ exports.init = (navBarsData, svgHookPoint) ->
   root =
     'name'       : null # topmost element
     'element'    : textRectFactory(svgHookPoint)
-    'color'      : '#999999'
     'parent'     : null
     'nestLevel'  : -1
     'viewStatus' : 'visible' # unnecessary?
@@ -141,6 +142,7 @@ exports.redraw = (geometry) ->
     switch bar.viewStatus 
       when 'selected'
         bar.heightRatio = "2/3"
+        bar.color = '#999999'
       else      
         bar.heightRatio = null
 
@@ -159,13 +161,13 @@ exports.redraw = (geometry) ->
     bar.geometry =
       x      : geometry.x                 # same for all bars 
       width  : geometry.width             # same for all bars 
-      y      : y                          # start after previous bar
+      y      : y - 0.5                    # start after previous bar
       height : height                     # the alloted height for this specific bar
 
     # sync the geometry to the scene object
     syncBar(bar)
 
-    y += height + 0.5 # advance starting point for next bar if any
+    y += height # advance starting point for next bar if any
 
     console.dir bar
 
@@ -191,7 +193,7 @@ exports.redraw = (geometry) ->
 
 
 
-something = () ->
+oldsomething = () ->
   numberOfBoxes = categories.length
   colorScale = d3.scale.linear().domain([0, numberOfBoxes-1]).range(['#87CEFA', '#00BFFF'])
   #colorScale = d3.scale.linear().domain([0, numberOfBoxes-1]).range(['#CCCCE0','#AAAABE']) # ['#CCCCE0','#AAAABE']
@@ -201,7 +203,7 @@ something = () ->
 # Draw elements to fit vertical segment, equal height to each
 # this will probably go away
 #
-panes = (groupY, groupH, borderX, elements) ->
+oldpanes = (groupY, groupH, borderX, elements) ->
 
   #boxH = (totalH / 2) / (sceneObject.categories.length - 1)
   boxH = (groupH) / (elements.length)
@@ -236,7 +238,7 @@ panes = (groupY, groupH, borderX, elements) ->
                     .attr('y', elements[i].y1 + height / 2)
 
 
-show = () ->
+oldshow = () ->
   #
   # Show left panes and make them change on clicks (hackish style)
   #
