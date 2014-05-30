@@ -6,6 +6,22 @@ globalDims  = require './globalDims'
 sceneObject = globalDims.sceneObject
 layout      = globalDims.layout
 
+# Global
+bars = []
+
+#
+# convenience function for applying computed geometry to a bar
+#
+syncBar = (item, callback) ->
+
+  # apply geometry to rectangle
+  for key, val of item.geometry
+    item.element.rectangle.attr(key, val)
+  
+  # apply rectangle center to text, so it can be centered around the center
+  item.element.text.attr('x', item.geometry.x + (item.geometry.width / 2))
+  item.element.text.attr('y', item.geometry.y + (item.geometry.height / 2))
+
 #
 # create a text filled rectangle, under a new svg group element
 #
@@ -55,8 +71,6 @@ exports.init = (navBarsData, svgHookPoint) ->
     'nestLevel'  : -1
     'viewStatus' : 'visible' # unnecessary?
 
-  bars = []
-
   #
   # set initial status of a bar
   #
@@ -73,7 +87,7 @@ exports.init = (navBarsData, svgHookPoint) ->
   # recursive derivation of a bar and its children bars,
   # per the input bars data. 
   #
-  # This does not deep clone or restructure the input, 
+  # This does not merely deep clones or restructures the input, 
   # but rather adds properties for working the bars 
   #
   barCreate = (svgHookPoint, barData, parentBar, color) ->
@@ -89,7 +103,7 @@ exports.init = (navBarsData, svgHookPoint) ->
       'color'      : colorScale(i)
       'parent'     : parentBar
       'nestLevel'  : nestLevel
-      'viewStatus' : 'hidden'
+      'viewStatus' : 'hidden' # everything hidden till marked otherwise
 
     initialViewStatus(bar)
 
@@ -101,28 +115,65 @@ exports.init = (navBarsData, svgHookPoint) ->
     
     return bar   
 
+  #
   for barData, i in navBarsData
     bar = barCreate(svgHookPoint, barData, null, colorScale(i))
     bars.push(bar)
 
+  # voila, now attach the top level nodes to the special root node,
+  # to complete the tree creation
   root.children = bars
 
   console.dir root
   
-  #
-  # draw all bars according to:
-  # screen geometry
-  # selection status
-  #
-  exports.redraw = (x, width, y, height) ->
-    
-    console.log 'navBars redraw started'
-    for bar, i in bars
-      switch bar.viewStatus 
-        when 'selected'
-          heightRatio = 2/3
-        else 
-          heightRatio = null
+#
+# draw all bars according to:
+# screen geometry
+# selection status
+#
+exports.redraw = (geometry) ->
+  
+  console.log 'navBars redraw started'
+  console.dir geometry
+  
+  # first pass - set geometry weights based on nodes status
+  for bar in bars
+    switch bar.viewStatus 
+      when 'selected'
+        bar.heightRatio = "2/3"
+      else      
+        bar.heightRatio = null
+
+  # second pass - attach geometry based on given weights
+  y = geometry.y # initialize starting position for next bar
+
+  for bar, i in bars
+
+    # derive height for the bar
+    if bar.heightRatio?       
+      height = Math.floor(geometry.height * (2 / 3))   # take up 2/3's the total height                  
+    else
+      height = Math.floor(geometry.height * (1 / 3) / (bars.length - 1))   # take up its share from the remains of 1/3 total height
+
+    # set geometry for the bar
+    bar.geometry =
+      x      : geometry.x                 # same for all bars 
+      width  : geometry.width             # same for all bars 
+      y      : y                          # start after previous bar
+      height : height                     # the alloted height for this specific bar
+
+    # sync the geometry to the scene object
+    syncBar(bar)
+
+    y += height + 0.5 # advance starting point for next bar if any
+
+    console.dir bar
+
+  return null
+
+
+  
+
 
 
     

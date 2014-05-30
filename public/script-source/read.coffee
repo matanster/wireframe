@@ -461,7 +461,14 @@ sceneSync = (mode) ->
 
   sceneObject.rightPane.redraw()
 
-  navBars.redraw(0, layout.separator.left.x.current - 0.5, layout.separator.top.y - 0.5, totalH)
+  leftPane = 
+    geometry:
+      x:      0 
+      width:  layout.separator.left.x.current - 0.5, 
+      y:      layout.separator.top.y - 0.5, 
+      height: totalH
+
+  navBars.redraw(leftPane.geometry)
 
   sceneObject.TOC.redraw = () ->
 

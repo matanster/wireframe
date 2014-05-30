@@ -251,7 +251,7 @@ sceneDefine = function() {
 };
 
 sceneSync = function(mode) {
-  var autoUpdate, update;
+  var autoUpdate, leftPane, update;
   viewport = util.getViewport();
   layout.separator.top = {
     'y': calcStart()
@@ -332,7 +332,15 @@ sceneSync = function(mode) {
   };
   sceneObject.downButton.redraw();
   sceneObject.rightPane.redraw();
-  navBars.redraw(0, layout.separator.left.x.current - 0.5, layout.separator.top.y - 0.5, totalH);
+  leftPane = {
+    geometry: {
+      x: 0,
+      width: layout.separator.left.x.current - 0.5,
+      y: layout.separator.top.y - 0.5,
+      height: totalH
+    }
+  };
+  navBars.redraw(leftPane.geometry);
   return sceneObject.TOC.redraw = function() {
     var TOCToken, lHeight, paddingX, paddingY, spaceWidth, tokenViewable, viewPortFull, x, y, _i, _len, _results;
     spaceWidth = textDraw.tokenToViewable('a a', sceneObject.TOC.subElement).width - textDraw.tokenToViewable('aa', sceneObject.TOC.subElement).width;
