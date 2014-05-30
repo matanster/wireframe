@@ -392,7 +392,7 @@ data.get('abstract', function(response) {
 });
 
 data.get('categories', function(response) {
-  return navBarsData = JSON.parse(response).hierarchy;
+  return navBarsData = JSON.parse(response).root;
 });
 
 data.get('TOC', function(response) {

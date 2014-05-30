@@ -15,7 +15,11 @@ textRectFactory = function(svgHookPoint, rectText) {
   var group, rectangle, text;
   group = svgHookPoint.append('g').style('-webkit-user-select', 'none').style('-webkit-touch-callout', 'none').style('user-select', 'none');
   rectangle = group.append('rect').style('stroke-width', '0px').style('fill-opacity', '1');
-  text = group.append('text').text(rectText).style("text-anchor", "middle").attr("dominant-baseline", "central").style("font-family", "verdana").style("font-weight", "bold").style('fill', '#EEEEEE');
+  if (rectText != null) {
+    text = group.append('text').text(rectText).style("text-anchor", "middle").attr("dominant-baseline", "central").style("font-family", "verdana").style("font-weight", "bold").style('fill', '#EEEEEE');
+  } else {
+    text = null;
+  }
   sceneObject = {
     group: group,
     rectangle: rectangle,
@@ -25,11 +29,19 @@ textRectFactory = function(svgHookPoint, rectText) {
 };
 
 exports.init = function(navBarsData, svgHookPoint) {
-  var bar, barCreate, barData, bars, colorScale, i, initialViewStatus, _i, _len;
+  var bar, barCreate, barData, bars, colorScale, i, initialViewStatus, root, _i, _len;
   console.log('navBars init started');
   console.log('navBarsData object:');
   console.dir(navBarsData);
   colorScale = d3.scale.linear().domain([0, navBarsData.length]).range(['#87CEFA', '#00BFFF']);
+  root = {
+    'name': null,
+    'element': textRectFactory(svgHookPoint),
+    'color': '#999999',
+    'parent': null,
+    'nestLevel': -1,
+    'viewStatus': 'visible'
+  };
   bars = [];
   initialViewStatus = function(bar) {
     if (bar.parentBar === null) {
@@ -71,7 +83,8 @@ exports.init = function(navBarsData, svgHookPoint) {
     bar = barCreate(svgHookPoint, barData, null, colorScale(i));
     bars.push(bar);
   }
-  console.dir(bars);
+  root.children = bars;
+  console.dir(root);
   return exports.redraw = function(x, width, y, height) {
     var heightRatio, _j, _len1, _results;
     console.log('navBars redraw started');

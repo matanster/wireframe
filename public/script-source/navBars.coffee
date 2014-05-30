@@ -20,16 +20,25 @@ textRectFactory = (svgHookPoint, rectText) -> # sceneObject.main
                        .style('stroke-width', '0px')
                        .style('fill-opacity', '1')
 
-  text = group.append('text').text(rectText)
-                                   .style("text-anchor", "middle")
-                                   .attr("dominant-baseline", "central")
-                                   .style("font-family", "verdana")
-                                   .style("font-weight", "bold")
-                                   .style('fill', '#EEEEEE')                                                                                                               
+  # skip text node if no text is provided
+  if rectText?
+    text = group.append('text').text(rectText)
+                                     .style("text-anchor", "middle")
+                                     .attr("dominant-baseline", "central")
+                                     .style("font-family", "verdana")
+                                     .style("font-weight", "bold")
+                                     .style('fill', '#EEEEEE')
+  else 
+    text = null
 
   sceneObject = { group, rectangle, text}
   return sceneObject
 
+
+#
+# construct json tree of bars, 
+# topmost node being a special case node
+#
 exports.init = (navBarsData, svgHookPoint) ->
 
   console.log 'navBars init started'
@@ -37,6 +46,14 @@ exports.init = (navBarsData, svgHookPoint) ->
   console.dir navBarsData
 
   colorScale = d3.scale.linear().domain([0, navBarsData.length]).range(['#87CEFA', '#00BFFF'])
+
+  root =
+    'name'       : null # topmost element
+    'element'    : textRectFactory(svgHookPoint)
+    'color'      : '#999999'
+    'parent'     : null
+    'nestLevel'  : -1
+    'viewStatus' : 'visible' # unnecessary?
 
   bars = []
 
@@ -84,14 +101,13 @@ exports.init = (navBarsData, svgHookPoint) ->
     
     return bar   
 
-  #
-  # construct array of top level bars
-  #
   for barData, i in navBarsData
     bar = barCreate(svgHookPoint, barData, null, colorScale(i))
     bars.push(bar)
 
-  console.dir bars
+  root.children = bars
+
+  console.dir root
   
   #
   # draw all bars according to:
@@ -108,7 +124,7 @@ exports.init = (navBarsData, svgHookPoint) ->
         else 
           heightRatio = null
 
-    
+
     
     
 
