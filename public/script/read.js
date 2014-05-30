@@ -513,15 +513,13 @@ lookup = {};
 lastGeometry = {};
 
 syncBar = function(item, callback) {
-  var key, val, _ref;
-  _ref = item.geometry;
-  for (key in _ref) {
-    val = _ref[key];
-    item.element.rectangle.attr(key, val);
-  }
-  item.element.rectangle.style('fill', item.color);
-  item.element.text.attr('x', item.geometry.x + (item.geometry.width / 2));
-  return item.element.text.attr('y', item.geometry.y + (item.geometry.height / 2));
+  var textGeometry;
+  item.element.rectangle.transition().ease('linear').duration(400).attr(item.geometry).style('fill', item.color);
+  textGeometry = {
+    'x': item.geometry.x + (item.geometry.width / 2),
+    'y': item.geometry.y + (item.geometry.height / 2)
+  };
+  return item.element.text.transition().ease('linear').duration(400).attr(textGeometry);
 };
 
 textRectFactory = function(svgHookPoint, rectText) {
@@ -542,7 +540,7 @@ textRectFactory = function(svgHookPoint, rectText) {
 };
 
 exports.init = function(navBarsData, svgHookPoint) {
-  var bar, barCreate, barData, colorScale, i, initialViewStatus, root, _i, _len;
+  var bar, barCreate, barData, colorScale, i, initialViewStatus, root, _i, _j, _len, _len1;
   console.log('navBars init started');
   console.log('navBarsData object:');
   console.dir(navBarsData);
@@ -572,7 +570,7 @@ exports.init = function(navBarsData, svgHookPoint) {
     bar = {
       'name': barData.name,
       'element': textRectFactory(svgHookPoint, barData.name),
-      'color': colorScale(i),
+      'baseColor': colorScale(i),
       'parent': parentBar,
       'nestLevel': nestLevel,
       'viewStatus': 'hidden'
@@ -596,6 +594,7 @@ exports.init = function(navBarsData, svgHookPoint) {
     }).on('mousedown', function() {
       var sibling, _j, _len1, _ref1;
       bar = lookup[this.getAttribute('id')];
+      console.dir(bar);
       if (bar.parent != null) {
         _ref1 = bar.parent.children;
         for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
@@ -614,6 +613,10 @@ exports.init = function(navBarsData, svgHookPoint) {
     bars.push(bar);
   }
   root.children = bars;
+  for (_j = 0, _len1 = bars.length; _j < _len1; _j++) {
+    bar = bars[_j];
+    bar.parent = root;
+  }
   return console.dir(root);
 };
 
@@ -622,8 +625,8 @@ redraw = function(geometry) {
   lastGeometry = geometry;
   console.log('navBars redraw started');
   console.dir(geometry);
-  for (_i = 0, _len = bars.length; _i < _len; _i++) {
-    bar = bars[_i];
+  for (i = _i = 0, _len = bars.length; _i < _len; i = ++_i) {
+    bar = bars[i];
     switch (bar.viewStatus) {
       case 'selected':
         bar.heightRatio = "2/3";
@@ -631,6 +634,7 @@ redraw = function(geometry) {
         break;
       default:
         bar.heightRatio = null;
+        bar.color = bar.baseColor;
     }
   }
   y = geometry.y;

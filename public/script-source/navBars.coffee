@@ -16,15 +16,16 @@ lastGeometry = {}
 #
 syncBar = (item, callback) ->
 
-  # apply geometry to rectangle
-  for key, val of item.geometry
-    item.element.rectangle.attr(key, val)
-
-  item.element.rectangle.style('fill', item.color)
+  # apply geometry and fill to rectangle
+  item.element.rectangle.transition().ease('linear').duration(400).attr(item.geometry)
+                                                   .style('fill', item.color)
   
   # apply rectangle center to text, so it can be centered around the center
-  item.element.text.attr('x', item.geometry.x + (item.geometry.width / 2))
-  item.element.text.attr('y', item.geometry.y + (item.geometry.height / 2))
+  textGeometry = 
+    'x': item.geometry.x + (item.geometry.width / 2)
+    'y': item.geometry.y + (item.geometry.height / 2)
+
+  item.element.text.transition().ease('linear').duration(400).attr(textGeometry)
 
 #
 # create a text filled rectangle, under a new svg group element
@@ -104,7 +105,7 @@ exports.init = (navBarsData, svgHookPoint) ->
     bar =
       'name'       : barData.name
       'element'    : textRectFactory(svgHookPoint, barData.name)
-      'color'      : colorScale(i)
+      'baseColor'  : colorScale(i)
       'parent'     : parentBar
       'nestLevel'  : nestLevel
       'viewStatus' : 'hidden' # everything hidden till marked otherwise
@@ -138,6 +139,7 @@ exports.init = (navBarsData, svgHookPoint) ->
         # retreive bar object associated to the svg that was clicked
         bar = lookup[this.getAttribute('id')]
         # change selection amongst siblings of the clicked bar
+        console.dir bar
         if bar.parent?
          for sibling in bar.parent.children
            sibling.viewStatus = 'visible'
@@ -152,9 +154,11 @@ exports.init = (navBarsData, svgHookPoint) ->
     bar = barCreate(svgHookPoint, barData, null, colorScale(i))
     bars.push(bar)
 
-  # voila, now attach the top level nodes to the special root node,
+  # voila, now associate the top level nodes to the special root node,
   # to complete the tree creation
   root.children = bars
+  for bar in bars
+    bar.parent = root
 
   console.dir root
   
@@ -171,13 +175,14 @@ redraw = (geometry) ->
   console.dir geometry
   
   # first pass - set geometry weights based on nodes status
-  for bar in bars
+  for bar, i in bars
     switch bar.viewStatus 
       when 'selected'
         bar.heightRatio = "2/3"
         bar.color = '#999999'
       else      
         bar.heightRatio = null
+        bar.color = bar.baseColor
 
   # second pass - attach geometry based on given weights
   y = geometry.y # initialize starting position for next bar
