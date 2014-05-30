@@ -461,6 +461,8 @@ sceneSync = (mode) ->
 
   sceneObject.rightPane.redraw()
 
+  navBars.redraw(0, layout.separator.left.x.current - 0.5, layout.separator.top.y - 0.5, totalH)
+
   sceneObject.TOC.redraw = () ->
 
     #console.log 'starting TOC redraw'

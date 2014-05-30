@@ -1,9 +1,4 @@
 util        = require './util'
-#data        = require './data'
-#tokenize    = require './tokenize'
-#textporting = require './textporting'
-#textportingAbstract = require './textportingAbstract'
-#textDraw    = require './textDraw'
 svgUtil     = require './svgUtil'
 
 # Global geometry 
@@ -72,11 +67,12 @@ exports.init = (navBarsData, svgHookPoint) ->
       nestLevel = parentBar.nestLevel + 1
 
     bar =
-      'name'      : barData.name
-      'element'   : textRectFactory(svgHookPoint, barData.name)
-      'color'     : colorScale(i)
-      'parent'    : parentBar
-      'nestLevel' : nestLevel
+      'name'       : barData.name
+      'element'    : textRectFactory(svgHookPoint, barData.name)
+      'color'      : colorScale(i)
+      'parent'     : parentBar
+      'nestLevel'  : nestLevel
+      'viewStatus' : 'hidden'
 
     initialViewStatus(bar)
 
@@ -97,8 +93,28 @@ exports.init = (navBarsData, svgHookPoint) ->
 
   console.dir bars
   
+  #
+  # draw all bars according to:
+  # screen geometry
+  # selection status
+  #
+  exports.redraw = (x, width, y, height) ->
+    
+    console.log 'navBars redraw started'
+    for bar, i in bars
+      switch bar.viewStatus 
+        when 'selected'
+          heightRatio = 2/3
+        else 
+          heightRatio = null
+
+    
+    
+    
 
 
+  
+  
 
 
 

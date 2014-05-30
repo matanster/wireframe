@@ -51,7 +51,8 @@ exports.init = function(navBarsData, svgHookPoint) {
       'element': textRectFactory(svgHookPoint, barData.name),
       'color': colorScale(i),
       'parent': parentBar,
-      'nestLevel': nestLevel
+      'nestLevel': nestLevel,
+      'viewStatus': 'hidden'
     };
     initialViewStatus(bar);
     if (barData.subs != null) {
@@ -70,7 +71,23 @@ exports.init = function(navBarsData, svgHookPoint) {
     bar = barCreate(svgHookPoint, barData, null, colorScale(i));
     bars.push(bar);
   }
-  return console.dir(bars);
+  console.dir(bars);
+  return exports.redraw = function(x, width, y, height) {
+    var heightRatio, _j, _len1, _results;
+    console.log('navBars redraw started');
+    _results = [];
+    for (i = _j = 0, _len1 = bars.length; _j < _len1; i = ++_j) {
+      bar = bars[i];
+      switch (bar.viewStatus) {
+        case 'selected':
+          _results.push(heightRatio = 2 / 3);
+          break;
+        default:
+          _results.push(heightRatio = null);
+      }
+    }
+    return _results;
+  };
 };
 
 something = function() {
