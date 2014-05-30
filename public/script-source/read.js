@@ -391,7 +391,7 @@ data.get('abstract', function(response) {
 });
 
 data.get('categories', function(response) {
-  return navBarsData = JSON.parse(response);
+  return navBarsData = JSON.parse(response).hierarchy;
 });
 
 data.get('TOC', function(response) {

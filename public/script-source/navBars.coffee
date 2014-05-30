@@ -11,7 +11,9 @@ globalDims  = require './globalDims'
 sceneObject = globalDims.sceneObject
 layout      = globalDims.layout
 
-# create a text filled rectangle
+#
+# create a text filled rectangle, under a new svg group element
+#
 textRectFactory = (svgHookPoint, rectText) -> # sceneObject.main
   group = svgHookPoint.append('g')
                         .style('-webkit-user-select', 'none')      # avoid standard text handling of the category texts (selection, touch callouts)
@@ -19,7 +21,7 @@ textRectFactory = (svgHookPoint, rectText) -> # sceneObject.main
                         .style('user-select', 'none') # future compatibility
 
   rectangle = group.append('rect')
-                       .style('fill', colorScale(box))   
+                       #.style('fill', colorScale(box))   
                        .style('stroke-width', '0px')
                        .style('fill-opacity', '1')
 
@@ -30,20 +32,81 @@ textRectFactory = (svgHookPoint, rectText) -> # sceneObject.main
                                    .style("font-weight", "bold")
                                    .style('fill', '#EEEEEE')                                                                                                               
 
-  
   sceneObject = { group, rectangle, text}
   return sceneObject
-
-barInit = (bar, svgHookPoint, barName) -> 
-  bar.element = textRectFactory(barName)
 
 exports.init = (navBarsData, svgHookPoint) ->
 
   console.log 'navBars init started'
-  
-  for bar in navBarsData
-    console.log bar
+  console.log 'navBarsData object:'
+  console.dir navBarsData
+
+  colorScale = d3.scale.linear().domain([0, navBarsData.length]).range(['#87CEFA', '#00BFFF'])
+
+  bars = []
+
+  #
+  # set initial status of a bar
+  #
+  initialViewStatus = (bar) ->
+    # mark the active bar
+
+    if bar.parentBar is null
+      bar.viewStatus = 'visible'
+
+    if bar.name is "Introduction"
+      bar.viewStatus = 'selected'
+
+  #
+  # recursive derivation of a bar and its children bars,
+  # per the input bars data. 
+  #
+  # This does not deep clone or restructure the input, 
+  # but rather adds properties for working the bars 
+  #
+  barCreate = (svgHookPoint, barData, parentBar, color) ->
+
+    if parentBar is null
+      nestLevel = 0
+    else 
+      nestLevel = parentBar.nestLevel + 1
+
+    bar =
+      'name'      : barData.name
+      'element'   : textRectFactory(svgHookPoint, barData.name)
+      'color'     : colorScale(i)
+      'parent'    : parentBar
+      'nestLevel' : nestLevel
+
+    initialViewStatus(bar)
+
+    if barData.subs?
+      bar.children = []
+      for barDataSub in barData.subs
+        subBar = barCreate(svgHookPoint, barDataSub, bar, color)
+        bar.children.push(subBar)
     
+    return bar   
+
+  #
+  # construct array of top level bars
+  #
+  for barData, i in navBarsData
+    bar = barCreate(svgHookPoint, barData, null, colorScale(i))
+    bars.push(bar)
+
+  console.dir bars
+  
+
+
+
+
+
+
+
+
+
+
 
 something = () ->
   numberOfBoxes = categories.length

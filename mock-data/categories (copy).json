@@ -1,0 +1,35 @@
+{ "hierarchy": 
+  [
+    { 
+      "Introduction": 
+      []
+    },
+    {
+      "What were the article goals?":
+      [
+        "problem definition",
+        "purpose",
+        "hypotheses"
+      ]
+    },
+    {
+      "How was the research done?":
+      []
+    },
+    {
+      "What were the findings?":
+      [
+        "findings",
+        "conclusions"
+      ]
+    },
+    { 
+      "So what?":
+      [
+        "contribution",
+        "implications",
+        "recommendation"
+      ]
+    }
+  ]
+}

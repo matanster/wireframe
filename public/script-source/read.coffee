@@ -544,7 +544,7 @@ data.get('categories', (response) ->
   #console.log(response)
   #mainCategories       = JSON.parse(response).Top
   #categoriesOfSummary  = JSON.parse(response).More
-  navBarsData = JSON.parse(response)
+  navBarsData = JSON.parse(response).hierarchy
 )
 
 data.get('TOC', (response) -> 

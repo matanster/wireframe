@@ -1,22 +1,36 @@
-{ "Introduction": 
-  [],
-  "What were the article goals?":
+{ "hierarchy": 
   [
-    "problem definition",
-    "purpose",
-    "hypotheses"
-  ],
-  "How was the research done?":
-  [],    
-  "What were the findings?":
-  [
-    "findings",
-    "conclusions"
-  ],
-  "So what?":
-  [
-    "contribution",
-    "implications",
-    "recommendation"
+    { 
+      "name":   "Introduction"
+    },
+    {
+      "name": "What were the article goals?",
+      "subs": 
+      [
+        {"name": "problem definition"},
+        {"name": "purpose"},
+        {"name": "hypotheses"}
+      ]
+    },
+    {
+      "name": "How was the research done?"
+    },
+    {
+      "name":"What were the findings?",
+      "subs": 
+      [
+        {"name": "findings"},
+        {"name": "conclusions"}
+      ]
+    },
+    { 
+      "name": "So what?",
+      "subs":       
+      [
+        {"name": "contribution"},
+        {"name": "implications"},
+        {"name": "recommendation"}
+      ]
+    }
   ]
 }
