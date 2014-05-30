@@ -8,6 +8,8 @@ layout      = globalDims.layout
 
 # Global
 bars = []
+lookup = {}
+lastGeometry = {}
 
 #
 # convenience function for applying computed geometry to a bar
@@ -32,6 +34,7 @@ textRectFactory = (svgHookPoint, rectText) -> # sceneObject.main
                         .style('-webkit-user-select', 'none')      # avoid standard text handling of the category texts (selection, touch callouts)
                         .style('-webkit-touch-callout', 'none')    # avoid standard text handling of the category texts (selection, touch callouts) 
                         .style('user-select', 'none') # future compatibility
+                        .attr('id', rectText)
 
   rectangle = group.append('rect')
                        #.style('fill', colorScale(box))   
@@ -108,15 +111,43 @@ exports.init = (navBarsData, svgHookPoint) ->
 
     initialViewStatus(bar)
 
+    # associate svg element to the bar object, so that mouse/touch events
+    # can access the control data they need to
+    lookup[bar.element.group.attr('id')] = bar
+
+    console.dir lookup
+
+    # proceed to recursion over bar subs, if any
     if barData.subs?
       bar.children = []
       for barDataSub in barData.subs
         subBar = barCreate(svgHookPoint, barDataSub, bar, color)
         bar.children.push(subBar)
     
+    #
+    # attach mouse events to bar
+    #
+    bar.element.group
+      .on('mouseover', () -> 
+        console.log('hover'))
+        #sceneObject.downButton.element.transition().ease('sin').duration(200).attr('height', sceneObject.downButton.geometry.height + (sceneObject.downButton.geometry.paddingY *2/3)))
+      .on('mouseout', () -> 
+        console.log('hover end'))
+        #sceneObject.downButton.element.transition().duration(400).attr('height', sceneObject.downButton.geometry.height))
+      .on('mousedown', () -> 
+        # retreive bar object associated to the svg that was clicked
+        bar = lookup[this.getAttribute('id')]
+        # change selection amongst siblings of the clicked bar
+        if bar.parent?
+         for sibling in bar.parent.children
+           sibling.viewStatus = 'visible'
+        bar.viewStatus = 'selected'
+        redraw(lastGeometry)
+    )             
+
     return bar   
 
-  #
+
   for barData, i in navBarsData
     bar = barCreate(svgHookPoint, barData, null, colorScale(i))
     bars.push(bar)
@@ -132,7 +163,9 @@ exports.init = (navBarsData, svgHookPoint) ->
 # screen geometry
 # selection status
 #
-exports.redraw = (geometry) ->
+redraw = (geometry) ->
+
+  lastGeometry = geometry # temporary: persist for now, while it's all driven from this module. 
   
   console.log 'navBars redraw started'
   console.dir geometry
@@ -173,7 +206,7 @@ exports.redraw = (geometry) ->
 
   return null
 
-
+exports.redraw = redraw
   
 
 
