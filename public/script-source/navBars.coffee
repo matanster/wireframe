@@ -237,7 +237,11 @@ redraw = (bars) ->
       if bar.children[0].viewStatus in ['visible', 'selected']
         visibleChildren = true
 
-    textHeight = 15 # to be replaced with real measurement - we already have such function
+    
+
+    #textHeight = 15 
+    textHeight = 15 
+    # to be replaced with real measurement - we already have such function
 
     #
     # take care of geometry for the bar's rectangle
@@ -256,9 +260,11 @@ redraw = (bars) ->
     # calculate geometry for the bar's text
     #
     if visibleChildren
+      # TODO: the following makes the text invisible, this is a hackish way to make
+      # it invisible, to be replaced in case this code segment persists. 
       textGeometry = 
         'x': bar.geometry.x + (bar.geometry.width / 2)
-        'y': bar.geometry.y + textHeight
+        'y': bar.geometry.y + (bar.geometry.height / 2) # bar.geometry.y + textHeight
     else
       textGeometry = 
         'x': bar.geometry.x + (bar.geometry.width / 2)
@@ -273,12 +279,16 @@ redraw = (bars) ->
     #
     # take care of allowed geometry for child bars, if any
     #
+    childGeometryPadding =
+      x: 6
+      y: 5 # todo: make ratio of x and y same as de-facto screen aspect ratio, for uniform physical length
+
     if visibleChildren
       bar.childrenGeometry = 
-        x      : bar.geometry.x      +  15
-        width  : bar.geometry.width  - (15 * 2) 
-        y      : bar.geometry.y      +  15       +   textHeight       # to be replaced with real measurement - we already have such function
-        height : bar.geometry.height - (15 * 2)  -  (textHeight * 2)
+        x      : bar.geometry.x      +  childGeometryPadding.x
+        width  : bar.geometry.width  - (childGeometryPadding.x * 2) 
+        y      : bar.geometry.y      +  childGeometryPadding.y         
+        height : bar.geometry.height - (childGeometryPadding.y * 2)  
     ###
     else
       bar.childrenGeometry = 

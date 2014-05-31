@@ -650,7 +650,7 @@ exports.init = function(navBarsData, svgHookPoint) {
 };
 
 redraw = function(bars) {
-  var allowedGeometry, anySelected, bar, height, i, textGeometry, textHeight, visibleChildren, y, _i, _j, _k, _l, _len, _len1, _len2, _len3, _len4, _m, _ref;
+  var allowedGeometry, anySelected, bar, childGeometryPadding, height, i, textGeometry, textHeight, visibleChildren, y, _i, _j, _k, _l, _len, _len1, _len2, _len3, _len4, _m, _ref;
   console.log('navBars redraw started');
   allowedGeometry = bars[0].parent.childrenGeometry;
   anySelected = false;
@@ -717,7 +717,7 @@ redraw = function(bars) {
     if (visibleChildren) {
       textGeometry = {
         'x': bar.geometry.x + (bar.geometry.width / 2),
-        'y': bar.geometry.y + textHeight
+        'y': bar.geometry.y + (bar.geometry.height / 2)
       };
     } else {
       textGeometry = {
@@ -727,12 +727,16 @@ redraw = function(bars) {
     }
     bar.element.text.transition().ease('linear').duration(400).attr(textGeometry);
     bar.element.group.attr('visibility', 'visible');
+    childGeometryPadding = {
+      x: 6,
+      y: 5
+    };
     if (visibleChildren) {
       bar.childrenGeometry = {
-        x: bar.geometry.x + 15,
-        width: bar.geometry.width - (15 * 2),
-        y: bar.geometry.y + 15 + textHeight,
-        height: bar.geometry.height - (15 * 2) - (textHeight * 2)
+        x: bar.geometry.x + childGeometryPadding.x,
+        width: bar.geometry.width - (childGeometryPadding.x * 2),
+        y: bar.geometry.y + childGeometryPadding.y,
+        height: bar.geometry.height - (childGeometryPadding.y * 2)
       };
     }
     /*
