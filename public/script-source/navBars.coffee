@@ -32,7 +32,8 @@ syncBar = (item, callback) ->
   item.element.text.transition().ease('linear').duration(400).attr(textGeometry)
 
 #
-# create a text filled rectangle, under a new svg group element
+# create a hidden text filled rectangle, under a new svg group element,
+# ready to be later made visible.
 #
 textRectFactory = (svgHookPoint, rectText) -> # sceneObject.main
   group = svgHookPoint.append('g')
@@ -40,6 +41,7 @@ textRectFactory = (svgHookPoint, rectText) -> # sceneObject.main
                         .style('-webkit-touch-callout', 'none')    # avoid standard text handling of the category texts (selection, touch callouts) 
                         .style('user-select', 'none') # future compatibility
                         .attr('id', rectText)
+                        .attr('visibility', 'hidden')
 
   rectangle = group.append('rect')
                        #.style('fill', colorScale(box))   
@@ -61,6 +63,21 @@ textRectFactory = (svgHookPoint, rectText) -> # sceneObject.main
   return sceneObject
 
 
+#
+# revoke 'selected' status off bar, while reflecting the change
+# also to it's children
+#
+barUnselect = (bar) ->
+  hideChildren = (bar) ->
+    if bar.children?
+      for child in bar.children
+        child.viewStatus = 'hidden' 
+        child.element.group.attr('visibility', 'hidden')
+        hideChildren(child)
+
+  bar.viewStatus = 'visible'
+  hideChildren(bar)
+   
 #
 # construct json tree of bars, 
 # topmost node being a special case node
@@ -139,10 +156,13 @@ exports.init = (navBarsData, svgHookPoint) ->
       .on('mousedown', () -> 
         # retreive bar object associated to the svg that was clicked
         bar = lookup[this.getAttribute('id')]
-        # change selection amongst siblings of the clicked bar
+        # move the selection status to now selected item, 
+        # after removing that status from whatever had it before.
         if bar.parent?
          for sibling in bar.parent.children
-           sibling.viewStatus = 'visible'
+           if sibling.viewStatus is 'selected'
+             barUnselect(sibling)             
+
         bar.viewStatus = 'selected'
         # make children, if any, visible
         if bar.children?
@@ -262,6 +282,9 @@ redraw = (bars) ->
 
     # apply geometry and fill to bar's text
     bar.element.text.transition().ease('linear').duration(400).attr(textGeometry)
+ 
+    # make it visible
+    bar.element.group.attr('visibility', 'visible')
 
     #
     # take care of allowed geometry for child bars, if any
