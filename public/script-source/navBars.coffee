@@ -10,6 +10,10 @@ layout      = globalDims.layout
 bars = []
 lookup = {}
 lastGeometry = {}
+colors =
+  scaleStart : '#A3B1BA'  # '#87CEFA' 
+  scaleEnd   : '#87CEFA'  # '#00BFFF'
+  selection  : '#999999'
 
 #
 # convenience function for applying computed geometry to a bar
@@ -67,7 +71,8 @@ exports.init = (navBarsData, svgHookPoint) ->
   console.log 'navBarsData object:'
   console.dir navBarsData
 
-  colorScale = d3.scale.linear().domain([0, navBarsData.length]).range(['#87CEFA', '#00BFFF'])
+  #colorScale = d3.scale.linear().domain([0, navBarsData.length]).range(['#87CEFA', '#00BFFF'])
+  colorScale = d3.scale.linear().domain([0, navBarsData.length]).range([colors.scaleStart, colors.scaleEnd])
 
   root =
     'name'       : null # topmost element
@@ -179,7 +184,7 @@ redraw = (geometry) ->
     switch bar.viewStatus 
       when 'selected'
         bar.heightRatio = "2/3"
-        bar.color = '#999999'
+        bar.color = colors.selection
       else      
         bar.heightRatio = null
         bar.color = bar.baseColor

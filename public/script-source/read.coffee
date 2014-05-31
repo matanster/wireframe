@@ -20,6 +20,9 @@ firstEntry = true
 # Globals
 viewport  = null
 states    = {}
+colors =
+  scaleStart : '#87CEFA'
+  scaleEnd   : '#00BFFF'
 
 # Convenience globals - this can be refactored
 tokens    = undefined
@@ -39,7 +42,7 @@ layout =
 layout.separator.left.x.revertsTo = layout.separator.left.x.current
 layout.separator.top = {}
 
-totalH = null
+coreH = null
 boxH   = null
 end    = null
 
@@ -89,7 +92,7 @@ sceneDefine = () ->
   mainPanes = (categories) ->
     #console.log categories
     numberOfBoxes = categories.length
-    colorScale = d3.scale.linear().domain([0, numberOfBoxes-1]).range(['#87CEFA', '#00BFFF'])
+    colorScale = d3.scale.linear().domain([0, numberOfBoxes-1]).range([colors.scaleStart, colors.scaleEnd])
     #colorScale = d3.scale.linear().domain([0, numberOfBoxes-1]).range(['#CCCCE0','#AAAABE']) # ['#CCCCE0','#AAAABE']
     colorTransition = (i) -> (() -> d3.select(this).transition().duration(25).ease('circle').style('fill', colorScale(i)))
     
@@ -252,7 +255,7 @@ sceneDefine = () ->
 
       sceneObject.rightPane.geometry.x = layout.separator.right.x
       sceneObject.rightPane.geometry.y = layout.separator.top.y
-      sceneObject.rightPane.geometry.height = totalH
+      sceneObject.rightPane.geometry.height = coreH
 
       if states.showTOC is 'in progress'
         svgUtil.sync(sceneObject.rightPane, sceneObject.TOC.redraw)
@@ -326,7 +329,7 @@ sceneSync = (mode) ->
   layout.separator.top = { 'y' : calcStart()}
   end   = 0 # calcEnd()
 
-  totalH = viewport.height - layout.separator.top.y - end
+  coreH = viewport.height - layout.separator.top.y - end
 
   # draw main svg
   sceneHook.svg.attr('width', viewport.width)
@@ -342,7 +345,7 @@ sceneSync = (mode) ->
     'x':            layout.separator.left.x.current,
     'width':        layout.separator.right.x - layout.separator.left.x.current,
     'y':            layout.separator.top.y + 5,
-    'height':       totalH
+    'height':       coreH
 
   sceneObject.textPortBoundary.style = 
     'stroke-width': '25px'
@@ -352,7 +355,7 @@ sceneSync = (mode) ->
   sceneObject.textPort.geometry = 
               'x'      : layout.separator.left.x.current + 5,
               'width'  : layout.separator.right.x - layout.separator.left.x.current - 10,
-              'height' : totalH, # this is a hack - it ends below viewport bottom, otherwise curved edge shows
+              'height' : coreH, # this is a hack - it ends below viewport bottom, otherwise curved edge shows
               'y'      : layout.separator.top.y + 5 + 10,
               'rx'     : 10,
               'rx'     : 10
@@ -464,9 +467,9 @@ sceneSync = (mode) ->
   leftPane = 
     geometry:
       x:      0 
-      width:  layout.separator.left.x.current - 0.5, 
+      width:  layout.separator.left.x.current - 10, 
       y:      layout.separator.top.y - 0.5, 
-      height: totalH
+      height: coreH
 
   navBars.redraw(leftPane.geometry)
 
