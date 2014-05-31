@@ -11,6 +11,8 @@ layout = globalDims.layout
 # return svg text element text for an input token, 
 # along with its dimensions through having drawn it invisibly
 #
+# it can then later be made visible
+#
 exports.tokenToViewable = (token, visibleGroup) ->
 
     visualToken = {}

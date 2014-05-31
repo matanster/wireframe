@@ -520,22 +520,27 @@ lookup = {};
 colors = {
   scaleStart: '#87CEFA',
   scaleEnd: '#00BFFF',
-  selection: '#333333'
+  selection: '#999999'
 };
 
 textRectFactory = function(svgHookPoint, rectText) {
-  var group, rectangle, text;
+  var group, rectangle, text, textDims;
   group = svgHookPoint.append('g').style('-webkit-user-select', 'none').style('-webkit-touch-callout', 'none').style('user-select', 'none').attr('id', rectText).attr('visibility', 'hidden');
   rectangle = group.append('rect').style('stroke-width', '0px').style('fill-opacity', '1');
   if (rectText != null) {
-    text = group.append('text').text(rectText).style("text-anchor", "middle").attr("dominant-baseline", "central").style("font-family", "verdana").style("font-weight", "bold").style('fill', '#EEEEEE');
+    text = group.append('text').text(rectText).style("text-anchor", "middle").attr("dominant-baseline", "central").style("font-family", "verdana").style('fill', '#EEEEEE');
+    textDims = {
+      width: text.node().getBBox().width,
+      height: text.node().getBBox().height
+    };
   } else {
     text = null;
   }
   sceneObject = {
     group: group,
     rectangle: rectangle,
-    text: text
+    text: text,
+    textDims: textDims
   };
   return sceneObject;
 };
@@ -650,7 +655,7 @@ exports.init = function(navBarsData, svgHookPoint) {
 };
 
 redraw = function(bars) {
-  var allowedGeometry, anySelected, bar, childGeometryPadding, height, i, textGeometry, textHeight, visibleChildren, y, _i, _j, _k, _l, _len, _len1, _len2, _len3, _len4, _m, _ref;
+  var allowedGeometry, anySelected, bar, childGeometryPadding, height, i, innerExtraPadding, oldHeight, textGeometry, textPaddedSpace, visibleChildren, y, _i, _j, _k, _l, _len, _len1, _len2, _len3, _len4, _m, _ref;
   console.log('navBars redraw started');
   allowedGeometry = bars[0].parent.childrenGeometry;
   anySelected = false;
@@ -665,9 +670,11 @@ redraw = function(bars) {
     switch (bar.viewStatus) {
       case 'selected':
         bar.color = colors.selection;
+        bar.element.text.style("font-weight", "bold");
         break;
       default:
         bar.color = bar.baseColor;
+        bar.element.text.style("font-weight", "normal");
     }
   }
   if (anySelected) {
@@ -706,7 +713,14 @@ redraw = function(bars) {
         visibleChildren = true;
       }
     }
-    textHeight = 15;
+    if (bar.geometry != null) {
+      oldHeight = bar.geometry.height;
+      textPaddedSpace = oldHeight;
+      innerExtraPadding = {
+        top: textPaddedSpace * 1.5,
+        bottom: textPaddedSpace * 0.2
+      };
+    }
     bar.geometry = {
       x: allowedGeometry.x,
       width: allowedGeometry.width,
@@ -715,9 +729,20 @@ redraw = function(bars) {
     };
     bar.element.rectangle.transition().ease('linear').duration(400).attr(bar.geometry).style('fill', bar.color);
     if (visibleChildren) {
+      childGeometryPadding = {
+        x: 6,
+        y: 5
+      };
+      bar.childrenGeometry = {
+        x: bar.geometry.x + childGeometryPadding.x,
+        width: bar.geometry.width - (childGeometryPadding.x * 2),
+        y: bar.geometry.y + childGeometryPadding.y + innerExtraPadding.top,
+        height: bar.geometry.height - (childGeometryPadding.y * 2) - (innerExtraPadding.top + innerExtraPadding.bottom)
+      };
+      redraw(bar.children);
       textGeometry = {
         'x': bar.geometry.x + (bar.geometry.width / 2),
-        'y': bar.geometry.y + (bar.geometry.height / 2)
+        'y': bar.geometry.y + (innerExtraPadding.top / 2)
       };
     } else {
       textGeometry = {
@@ -727,30 +752,6 @@ redraw = function(bars) {
     }
     bar.element.text.transition().ease('linear').duration(400).attr(textGeometry);
     bar.element.group.attr('visibility', 'visible');
-    childGeometryPadding = {
-      x: 6,
-      y: 5
-    };
-    if (visibleChildren) {
-      bar.childrenGeometry = {
-        x: bar.geometry.x + childGeometryPadding.x,
-        width: bar.geometry.width - (childGeometryPadding.x * 2),
-        y: bar.geometry.y + childGeometryPadding.y,
-        height: bar.geometry.height - (childGeometryPadding.y * 2)
-      };
-    }
-    /*
-    else
-      bar.childrenGeometry = 
-        x      : bar.geometry.x      +  15
-        width  : bar.geometry.width  - (15 * 2)
-        y      : bar.geometry.y      +  15
-        height : bar.geometry.height - (15 * 2)
-    */
-
-    if (visibleChildren) {
-      redraw(bar.children);
-    }
     y += height;
   }
   return null;
