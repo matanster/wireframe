@@ -11,25 +11,9 @@ bars = []
 root = {}
 lookup = {}
 colors =
-  scaleStart : '#A3B1BA'  # '#87CEFA' 
-  scaleEnd   : '#87CEFA'  # '#00BFFF'
-  selection  : '#999999'
-
-#
-# convenience function for applying computed geometry to a bar
-#
-syncBar = (item, callback) ->
-
-  # apply geometry and fill to rectangle
-  item.element.rectangle.transition().ease('linear').duration(400).attr(item.geometry)
-                                                    .style('fill', item.color)
-  
-  # apply rectangle center to text, so it can be centered around the center
-  textGeometry = 
-    'x': item.geometry.x + (item.geometry.width / 2)
-    'y': item.geometry.y + (item.geometry.height / 2)
-
-  item.element.text.transition().ease('linear').duration(400).attr(textGeometry)
+  scaleStart : '#87CEFA'  # '#A3B1BA'
+  scaleEnd   : '#00BFFF'  # '#87CEFA'
+  selection  : '#333333'  # '#999999'
 
 #
 # create a hidden text filled rectangle, under a new svg group element,
@@ -64,16 +48,19 @@ textRectFactory = (svgHookPoint, rectText) -> # sceneObject.main
 
 
 #
-# revoke 'selected' status off bar, while reflecting the change
-# also to it's children
+# revoke 'selected' status off bar, reflecting the change
+# also to it's children. 
 #
 barUnselect = (bar) ->
   hideChildren = (bar) ->
     if bar.children?
       for child in bar.children
+        #
+        # set the hidden status, and execute its hiding
+        #
         child.viewStatus = 'hidden' 
         child.element.group.attr('visibility', 'hidden')
-        hideChildren(child)
+        hideChildren(child) # recurse over children
 
   bar.viewStatus = 'visible'
   hideChildren(bar)
@@ -197,7 +184,6 @@ redraw = (bars) ->
   # get the space to be used within the parent geometry.
   #
   allowedGeometry = bars[0].parent.childrenGeometry 
-  console.dir allowedGeometry
   
   # figure if any of current layer are selected
   anySelected = false
@@ -251,8 +237,6 @@ redraw = (bars) ->
       if bar.children[0].viewStatus in ['visible', 'selected']
         visibleChildren = true
 
-    console.log visibleChildren
-
     textHeight = 15 # to be replaced with real measurement - we already have such function
 
     #
@@ -304,14 +288,11 @@ redraw = (bars) ->
         height : bar.geometry.height - (15 * 2)
     ###
 
-    console.log 'bar.childrenGeometry'
-    console.log JSON.stringify(bar.childrenGeometry, null, '  ')
     #
     # invoke for children if any
     #
     if visibleChildren
       redraw(bar.children) # recurse for children 
-      console.log ''
 
     #
     # advance starting point for next bar if any
@@ -405,7 +386,7 @@ oldshow = () ->
   panes(groupY, totalH/2, layout.separator.left.x.current, sceneObject.categories.level2)
 
 
-
+# console.log JSON.stringify(bar.childrenGeometry, null, '  ')
 
 
 
