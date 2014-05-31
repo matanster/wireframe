@@ -466,10 +466,10 @@ sceneSync = (mode) ->
 
   leftPane = 
     geometry:
-      x:      0 
-      width:  layout.separator.left.x.current - 10, 
-      y:      layout.separator.top.y - 0.5, 
-      height: coreH
+      x      : 0 
+      width  : layout.separator.left.x.current - 10, 
+      y      : layout.separator.top.y - 0.5, 
+      height : coreH
 
   navBars.redraw(leftPane.geometry)
 

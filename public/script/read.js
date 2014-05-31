@@ -551,7 +551,7 @@ textRectFactory = function(svgHookPoint, rectText) {
 };
 
 exports.init = function(navBarsData, svgHookPoint) {
-  var bar, barCreate, barData, colorScale, i, initialViewStatus, _i, _j, _len, _len1;
+  var bar, barCreate, barData, colorScale, i, initialViewStatus, _i, _j, _len, _len1, _results;
   console.log('navBars init started');
   console.log('navBarsData object:');
   console.dir(navBarsData);
@@ -588,7 +588,6 @@ exports.init = function(navBarsData, svgHookPoint) {
     };
     initialViewStatus(bar);
     lookup[bar.element.group.attr('id')] = bar;
-    console.dir(lookup);
     if (barData.subs != null) {
       bar.children = [];
       _ref = barData.subs;
@@ -599,9 +598,9 @@ exports.init = function(navBarsData, svgHookPoint) {
       }
     }
     bar.element.group.on('mouseover', function() {
-      return console.log('hover');
+      return null;
     }).on('mouseout', function() {
-      return console.log('hover end');
+      return null;
     }).on('mousedown', function() {
       var child, sibling, _j, _k, _len1, _len2, _ref1, _ref2;
       bar = lookup[this.getAttribute('id')];
@@ -630,18 +629,19 @@ exports.init = function(navBarsData, svgHookPoint) {
     bars.push(bar);
   }
   root.children = bars;
+  _results = [];
   for (_j = 0, _len1 = bars.length; _j < _len1; _j++) {
     bar = bars[_j];
-    bar.parent = root;
+    _results.push(bar.parent = root);
   }
-  return console.dir(root);
+  return _results;
 };
 
 redraw = function(bars) {
-  var anySelected, bar, height, i, parentGeometry, y, _i, _j, _k, _l, _len, _len1, _len2, _len3, _len4, _len5, _m, _n, _ref;
-  parentGeometry = bars[0].parent.geometry;
+  var allowedGeometry, anySelected, bar, height, i, textGeometry, textHeight, visibleChildren, y, _i, _j, _k, _l, _len, _len1, _len2, _len3, _len4, _m, _ref;
   console.log('navBars redraw started');
-  console.dir(parentGeometry);
+  allowedGeometry = bars[0].parent.childrenGeometry;
+  console.dir(allowedGeometry);
   anySelected = false;
   for (_i = 0, _len = bars.length; _i < _len; _i++) {
     bar = bars[_i];
@@ -676,41 +676,68 @@ redraw = function(bars) {
       bar.heightRatio = 'even';
     }
   }
-  y = parentGeometry.y;
+  y = allowedGeometry.y;
   for (i = _m = 0, _len4 = bars.length; _m < _len4; i = ++_m) {
     bar = bars[i];
     switch (bar.heightRatio) {
       case 'main':
-        height = Math.floor(parentGeometry.height * (2 / 3));
+        height = Math.floor(allowedGeometry.height * (2 / 3));
         break;
       case 'subordinate':
-        height = Math.floor(parentGeometry.height * (1 / 3) / (bars.length - 1));
+        height = Math.floor(allowedGeometry.height * (1 / 3) / (bars.length - 1));
         break;
       case 'even':
-        height = Math.floor(parentGeometry.height / bars.length);
+        height = Math.floor(allowedGeometry.height / bars.length);
     }
+    visibleChildren = false;
+    if (bar.children != null) {
+      if ((_ref = bar.children[0].viewStatus) === 'visible' || _ref === 'selected') {
+        visibleChildren = true;
+      }
+    }
+    console.log(visibleChildren);
+    textHeight = 15;
     bar.geometry = {
-      x: parentGeometry.x,
-      width: parentGeometry.width,
-      y: y - 0.5,
+      x: allowedGeometry.x,
+      width: allowedGeometry.width,
+      y: y + 0.5,
       height: height
     };
-    syncBar(bar);
-    console.dir(bar);
-    for (_n = 0, _len5 = bars.length; _n < _len5; _n++) {
-      bar = bars[_n];
-      if (bar.children != null) {
-        if ((_ref = bar.children[0].viewStatus) === 'visible' || _ref === 'selected') {
-          console.log('visible children');
-          bar.geometry = {
-            'x': parentGeometry.x + 15,
-            'width': parentGeometry.width - (15 * 2),
-            'y': y + 15,
-            'height': height - (15 * 2)
-          };
-          redraw(bar.children);
-        }
-      }
+    bar.element.rectangle.transition().ease('linear').duration(400).attr(bar.geometry).style('fill', bar.color);
+    if (visibleChildren) {
+      textGeometry = {
+        'x': bar.geometry.x + (bar.geometry.width / 2),
+        'y': bar.geometry.y + textHeight
+      };
+    } else {
+      textGeometry = {
+        'x': bar.geometry.x + (bar.geometry.width / 2),
+        'y': bar.geometry.y + (bar.geometry.height / 2)
+      };
+    }
+    bar.element.text.transition().ease('linear').duration(400).attr(textGeometry);
+    if (visibleChildren) {
+      bar.childrenGeometry = {
+        x: bar.geometry.x + 15,
+        width: bar.geometry.width - (15 * 2),
+        y: bar.geometry.y + 15 + textHeight,
+        height: bar.geometry.height - (15 * 2) - (textHeight * 2)
+      };
+    }
+    /*
+    else
+      bar.childrenGeometry = 
+        x      : bar.geometry.x      +  15
+        width  : bar.geometry.width  - (15 * 2)
+        y      : bar.geometry.y      +  15
+        height : bar.geometry.height - (15 * 2)
+    */
+
+    console.log('bar.childrenGeometry');
+    console.log(JSON.stringify(bar.childrenGeometry, null, '  '));
+    if (visibleChildren) {
+      redraw(bar.children);
+      console.log('');
     }
     y += height;
   }
@@ -719,6 +746,12 @@ redraw = function(bars) {
 
 exports.redraw = function(geometry) {
   root.geometry = geometry;
+  root.childrenGeometry = {
+    x: root.geometry.x + 5,
+    width: root.geometry.width - (5 * 2),
+    y: root.geometry.y + 5,
+    height: root.geometry.height - (5 * 2)
+  };
   return redraw(bars);
 };
 

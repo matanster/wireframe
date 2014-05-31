@@ -22,7 +22,7 @@ syncBar = (item, callback) ->
 
   # apply geometry and fill to rectangle
   item.element.rectangle.transition().ease('linear').duration(400).attr(item.geometry)
-                                                   .style('fill', item.color)
+                                                    .style('fill', item.color)
   
   # apply rectangle center to text, so it can be centered around the center
   textGeometry = 
@@ -121,8 +121,6 @@ exports.init = (navBarsData, svgHookPoint) ->
     # can access the control data they need to
     lookup[bar.element.group.attr('id')] = bar
 
-    console.dir lookup
-
     # proceed to recursion over bar subs, if any
     if barData.subs?
       bar.children = []
@@ -134,11 +132,9 @@ exports.init = (navBarsData, svgHookPoint) ->
     # attach mouse events to bar
     #
     bar.element.group
-      .on('mouseover', () -> 
-        console.log('hover'))
+      .on('mouseover', () -> null)
         #sceneObject.downButton.element.transition().ease('sin').duration(200).attr('height', sceneObject.downButton.geometry.height + (sceneObject.downButton.geometry.paddingY *2/3)))
-      .on('mouseout', () -> 
-        console.log('hover end'))
+      .on('mouseout', () -> null)
         #sceneObject.downButton.element.transition().duration(400).attr('height', sceneObject.downButton.geometry.height))
       .on('mousedown', () -> 
         # retreive bar object associated to the svg that was clicked
@@ -168,8 +164,6 @@ exports.init = (navBarsData, svgHookPoint) ->
   for bar in bars
     bar.parent = root
 
-  console.dir root
-  
 #
 # draw all bars according to:
 # screen geometry
@@ -177,10 +171,13 @@ exports.init = (navBarsData, svgHookPoint) ->
 #
 redraw = (bars) ->
 
-  parentGeometry = bars[0].parent.geometry 
-  
   console.log 'navBars redraw started'
-  console.dir parentGeometry
+
+  #
+  # get the space to be used within the parent geometry.
+  #
+  allowedGeometry = bars[0].parent.childrenGeometry 
+  console.dir allowedGeometry
   
   # figure if any of current layer are selected
   anySelected = false
@@ -215,44 +212,83 @@ redraw = (bars) ->
   #
   # Attach geometry based on height type
   #
-  y = parentGeometry.y # initialize starting position for next bar
+  y = allowedGeometry.y # initialize starting position for next bar
 
   for bar, i in bars
 
     # derive height for the bar
     switch bar.heightRatio
       when 'main'
-        height = Math.floor(parentGeometry.height * (2 / 3))   # take up 2/3's the total height                  
+        height = Math.floor(allowedGeometry.height * (2 / 3))   # take up 2/3's the total height                  
       when 'subordinate' 
-        height = Math.floor(parentGeometry.height * (1 / 3) / (bars.length - 1))   # take up even share of remaining 1/3
+        height = Math.floor(allowedGeometry.height * (1 / 3) / (bars.length - 1))   # take up even share of remaining 1/3
       when 'even' 
-        height = Math.floor(parentGeometry.height / (bars.length))   # take up even share
+        height = Math.floor(allowedGeometry.height / (bars.length))   # take up even share
 
-    # set geometry for the bar
+    # check if any visible children - as this should affect some geometry
+    visibleChildren = false
+    if bar.children?  # if there are visible children
+      if bar.children[0].viewStatus in ['visible', 'selected']
+        visibleChildren = true
+
+    console.log visibleChildren
+
+    textHeight = 15 # to be replaced with real measurement - we already have such function
+
+    #
+    # take care of geometry for the bar's rectangle
+    #
     bar.geometry =
-      x      : parentGeometry.x           # same for all bars 
-      width  : parentGeometry.width       # same for all bars 
-      y      : y - 0.5                    # start after previous bar
-      height : height                     # the alloted height for this specific bar
+      x      : allowedGeometry.x      # same for all bars 
+      width  : allowedGeometry.width  # same for all bars 
+      y      : y + 0.5                # start after previous bar
+      height : height                 # the alloted height for this specific bar
 
-    # sync the established geometry and style to the scene object
-    syncBar(bar)
-
-    console.dir bar
+    # apply geometry and fill to bar's rectangle
+    bar.element.rectangle.transition().ease('linear').duration(400).attr(bar.geometry)
+                                                                   .style('fill', bar.color)
 
     #
-    # last pass - invoke for all children
+    # calculate geometry for the bar's text
     #
-    for bar in bars
-      if bar.children?  # if there are visible children
-        if bar.children[0].viewStatus in ['visible', 'selected']
-          console.log 'visible children'
-          bar.geometry =  # set own geometry as container for them
-            'x':      parentGeometry.x     +  15
-            'width':  parentGeometry.width - (15 * 2)
-            'y':      y                    +  15 
-            'height': height               - (15 * 2)           
-          redraw(bar.children) # recurse for children 
+    if visibleChildren
+      textGeometry = 
+        'x': bar.geometry.x + (bar.geometry.width / 2)
+        'y': bar.geometry.y + textHeight
+    else
+      textGeometry = 
+        'x': bar.geometry.x + (bar.geometry.width / 2)
+        'y': bar.geometry.y + (bar.geometry.height / 2)
+
+    # apply geometry and fill to bar's text
+    bar.element.text.transition().ease('linear').duration(400).attr(textGeometry)
+
+    #
+    # take care of allowed geometry for child bars, if any
+    #
+    if visibleChildren
+      bar.childrenGeometry = 
+        x      : bar.geometry.x      +  15
+        width  : bar.geometry.width  - (15 * 2) 
+        y      : bar.geometry.y      +  15       +   textHeight       # to be replaced with real measurement - we already have such function
+        height : bar.geometry.height - (15 * 2)  -  (textHeight * 2)
+    ###
+    else
+      bar.childrenGeometry = 
+        x      : bar.geometry.x      +  15
+        width  : bar.geometry.width  - (15 * 2)
+        y      : bar.geometry.y      +  15
+        height : bar.geometry.height - (15 * 2)
+    ###
+
+    console.log 'bar.childrenGeometry'
+    console.log JSON.stringify(bar.childrenGeometry, null, '  ')
+    #
+    # invoke for children if any
+    #
+    if visibleChildren
+      redraw(bar.children) # recurse for children 
+      console.log ''
 
     #
     # advance starting point for next bar if any
@@ -263,6 +299,12 @@ redraw = (bars) ->
 
 exports.redraw = (geometry) ->
   root.geometry = geometry
+  root.childrenGeometry = 
+    x      : root.geometry.x      +  5
+    width  : root.geometry.width  - (5 * 2)
+    y      : root.geometry.y      +  5
+    height : root.geometry.height - (5 * 2)
+
   redraw(bars)
   
 
