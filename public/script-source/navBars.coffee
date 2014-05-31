@@ -8,8 +8,8 @@ layout      = globalDims.layout
 
 # Global
 bars = []
+root = {}
 lookup = {}
-lastGeometry = {}
 colors =
   scaleStart : '#A3B1BA'  # '#87CEFA' 
   scaleEnd   : '#87CEFA'  # '#00BFFF'
@@ -144,12 +144,15 @@ exports.init = (navBarsData, svgHookPoint) ->
         # retreive bar object associated to the svg that was clicked
         bar = lookup[this.getAttribute('id')]
         # change selection amongst siblings of the clicked bar
-        console.dir bar
         if bar.parent?
          for sibling in bar.parent.children
            sibling.viewStatus = 'visible'
         bar.viewStatus = 'selected'
-        redraw(lastGeometry)
+        # make children, if any, visible
+        if bar.children?
+          for child in bar.children
+            child.viewStatus = 'visible'
+        redraw(bars)
     )             
 
     return bar   
@@ -172,51 +175,95 @@ exports.init = (navBarsData, svgHookPoint) ->
 # screen geometry
 # selection status
 #
-redraw = (geometry) ->
+redraw = (bars) ->
 
-  lastGeometry = geometry # temporary: persist for now, while it's all driven from this module. 
+  parentGeometry = bars[0].parent.geometry 
   
   console.log 'navBars redraw started'
-  console.dir geometry
+  console.dir parentGeometry
   
-  # first pass - set geometry weights based on nodes status
-  for bar, i in bars
+  # figure if any of current layer are selected
+  anySelected = false
+  for bar in bars
+    if bar.viewStatus is 'selected'
+      anySelected = true
+ 
+  #
+  # determine coloring
+  #
+  for bar in bars
     switch bar.viewStatus 
       when 'selected'
-        bar.heightRatio = "2/3"
         bar.color = colors.selection
       else      
-        bar.heightRatio = null
         bar.color = bar.baseColor
+  
+  #
+  # determine height calculation type
+  #
+  if anySelected
+    for bar in bars
+      switch bar.viewStatus 
+        when 'selected'
+          bar.heightRatio = 'main'
+        else      
+          bar.heightRatio = 'subordinate'
+  else
+    for bar in bars
+      bar.heightRatio = 'even'
 
-  # second pass - attach geometry based on given weights
-  y = geometry.y # initialize starting position for next bar
+  #
+  # Attach geometry based on height type
+  #
+  y = parentGeometry.y # initialize starting position for next bar
 
   for bar, i in bars
 
     # derive height for the bar
-    if bar.heightRatio?       
-      height = Math.floor(geometry.height * (2 / 3))   # take up 2/3's the total height                  
-    else
-      height = Math.floor(geometry.height * (1 / 3) / (bars.length - 1))   # take up its share from the remains of 1/3 total height
+    switch bar.heightRatio
+      when 'main'
+        height = Math.floor(parentGeometry.height * (2 / 3))   # take up 2/3's the total height                  
+      when 'subordinate' 
+        height = Math.floor(parentGeometry.height * (1 / 3) / (bars.length - 1))   # take up even share of remaining 1/3
+      when 'even' 
+        height = Math.floor(parentGeometry.height / (bars.length))   # take up even share
 
     # set geometry for the bar
     bar.geometry =
-      x      : geometry.x                 # same for all bars 
-      width  : geometry.width             # same for all bars 
+      x      : parentGeometry.x           # same for all bars 
+      width  : parentGeometry.width       # same for all bars 
       y      : y - 0.5                    # start after previous bar
       height : height                     # the alloted height for this specific bar
 
-    # sync the geometry to the scene object
+    # sync the established geometry and style to the scene object
     syncBar(bar)
-
-    y += height # advance starting point for next bar if any
 
     console.dir bar
 
+    #
+    # last pass - invoke for all children
+    #
+    for bar in bars
+      if bar.children?  # if there are visible children
+        if bar.children[0].viewStatus in ['visible', 'selected']
+          console.log 'visible children'
+          bar.geometry =  # set own geometry as container for them
+            'x':      parentGeometry.x     +  15
+            'width':  parentGeometry.width - (15 * 2)
+            'y':      y                    +  15 
+            'height': height               - (15 * 2)           
+          redraw(bar.children) # recurse for children 
+
+    #
+    # advance starting point for next bar if any
+    #
+    y += height 
+
   return null
 
-exports.redraw = redraw
+exports.redraw = (geometry) ->
+  root.geometry = geometry
+  redraw(bars)
   
 
 
