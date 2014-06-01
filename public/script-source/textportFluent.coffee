@@ -8,7 +8,7 @@ session = require './session'
 textDraw = require './textDraw'
 
 # module static variables
-fontSize  = '36px' # temporarily
+fontSize  = '32px' # temporarily
 fontFamily = 'Helvetica' # for now
 
 module.exports = (sentences, fontSizeChange, scroll, mode) ->
@@ -78,12 +78,10 @@ module.exports = (sentences, fontSizeChange, scroll, mode) ->
         #
         switch token.mark
           when 1
-            tokenViewable.svg.style('fill', 'rgb(120,240,240)')
-            break
+            tokenViewable.svg.style('fill', '#4488FE')  # 'rgb(120,240,240)'
           when 2
             #tokenViewable.svg.style('fill', 'rgb(70,140,140)')
             tokenViewable.svg.style('fill', 'rgb(100,200,200)')
-            break
 
         if x + tokenViewable.width < sceneObject.textPortInnerSVG.element.attr('width')
           #console.log 'adding to line'

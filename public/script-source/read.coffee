@@ -188,7 +188,7 @@ sceneDefine = () ->
     sceneObject.titlePort = sceneHook.svg.append('g') # for now this grouping isn't used for anything, but a best practice anyway
 
     sceneObject.titlePortRect = sceneObject.titlePort.append('rect')
-                                     .style('fill', '#2F72FF')   
+                                     .style('fill', '#60CAFB')   
 
     # nest an html element containing an svg, inside the topmost svg hook, so we can use a non-svg transform on it
     sceneObject.titleForeignContainer = sceneObject.titlePort.append('foreignObject')
@@ -196,7 +196,7 @@ sceneDefine = () ->
                            .html("<svg style='-webkit-transform: perspective(40px) rotateX(2deg)' id='titleSVG'></svg>")
     
     # modify the svg nested inside the html just created
-    sceneObject.title = d3.select('#titleSVG').append('text').text("  the Relationship Between Human Capital and Firm Performance")  # "Something Something Something Title"
+    sceneObject.title = d3.select('#titleSVG').append('text').text("  The Relationship Between Human Capital and Firm Performance")  # "Something Something Something Title"
                                       .attr("id", "title")
                                       .attr("dominant-baseline", "central")
                                       .style("text-anchor", "middle")
@@ -545,7 +545,7 @@ data.get('abstract', (response) ->
   for rawSegment in rawSegments
     segment = new Object
     segment.category = rawSegment.category
-    segment.tokens     = rawSegment.text.split(' ')
+    segment.tokens   = rawSegment.text.split(' ')
     segments.push segment
 
   #console.dir segments

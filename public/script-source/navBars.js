@@ -67,7 +67,7 @@ textportRefresh = function(fontSizeChange, scroll, mode) {
           rawSegment = rawTextArray[_i];
           segment = {
             category: null,
-            tokens: rawSegment.split(' ')
+            tokens: tokenize(rawSegment)
           };
           segments.push(segment);
         }

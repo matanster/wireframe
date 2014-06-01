@@ -104,7 +104,17 @@ module.exports = (segments, fontSizeChange, scroll, mode) ->
 
         #console.log textToken
 
-        tokenViewable = textDraw.tokenToViewable(textToken, segment.element)
+        tokenViewable = textDraw.tokenToViewable(textToken.text, segment.element)
+
+        #
+        # Apply word semantic styling
+        #
+        switch textToken.mark
+          when 1
+            tokenViewable.svg.style('fill', '#2F4FFF')
+          when 2
+            #tokenViewable.svg.style('fill', 'rgb(70,140,140)')
+            tokenViewable.svg.style('fill', 'rgb(100,200,200)')
 
         if x + tokenViewable.width < sceneObject.textPortInnerSVG.element.attr('width') - enclosing.paddingX
           #console.log 'adding to line'

@@ -10,7 +10,7 @@
       "emphasis": "less"
     },
     {
-      "name": "What were the article goals?",
+      "name": "article's goals",
       "subs": 
       [
         {
@@ -29,7 +29,7 @@
       "name": "How was the research done?"
     },
     {
-      "name":"What did they find find?",
+      "name":"What did they find?",
       "subs": 
       [
         {
@@ -56,7 +56,7 @@
       ]
     },
     { 
-      "name": "Epilog",
+      "name": "Wrap-up",
       "emphasis": "less"
     }
   ]

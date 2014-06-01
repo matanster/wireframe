@@ -55,7 +55,7 @@ textportRefresh = (fontSizeChange, scroll, mode) ->
         for rawSegment in rawTextArray
           segment = 
             category : null
-            tokens   : rawSegment.split(' ')
+            tokens   : tokenize(rawSegment)
           segments.push segment
 
         console.dir segments

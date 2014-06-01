@@ -66,7 +66,14 @@ module.exports = function(segments, fontSizeChange, scroll, mode) {
       _ref = segment.tokens;
       for (_j = 0, _len1 = _ref.length; _j < _len1; _j++) {
         textToken = _ref[_j];
-        tokenViewable = textDraw.tokenToViewable(textToken, segment.element);
+        tokenViewable = textDraw.tokenToViewable(textToken.text, segment.element);
+        switch (textToken.mark) {
+          case 1:
+            tokenViewable.svg.style('fill', '#2F4FFF');
+            break;
+          case 2:
+            tokenViewable.svg.style('fill', 'rgb(100,200,200)');
+        }
         if (x + tokenViewable.width < sceneObject.textPortInnerSVG.element.attr('width') - enclosing.paddingX) {
           tokenViewable.svg.attr('x', x);
           tokenViewable.svg.attr('y', y);

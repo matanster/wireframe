@@ -13,7 +13,7 @@ session = require('./session');
 
 textDraw = require('./textDraw');
 
-fontSize = '36px';
+fontSize = '32px';
 
 fontFamily = 'Helvetica';
 
@@ -52,11 +52,10 @@ module.exports = function(sentences, fontSizeChange, scroll, mode) {
           tokenViewable = textDraw.tokenToViewable(token.text, sceneObject.textPortInnerSVG.subElement);
           switch (token.mark) {
             case 1:
-              tokenViewable.svg.style('fill', 'rgb(120,240,240)');
+              tokenViewable.svg.style('fill', '#4488FE');
               break;
             case 2:
               tokenViewable.svg.style('fill', 'rgb(100,200,200)');
-              break;
           }
           if (x + tokenViewable.width < sceneObject.textPortInnerSVG.element.attr('width')) {
             tokenViewable.svg.attr('x', x);
