@@ -3,6 +3,7 @@ svgUtil           = require './svgUtil'
 textportFluent    = require './textportFluent'
 textportSegmented = require './textportSegmented'
 session           = require './session'
+tokenize          = require './tokenize'
 
 # Global geometry 
 globalDims  = require './globalDims'
@@ -41,11 +42,34 @@ getCategoryText = (catName) ->
 # activate text porting update, per the current display type
 #
 textportRefresh = (fontSizeChange, scroll, mode) ->
-  switch session.display
-    when 'segmented'
-      textportSegmented(session.selected, fontSizeChange, scroll, mode)
-    when 'fluent'
-      textportFluent(session.selected, fontSizeChange, scroll, mode)
+
+  rawTextArray = getCategoryText(session.selected.name)
+  console.dir rawTextArray
+
+  if rawTextArray
+    switch session.display
+      when 'segmented'
+
+        # restructure into segments  
+        segments = []
+        for rawSegment in rawTextArray
+          segment = 
+            category : null
+            tokens   : rawSegment.split(' ')
+          segments.push segment
+
+        console.dir segments
+        textportSegmented(segments, fontSizeChange, scroll, mode)
+
+      when 'fluent'
+
+        sentences = []
+        for rawSentence in rawTextArray
+          sentence = 
+            text: tokenize(rawSentence)        
+          sentences.push(sentence)
+
+        textportFluent(sentences, fontSizeChange, scroll, mode)
 
 exports.textportRefresh = textportRefresh
 
@@ -162,6 +186,7 @@ exports.init = (navBarsData, svgHookPoint, categorizedTextTreeInput) ->
 
     bar =
       'name'       : barData.name
+      'display'    : barData.display
       'element'    : textRectFactory(svgHookPoint, barData.name)
       'baseColor'  : baseColor
       'parent'     : parentBar
@@ -174,7 +199,6 @@ exports.init = (navBarsData, svgHookPoint, categorizedTextTreeInput) ->
                        sessionSetDisplayType(this)
                        textportRefresh()
                      )
-      'display'    : barData.display
 
     initialViewStatus(bar)
 

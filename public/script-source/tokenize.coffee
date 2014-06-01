@@ -1,17 +1,25 @@
 # tokenization from dummy data
 
-module.exports = (textStream) ->
-  input = JSON.parse(textStream)
+module.exports = (text) ->
+  #input = JSON.parse(textStream)
   
-  textArray = input.text.split(' ') # array of words
+  textArray = text.split(' ') # array of words
 
-  markeringCodes = input.marks      # markering codes
+  #if input.marks?
+  #  markeringCodes = input.marks      # markering codes
 
   tokens = []
   for t in [0..textArray.length-1]
+    ###
+    if input.marks?
+      tokens.push 
+        'text': textArray[t],
+        'mark': markeringCodes[t]
+    else
+    ###
     tokens.push 
       'text': textArray[t],
-      'mark': markeringCodes[t]
-  
+      'mark': 0
+    
   console.dir tokens
   return tokens

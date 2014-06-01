@@ -4,6 +4,7 @@ sceneObject = globalDims.sceneObject
 sceneHook  = globalDims.sceneHook
 layout     = globalDims.layout
 svgUtil    = require './svgUtil'
+session = require './session'
 
 textDraw = require './textDraw'
 
@@ -59,6 +60,8 @@ module.exports = (segments, fontSizeChange, scroll, mode) ->
   segments.spacingY = 20
 
   #console.log sceneObject.textPort.element.attr('width')  - (paddingX * 2)
+  console.dir parseFloat(sceneObject.textPort.element.attr('x')) + paddingX + 3
+
   sceneObject.textPortInnerSVG.element
     .attr('x',      parseFloat(sceneObject.textPort.element.attr('x')) + paddingX + 3)
     .attr('width',  parseFloat sceneObject.textPort.element.attr('width')  - (paddingX * 2) - 3)

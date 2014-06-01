@@ -266,10 +266,9 @@ sceneDefine = () ->
   main()
   
   navBarHook = sceneHook.svg.append('g')
-  navBars.init(navBarsTree, navBarHook, categorizedTextTree)
-
   rightPane()
   textPort()
+  navBars.init(navBarsTree, navBarHook, categorizedTextTree)  
   titlePort()
   TOC()
 
