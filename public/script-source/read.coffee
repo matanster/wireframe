@@ -196,7 +196,7 @@ sceneDefine = () ->
                            .html("<svg style='-webkit-transform: perspective(40px) rotateX(2deg)' id='titleSVG'></svg>")
     
     # modify the svg nested inside the html just created
-    sceneObject.title = d3.select('#titleSVG').append('text').text("  Something Something Something Title") # "the Relationship Between Human Capital and Firm Performance"
+    sceneObject.title = d3.select('#titleSVG').append('text').text("  the Relationship Between Human Capital and Firm Performance")  # "Something Something Something Title"
                                       .attr("id", "title")
                                       .attr("dominant-baseline", "central")
                                       .style("text-anchor", "middle")
@@ -468,8 +468,8 @@ sceneSync = (mode) ->
     geometry:
       x      : 0 
       width  : layout.separator.left.x.current - 10, 
-      y      : layout.separator.top.y - 0.5, 
-      height : coreH
+      y      : layout.separator.top.y + 7, 
+      height : coreH - 2
 
   navBars.redraw(leftPane.geometry)
 

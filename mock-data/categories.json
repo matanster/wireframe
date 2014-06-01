@@ -1,7 +1,13 @@
 { "root": 
   [
     { 
-      "name":   "Introduction"
+      "name": "Abstract",
+      "emphasis": "less",
+      "type": "segmented"
+    },
+    { 
+      "name":   "Introduction",
+      "emphasis": "less"
     },
     {
       "name": "What were the article goals?",
@@ -16,7 +22,7 @@
       "name": "How was the research done?"
     },
     {
-      "name":"What were the findings?",
+      "name":"What did they find find?",
       "subs": 
       [
         {"name": "findings"},
@@ -31,6 +37,10 @@
         {"name": "implications"},
         {"name": "recommendation"}
       ]
+    },
+    { 
+      "name": "Epilog",
+      "emphasis": "less"
     }
   ]
 }

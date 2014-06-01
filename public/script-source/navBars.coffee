@@ -98,7 +98,7 @@ exports.init = (navBarsData, svgHookPoint) ->
     if bar.parentBar is null
       bar.viewStatus = 'visible'
 
-    if bar.name is "Introduction"
+    if bar.name is "Abstract"
       bar.viewStatus = 'selected'
 
   #
@@ -122,6 +122,7 @@ exports.init = (navBarsData, svgHookPoint) ->
       'parent'     : parentBar
       'nestLevel'  : nestLevel
       'viewStatus' : 'hidden' # everything hidden till marked otherwise
+      'emphasis'   : barData.emphasis
 
     initialViewStatus(bar)
 
@@ -218,6 +219,10 @@ redraw = (bars, borderColor) ->
         bar.color = bar.baseColor
         #bar.element.text.style("font-weight", "normal")        
   
+    console.log bar.emphasis
+    if bar.emphasis?
+      bar.element.text.style("font-weight", "normal")        
+
   #
   # determine height calculation type
   #
@@ -339,64 +344,7 @@ exports.redraw = (geometry) ->
 
 
     
-    
-
-
-  
-  
-
-
-
-
-
-
-
-
-
-oldsomething = () ->
-  numberOfBoxes = categories.length
-  colorScale = d3.scale.linear().domain([0, numberOfBoxes-1]).range(['#87CEFA', '#00BFFF'])
-  #colorScale = d3.scale.linear().domain([0, numberOfBoxes-1]).range(['#CCCCE0','#AAAABE']) # ['#CCCCE0','#AAAABE']
-  colorTransition = (i) -> (() -> d3.select(this).transition().duration(25).ease('circle').style('fill', colorScale(i)))
-
-#
-# Draw elements to fit vertical segment, equal height to each
-# this will probably go away
-#
-oldpanes = (groupY, groupH, borderX, elements) ->
-
-  #boxH = (totalH / 2) / (sceneObject.categories.length - 1)
-  boxH = (groupH) / (elements.length)
-
-  for i in [0..elements.length-1]
-
-    elements[i].x1 = 0
-    elements[i].x2 = borderX
-    ###
-    if i is 0
-      elements[i].y1 = layout.separator.top.y - 0.5
-      elements[i].y2 = layout.separator.top.y + (groupH/2) + 0.5
-    else ###
-    elements[i].y1 = groupY + Math.floor(boxH * (i)) - 0.5
-    elements[i].y2 = groupY + Math.floor((boxH * (i+1))) + 0.5    
-
-    #if i is elements.length-1 # occupy last pixel
-    #  elements[i].y2 = layout.separator.top.y + groupH + 0.5    
-    #else # leave last pixel to next box
-    #  elements[i].y2 = layout.separator.top.y + Math.floor((boxH * (i+1))) - 0.5
-
-    width =  util.calcLength(elements[i].x1, elements[i].x2)
-    height = util.calcLength(elements[i].y1, elements[i].y2)    
-
-    elements[i].element
-       .attr('x', elements[i].x1)
-       .attr('width', width)
-       .attr('y', elements[i].y1) 
-       .attr('height', height)
-
-    elements[i].text.attr('x', elements[i].x1 + width / 2)  
-                    .attr('y', elements[i].y1 + height / 2)
-
+###
 
 oldshow = () ->
   #
@@ -412,8 +360,4 @@ oldshow = () ->
 
 # console.log JSON.stringify(bar.childrenGeometry, null, '  ')
 
-
-
-
-
-
+###

@@ -175,7 +175,7 @@ sceneDefine = function() {
     sceneObject.titlePort = sceneHook.svg.append('g');
     sceneObject.titlePortRect = sceneObject.titlePort.append('rect').style('fill', '#2F72FF');
     sceneObject.titleForeignContainer = sceneObject.titlePort.append('foreignObject').append('xhtml:body').html("<svg style='-webkit-transform: perspective(40px) rotateX(2deg)' id='titleSVG'></svg>");
-    return sceneObject.title = d3.select('#titleSVG').append('text').text("  Something Something Something Title").attr("id", "title").attr("dominant-baseline", "central").style("text-anchor", "middle").style('fill', "#EEEEEE");
+    return sceneObject.title = d3.select('#titleSVG').append('text').text("  the Relationship Between Human Capital and Firm Performance").attr("id", "title").attr("dominant-baseline", "central").style("text-anchor", "middle").style('fill', "#EEEEEE");
   };
   rightPane = function() {
     sceneObject.rightPane = {};
@@ -341,8 +341,8 @@ sceneSync = function(mode) {
     geometry: {
       x: 0,
       width: layout.separator.left.x.current - 10,
-      y: layout.separator.top.y - 0.5,
-      height: coreH
+      y: layout.separator.top.y + 7,
+      height: coreH - 2
     }
   };
   navBars.redraw(leftPane.geometry);
