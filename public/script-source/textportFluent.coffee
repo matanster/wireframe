@@ -8,7 +8,7 @@ session = require './session'
 textDraw = require './textDraw'
 
 # module static variables
-fontSize  = '32px' # temporarily
+fontSize  = '30px' # temporarily
 fontFamily = 'Helvetica' # for now
 
 module.exports = (sentences, fontSizeChange, scroll, mode) ->

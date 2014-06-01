@@ -973,7 +973,7 @@ session = require('./session');
 
 textDraw = require('./textDraw');
 
-fontSize = '32px';
+fontSize = '30px';
 
 fontFamily = 'Helvetica';
 
