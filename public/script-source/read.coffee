@@ -28,6 +28,7 @@ colors =
 tokens    = undefined
 TOCTokens = []
 navBarsData = undefined
+categorizedText = undefined
 segments = undefined
 
 calcStart = () -> 90
@@ -559,6 +560,13 @@ data.get('categories', (response) ->
   navBarsData = JSON.parse(response).root
 )
 
+data.get('text', (response) -> 
+  #console.log(response)
+  #mainCategories       = JSON.parse(response).Top
+  #categoriesOfSummary  = JSON.parse(response).More
+  categorizedText = JSON.parse(response).root
+)
+
 data.get('TOC', (response) -> 
   # get the TOC data
   #console.log(response)
@@ -598,7 +606,7 @@ start = () ->
 waitForData = setInterval((()->  # can replace this with https://github.com/mbostock/queue
                                  # to do: make it possible to troubleshoot which ajax call didn't return,
                                  #        and log time taken with the new browser performance javascript api
-                if tokens? and TOCTokens? and segments? and navBarsData?
+                if tokens? and TOCTokens? and segments? and navBarsData? and categorizedText?
                   window.clearInterval(waitForData)
                   start()), 50)
                 

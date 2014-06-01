@@ -13,9 +13,16 @@
       "name": "What were the article goals?",
       "subs": 
       [
-        {"name": "problem definition"},
-        {"name": "purpose"},
-        {"name": "hypotheses"}
+        {
+          "name": "problem definition"
+        },
+        {
+          "name": "purpose"
+        },
+        {
+          "name": "hypotheses",
+          "type": "segmented"
+        }
       ]
     },
     {
@@ -25,17 +32,27 @@
       "name":"What did they find find?",
       "subs": 
       [
-        {"name": "findings"},
-        {"name": "conclusions"}
+        {
+          "name": "findings"
+        },
+        {
+          "name": "conclusions"
+        }
       ]
     },
     { 
       "name": "So what?",
       "subs":       
       [
-        {"name": "contribution"},
-        {"name": "implications"},
-        {"name": "recommendation"}
+        {
+          "name": "contribution"
+        },
+        {
+          "name": "implications"
+        },
+        {
+          "name": "recommendation"
+        }
       ]
     },
     { 
