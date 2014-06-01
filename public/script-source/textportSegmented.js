@@ -19,7 +19,7 @@ fontFamily = 'Helvetica';
 
 module.exports = function(segments, fontSizeChange, scroll, mode) {
   var enclosing, lHeight, paddingX, paddingY, redraw, spaceWidth;
-  console.log('textPorting abstract started ' + '(mode ' + mode + ')');
+  console.log('segmented textPorting started ' + '(mode ' + mode + ')');
   if (fontSizeChange != null) {
     fontSize = parseFloat(fontSize) + fontSizeChange + 'px';
   }

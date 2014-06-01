@@ -12,7 +12,7 @@ fontFamily = 'Helvetica' # for now
 
 module.exports = (tokens, fontSizeChange, scroll, mode) ->
   
-  console.log 'textPorting started ' + '(mode ' + mode + ')'
+  console.log 'fluent textPorting started ' + '(mode ' + mode + ')'
 
   if fontSizeChange?
     fontSize = parseFloat(fontSize) + fontSizeChange + 'px'
@@ -32,8 +32,8 @@ module.exports = (tokens, fontSizeChange, scroll, mode) ->
   # and a 'g' element to afford treating the whole bunch as one group
   #
 
-  console.dir sceneObject
-  console.dir sceneHook.svg
+  #console.dir sceneObject
+  #console.dir sceneHook.svg
 
   sceneObject.textPortInnerSVG.element = sceneHook.svg.append('svg')
 
@@ -53,7 +53,6 @@ module.exports = (tokens, fontSizeChange, scroll, mode) ->
   paddingX = 20
   paddingY = 18
 
-  console.log sceneObject.textPort.element.attr('width')  - (paddingX * 2)
   sceneObject.textPortInnerSVG.element
     .attr('x',      parseFloat(sceneObject.textPort.element.attr('x')) + paddingX + 3)
     .attr('width',  parseFloat sceneObject.textPort.element.attr('width')  - (paddingX * 2) - 3)

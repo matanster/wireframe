@@ -3,7 +3,7 @@
     { 
       "name": "Abstract",
       "emphasis": "less",
-      "type": "segmented"
+      "display": "segmented"
     },
     { 
       "name":   "Introduction",
@@ -21,7 +21,7 @@
         },
         {
           "name": "hypotheses",
-          "type": "segmented"
+          "display": "segmented"
         }
       ]
     },

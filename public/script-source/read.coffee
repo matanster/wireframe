@@ -1,11 +1,10 @@
 util        = require './util'
 data        = require './data'
 tokenize    = require './tokenize'
-textporting = require './textporting'
-textportingAbstract = require './textportingAbstract'
 textDraw    = require './textDraw'
 svgUtil     = require './svgUtil'
 navBars     = require './navBars'
+session     = require './session'
 
 # Global geometry 
 globalDims   = require './globalDims'
@@ -136,7 +135,7 @@ sceneDefine = () ->
                                 sceneObject.textPortBoundary.element.attr('width', widthInitialBoundary - xDiff)
                                 sceneObject.textPort.element.attr('width', widthInitialText - xDiff)
 
-                                textporting(tokens)
+                                navBars.textportRefresh()
                                 sceneObject.rightPane.redraw()
                                 sceneObject.downButton.redraw()
                               window.onmouseup = (event) ->
@@ -163,7 +162,7 @@ sceneDefine = () ->
                                 xDiff = xInitial - event.changedTouches[0].clientX
                                 sceneObject.textPortBoundary.element.attr('width', widthInitialBoundary - xDiff)
                                 sceneObject.textPort.element.attr('width', widthInitialText - xDiff)
-                                textporting(tokens)
+                                navBars.textportRefresh()
 
                               window.ontouchcancel = () ->
                                 window.ontouchmove = null
@@ -287,12 +286,12 @@ sceneDefine = () ->
     .on('mouseover', () -> console.log('hover'))
     .on('mousedown', () -> 
       console.log('click font decrease')
-      textporting(tokens, -2))
+      navBars.textportRefresh(-2))
   sceneObject.fontIncreaseButton 
     .on('mouseover', () -> console.log('hover'))
     .on('mousedown', () -> 
       console.log('click font increase')
-      textporting(tokens, 2)) 
+      navBars.textportRefresh(2)) 
 
   # viewport down button 
   sceneObject.downButton = {}
@@ -313,7 +312,7 @@ sceneDefine = () ->
       sceneObject.downButton.element.transition().duration(400).attr('height', sceneObject.downButton.geometry.height))
     .on('mousedown', () -> 
       #console.log('scroll')
-      textporting(tokens, 0, true)) 
+      navBars.textportRefresh(0, true)) 
 
 
 
@@ -431,7 +430,7 @@ sceneSync = (mode) ->
        .attr('y', 5) 
 
   # show text if source tokens already loaded
-  #console.log 'before textporting from scenesync'
+  #console.log 'before textportFluent from scenesync'
   if tokens? 
     #console.log mode
     switch mode
@@ -440,13 +439,13 @@ sceneSync = (mode) ->
         #console.log 'in animate'
         update = 0
         autoUpdate = setInterval((()-> 
-          textporting(tokens)
+          navBars.textportRefresh()
           if update > 8 then setTimeout(window.clearInterval(autoUpdate), 400)
           update += 1
         ), 50)  
       else
         #console.log 'without animate'
-        textporting(tokens)
+        navBars.textportRefresh()
 
   # draw down button
   sceneObject.downButton.redraw = () ->
@@ -599,8 +598,8 @@ syncInit = () ->
 start = () ->
   sceneDefine()
   syncInit()
-  #textporting(tokens)
-  textportingAbstract(segments)
+  #textportFluent(tokens)
+  #textportSegmented(segments)
   document.body.style.cursor = "default" # needed because of https://code.google.com/p/chromium/issues/detail?id=3a69986&thanks=369986&ts=1399291013
 
 waitForData = setInterval((()->  # can replace this with https://github.com/mbostock/queue

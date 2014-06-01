@@ -1,5 +1,8 @@
-util        = require './util'
-svgUtil     = require './svgUtil'
+util              = require './util'
+svgUtil           = require './svgUtil'
+textportFluent    = require './textportFluent'
+textportSegmented = require './textportSegmented'
+session           = require './session'
 
 # Global geometry 
 globalDims  = require './globalDims'
@@ -27,21 +30,33 @@ searchCategories = (categoryNodes, catName) ->
           return searchCategories(categoryNode.subs, catName) # harmless duplication with our small tree size..
 
   return false  # will only get here if not found
-      
+
+#
+# get the text tokens for a given category
+#      
 getCategoryText = (catName) ->
   text = searchCategories(categorizedTextTree, catName)
-#  console.log 'text for category ' + catName + ':'
-#  console.dir text
 
-display = (bar) ->
-  console.log 'display invoked for ' + bar.name
-  textArray = getCategoryText(bar.name)
-  if textArray
-    console.log 'text for category ' + bar.name + ':'
-    console.dir textArray
+#
+# activate text porting update, per the current display type
+#
+textportRefresh = (fontSizeChange, scroll, mode) ->
+  switch session.display
+    when 'segmented'
+      textportSegmented(session.selected, fontSizeChange, scroll, mode)
+    when 'fluent'
+      textportFluent(session.selected, fontSizeChange, scroll, mode)
+
+exports.textportRefresh = textportRefresh
+
+#
+# copy display type into session
+#
+sessionSetDisplayType = (bar) ->
+  if bar.display is 'segmented'
+    session.display = 'segmented'
   else
-    console.log 'no text found for category...'
-
+    session.display = 'fluent'      
 
 #
 # create a hidden text filled rectangle, under a new svg group element,
@@ -105,8 +120,8 @@ exports.init = (navBarsData, svgHookPoint, categorizedTextTreeInput) ->
 
   categorizedTextTree = categorizedTextTreeInput  # simply attach to module convenience global
   console.log 'navBars init started'
-  console.log 'navBarsData object:'
-  console.dir navBarsData
+  #console.log 'navBarsData object:'
+  #console.dir navBarsData
 
   #colorScale = d3.scale.linear().domain([0, navBarsData.length]).range(['#87CEFA', '#00BFFF'])
   colorScale = d3.scale.linear().domain([0, navBarsData.length]).range([colors.scaleStart, colors.scaleEnd])
@@ -129,7 +144,7 @@ exports.init = (navBarsData, svgHookPoint, categorizedTextTreeInput) ->
 
     if bar.name is "Abstract"
       bar.viewStatus = 'selected'
-      display(bar)
+      bar.select()
 
   #
   # recursive derivation of a bar and its children bars,
@@ -153,9 +168,13 @@ exports.init = (navBarsData, svgHookPoint, categorizedTextTreeInput) ->
       'nestLevel'  : nestLevel
       'viewStatus' : 'hidden' # everything hidden till marked otherwise
       'emphasis'   : barData.emphasis
-      'select'     : () -> display(this)
-
-    console.dir bar
+      'select'     : (() -> 
+                       console.dir this
+                       session.selected = this
+                       sessionSetDisplayType(this)
+                       textportRefresh()
+                     )
+      'display'    : barData.display
 
     initialViewStatus(bar)
 
@@ -254,7 +273,6 @@ redraw = (bars, borderColor) ->
         bar.color = bar.baseColor
         #bar.element.text.style("font-weight", "normal")        
   
-    console.log bar.emphasis
     if bar.emphasis?
       bar.element.text.style("font-weight", "normal")        
 

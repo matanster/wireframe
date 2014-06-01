@@ -13,7 +13,7 @@ fontFamily = 'Helvetica' # for now
 
 module.exports = (segments, fontSizeChange, scroll, mode) ->
   
-  console.log 'textPorting abstract started ' + '(mode ' + mode + ')'
+  console.log 'segmented textPorting started ' + '(mode ' + mode + ')'
 
   if fontSizeChange?
     fontSize = parseFloat(fontSize) + fontSizeChange + 'px'
