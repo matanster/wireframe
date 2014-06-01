@@ -39,7 +39,7 @@ textRectFactory = (svgHookPoint, rectText) -> # sceneObject.main
                                      .attr("dominant-baseline", "central")
                                      .style("font-family", "verdana")
                                      .style('fill', '#EEEEEE')
-
+                                     .style("font-weight", "bold")
     textDims = 
       width  : text.node().getBBox().width
       height : text.node().getBBox().height
@@ -108,7 +108,7 @@ exports.init = (navBarsData, svgHookPoint) ->
   # This does not merely deep clones or restructures the input, 
   # but rather adds properties for working the bars 
   #
-  barCreate = (svgHookPoint, barData, parentBar, color) ->
+  barCreate = (svgHookPoint, barData, parentBar, baseColor) ->
 
     if parentBar is null
       nestLevel = 0
@@ -118,7 +118,7 @@ exports.init = (navBarsData, svgHookPoint) ->
     bar =
       'name'       : barData.name
       'element'    : textRectFactory(svgHookPoint, barData.name)
-      'baseColor'  : colorScale(i)
+      'baseColor'  : baseColor
       'parent'     : parentBar
       'nestLevel'  : nestLevel
       'viewStatus' : 'hidden' # everything hidden till marked otherwise
@@ -133,7 +133,7 @@ exports.init = (navBarsData, svgHookPoint) ->
     if barData.subs?
       bar.children = []
       for barDataSub in barData.subs
-        subBar = barCreate(svgHookPoint, barDataSub, bar, color)
+        subBar = barCreate(svgHookPoint, barDataSub, bar, '#BBBBBB')
         bar.children.push(subBar)
     
     #
@@ -180,7 +180,7 @@ exports.init = (navBarsData, svgHookPoint) ->
 # screen geometry
 # selection status
 #
-redraw = (bars) ->
+redraw = (bars, borderColor) ->
 
   console.log 'navBars redraw started'
 
@@ -194,19 +194,29 @@ redraw = (bars) ->
   for bar in bars
     if bar.viewStatus is 'selected'
       anySelected = true
- 
+
   #
-  # determine coloring, 
-  #           font boldness
+  # determine coloring 
   #
+
   for bar in bars
+  
+    # check if any visible children - as this should affect coloring and geometry
+    visibleChildren = false
+    if bar.children?  # if there are visible children
+      if bar.children[0].viewStatus in ['visible', 'selected']
+        visibleChildren = true
+
     switch bar.viewStatus 
       when 'selected'
-        bar.color = colors.selection
-        bar.element.text.style("font-weight", "bold")
+        if visibleChildren
+          bar.color = bar.baseColor
+        else  
+          bar.color = colors.selection
+        #bar.element.text.style("font-weight", "bold")
       else      
         bar.color = bar.baseColor
-        bar.element.text.style("font-weight", "normal")        
+        #bar.element.text.style("font-weight", "normal")        
   
   #
   # determine height calculation type
@@ -229,6 +239,13 @@ redraw = (bars) ->
 
   for bar, i in bars
 
+  
+    # check if any visible children - as this should affect coloring and geometry
+    visibleChildren = false
+    if bar.children?  # if there are visible children
+      if bar.children[0].viewStatus in ['visible', 'selected']
+        visibleChildren = true
+
     # derive height for the bar
     switch bar.heightRatio
       when 'main'
@@ -238,42 +255,30 @@ redraw = (bars) ->
       when 'even' 
         height = Math.floor(allowedGeometry.height / (bars.length))   # take up even share
 
-    # check if any visible children - as this should affect some geometry
-    visibleChildren = false
-    if bar.children?  # if there are visible children
-      if bar.children[0].viewStatus in ['visible', 'selected']
-        visibleChildren = true
-
-    
     #textHeight = 15 # to be replaced with real measurement - we already have such function 
-    #textHeight = 15 
 
     #
     # take care of geometry for the bar's rectangle
     #
-
-    if bar.geometry?
-
-      oldHeight = bar.geometry.height # this is necessary for preserving text y position
-                                      # compared to top of the bar. a bit hackish.
-
-      textPaddedSpace = oldHeight  # height of hypthetical bar encasing the text of the current bar.
-                                   # being used to preserve the padding around the text on expansion
-      
-      innerExtraPadding = 
-        top    : textPaddedSpace * 1.5
-        bottom : textPaddedSpace * 0.2
-
     bar.geometry =
       x      : allowedGeometry.x      # same for all bars 
       width  : allowedGeometry.width  # same for all bars 
       y      : y + 0.5                # start after previous bar
       height : height                 # the alloted height for this specific bar
 
+    # compute padded space for text of rect for when it will have children open -
+    # basing (hackishly in that) on the height of the bar when initially collapsed
+    unless bar.textPaddedSpace?
+      bar.textPaddedSpace = bar.geometry.height  # height of hypthetical bar encasing the text of the current bar.
+                                                 # being used to preserve the padding around the text on expansion
+                                                 # hackishly rely on initial collapsed height of bar
+      bar.innerExtraPadding = 
+        top    : bar.textPaddedSpace * 1.5
+        bottom : bar.textPaddedSpace * 0.2
+
     # apply geometry and fill to bar's rectangle
     bar.element.rectangle.transition().ease('linear').duration(400).attr(bar.geometry)
                                                                    .style('fill', bar.color)
-
     if visibleChildren
       #
       # take care of allowed geometry for child bars, if any
@@ -285,13 +290,13 @@ redraw = (bars) ->
       bar.childrenGeometry = 
         x      : bar.geometry.x      +  childGeometryPadding.x
         width  : bar.geometry.width  - (childGeometryPadding.x * 2) 
-        y      : bar.geometry.y      +  childGeometryPadding.y       +   innerExtraPadding.top
-        height : bar.geometry.height - (childGeometryPadding.y * 2)  -   (innerExtraPadding.top + innerExtraPadding.bottom)
+        y      : bar.geometry.y      +  childGeometryPadding.y       +   bar.innerExtraPadding.top
+        height : bar.geometry.height - (childGeometryPadding.y * 2)  -   (bar.innerExtraPadding.top + bar.innerExtraPadding.bottom)
 
       #
       # invoke for children if any
       #
-      redraw(bar.children) # recurse for children 
+      window.setTimeout(redraw, 400, bar.children) # recurse for children - after own transition ended
 
       #
       # calculate geometry for the bar's text
@@ -300,7 +305,7 @@ redraw = (bars) ->
 
       textGeometry = 
         'x': bar.geometry.x + (bar.geometry.width / 2)
-        'y': bar.geometry.y + (innerExtraPadding.top / 2)  # preserves y distance from top of the bar
+        'y': bar.geometry.y + (bar.innerExtraPadding.top / 2)  # preserves y distance from top of the bar
 
     else
       textGeometry = 
@@ -309,7 +314,7 @@ redraw = (bars) ->
 
 
     # apply geometry and fill to bar's text
-    bar.element.text.transition().ease('linear').duration(400).attr(textGeometry)
+    bar.element.text.transition().ease('linear').duration(200).attr(textGeometry)
     # make it visible
     bar.element.group.attr('visibility', 'visible')
 

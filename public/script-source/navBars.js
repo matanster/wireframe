@@ -28,7 +28,7 @@ textRectFactory = function(svgHookPoint, rectText) {
   group = svgHookPoint.append('g').style('-webkit-user-select', 'none').style('-webkit-touch-callout', 'none').style('user-select', 'none').attr('id', rectText).attr('visibility', 'hidden');
   rectangle = group.append('rect').style('stroke-width', '0px').style('fill-opacity', '1');
   if (rectText != null) {
-    text = group.append('text').text(rectText).style("text-anchor", "middle").attr("dominant-baseline", "central").style("font-family", "verdana").style('fill', '#EEEEEE');
+    text = group.append('text').text(rectText).style("text-anchor", "middle").attr("dominant-baseline", "central").style("font-family", "verdana").style('fill', '#EEEEEE').style("font-weight", "bold");
     textDims = {
       width: text.node().getBBox().width,
       height: text.node().getBBox().height
@@ -86,7 +86,7 @@ exports.init = function(navBarsData, svgHookPoint) {
       return bar.viewStatus = 'selected';
     }
   };
-  barCreate = function(svgHookPoint, barData, parentBar, color) {
+  barCreate = function(svgHookPoint, barData, parentBar, baseColor) {
     var bar, barDataSub, nestLevel, subBar, _i, _len, _ref;
     if (parentBar === null) {
       nestLevel = 0;
@@ -96,7 +96,7 @@ exports.init = function(navBarsData, svgHookPoint) {
     bar = {
       'name': barData.name,
       'element': textRectFactory(svgHookPoint, barData.name),
-      'baseColor': colorScale(i),
+      'baseColor': baseColor,
       'parent': parentBar,
       'nestLevel': nestLevel,
       'viewStatus': 'hidden'
@@ -108,7 +108,7 @@ exports.init = function(navBarsData, svgHookPoint) {
       _ref = barData.subs;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         barDataSub = _ref[_i];
-        subBar = barCreate(svgHookPoint, barDataSub, bar, color);
+        subBar = barCreate(svgHookPoint, barDataSub, bar, '#BBBBBB');
         bar.children.push(subBar);
       }
     }
@@ -154,8 +154,8 @@ exports.init = function(navBarsData, svgHookPoint) {
   return _results;
 };
 
-redraw = function(bars) {
-  var allowedGeometry, anySelected, bar, childGeometryPadding, height, i, innerExtraPadding, oldHeight, textGeometry, textPaddedSpace, visibleChildren, y, _i, _j, _k, _l, _len, _len1, _len2, _len3, _len4, _m, _ref;
+redraw = function(bars, borderColor) {
+  var allowedGeometry, anySelected, bar, childGeometryPadding, height, i, textGeometry, visibleChildren, y, _i, _j, _k, _l, _len, _len1, _len2, _len3, _len4, _m, _ref, _ref1;
   console.log('navBars redraw started');
   allowedGeometry = bars[0].parent.childrenGeometry;
   anySelected = false;
@@ -167,14 +167,22 @@ redraw = function(bars) {
   }
   for (_j = 0, _len1 = bars.length; _j < _len1; _j++) {
     bar = bars[_j];
+    visibleChildren = false;
+    if (bar.children != null) {
+      if ((_ref = bar.children[0].viewStatus) === 'visible' || _ref === 'selected') {
+        visibleChildren = true;
+      }
+    }
     switch (bar.viewStatus) {
       case 'selected':
-        bar.color = colors.selection;
-        bar.element.text.style("font-weight", "bold");
+        if (visibleChildren) {
+          bar.color = bar.baseColor;
+        } else {
+          bar.color = colors.selection;
+        }
         break;
       default:
         bar.color = bar.baseColor;
-        bar.element.text.style("font-weight", "normal");
     }
   }
   if (anySelected) {
@@ -197,6 +205,12 @@ redraw = function(bars) {
   y = allowedGeometry.y;
   for (i = _m = 0, _len4 = bars.length; _m < _len4; i = ++_m) {
     bar = bars[i];
+    visibleChildren = false;
+    if (bar.children != null) {
+      if ((_ref1 = bar.children[0].viewStatus) === 'visible' || _ref1 === 'selected') {
+        visibleChildren = true;
+      }
+    }
     switch (bar.heightRatio) {
       case 'main':
         height = Math.floor(allowedGeometry.height * (2 / 3));
@@ -207,26 +221,19 @@ redraw = function(bars) {
       case 'even':
         height = Math.floor(allowedGeometry.height / bars.length);
     }
-    visibleChildren = false;
-    if (bar.children != null) {
-      if ((_ref = bar.children[0].viewStatus) === 'visible' || _ref === 'selected') {
-        visibleChildren = true;
-      }
-    }
-    if (bar.geometry != null) {
-      oldHeight = bar.geometry.height;
-      textPaddedSpace = oldHeight;
-      innerExtraPadding = {
-        top: textPaddedSpace * 1.5,
-        bottom: textPaddedSpace * 0.2
-      };
-    }
     bar.geometry = {
       x: allowedGeometry.x,
       width: allowedGeometry.width,
       y: y + 0.5,
       height: height
     };
+    if (bar.textPaddedSpace == null) {
+      bar.textPaddedSpace = bar.geometry.height;
+      bar.innerExtraPadding = {
+        top: bar.textPaddedSpace * 1.5,
+        bottom: bar.textPaddedSpace * 0.2
+      };
+    }
     bar.element.rectangle.transition().ease('linear').duration(400).attr(bar.geometry).style('fill', bar.color);
     if (visibleChildren) {
       childGeometryPadding = {
@@ -236,13 +243,13 @@ redraw = function(bars) {
       bar.childrenGeometry = {
         x: bar.geometry.x + childGeometryPadding.x,
         width: bar.geometry.width - (childGeometryPadding.x * 2),
-        y: bar.geometry.y + childGeometryPadding.y + innerExtraPadding.top,
-        height: bar.geometry.height - (childGeometryPadding.y * 2) - (innerExtraPadding.top + innerExtraPadding.bottom)
+        y: bar.geometry.y + childGeometryPadding.y + bar.innerExtraPadding.top,
+        height: bar.geometry.height - (childGeometryPadding.y * 2) - (bar.innerExtraPadding.top + bar.innerExtraPadding.bottom)
       };
-      redraw(bar.children);
+      window.setTimeout(redraw, 400, bar.children);
       textGeometry = {
         'x': bar.geometry.x + (bar.geometry.width / 2),
-        'y': bar.geometry.y + (innerExtraPadding.top / 2)
+        'y': bar.geometry.y + (bar.innerExtraPadding.top / 2)
       };
     } else {
       textGeometry = {
@@ -250,7 +257,7 @@ redraw = function(bars) {
         'y': bar.geometry.y + (bar.geometry.height / 2)
       };
     }
-    bar.element.text.transition().ease('linear').duration(400).attr(textGeometry);
+    bar.element.text.transition().ease('linear').duration(200).attr(textGeometry);
     bar.element.group.attr('visibility', 'visible');
     y += height;
   }
