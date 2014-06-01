@@ -27,8 +27,8 @@ colors =
 # Convenience globals - this can be refactored
 tokens    = undefined
 TOCTokens = []
-navBarsData = undefined
-categorizedText = undefined
+navBarsTree = undefined
+categorizedTextTree = undefined
 segments = undefined
 
 calcStart = () -> 90
@@ -267,7 +267,7 @@ sceneDefine = () ->
   main()
   
   navBarHook = sceneHook.svg.append('g')
-  navBars.init(navBarsData, navBarHook)
+  navBars.init(navBarsTree, navBarHook, categorizedTextTree)
 
   rightPane()
   textPort()
@@ -557,14 +557,14 @@ data.get('categories', (response) ->
   #console.log(response)
   #mainCategories       = JSON.parse(response).Top
   #categoriesOfSummary  = JSON.parse(response).More
-  navBarsData = JSON.parse(response).root
+  navBarsTree = JSON.parse(response).root
 )
 
 data.get('text', (response) -> 
   #console.log(response)
   #mainCategories       = JSON.parse(response).Top
   #categoriesOfSummary  = JSON.parse(response).More
-  categorizedText = JSON.parse(response).root
+  categorizedTextTree = JSON.parse(response).root
 )
 
 data.get('TOC', (response) -> 
@@ -606,7 +606,7 @@ start = () ->
 waitForData = setInterval((()->  # can replace this with https://github.com/mbostock/queue
                                  # to do: make it possible to troubleshoot which ajax call didn't return,
                                  #        and log time taken with the new browser performance javascript api
-                if tokens? and TOCTokens? and segments? and navBarsData? and categorizedText?
+                if tokens? and TOCTokens? and segments? and navBarsTree? and categorizedTextTree?
                   window.clearInterval(waitForData)
                   start()), 50)
                 

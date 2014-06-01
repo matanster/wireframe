@@ -15,6 +15,34 @@ colors =
   scaleEnd   : '#00BFFF'  # '#87CEFA'
   selection  : '#999999'  # '#333333'
 
+categorizedTextTree = undefined
+
+searchCategories = (categoryNodes, catName) ->
+  for categoryNode in categoryNodes
+    if categoryNode.name is catName
+      return categoryNode.text
+    else   
+      if categoryNode.subs?
+        if searchCategories(categoryNode.subs, catName)
+          return searchCategories(categoryNode.subs, catName) # harmless duplication with our small tree size..
+
+  return false  # will only get here if not found
+      
+getCategoryText = (catName) ->
+  text = searchCategories(categorizedTextTree, catName)
+#  console.log 'text for category ' + catName + ':'
+#  console.dir text
+
+display = (bar) ->
+  console.log 'display invoked for ' + bar.name
+  textArray = getCategoryText(bar.name)
+  if textArray
+    console.log 'text for category ' + bar.name + ':'
+    console.dir textArray
+  else
+    console.log 'no text found for category...'
+
+
 #
 # create a hidden text filled rectangle, under a new svg group element,
 # ready to be later made visible.
@@ -73,8 +101,9 @@ barUnselect = (bar) ->
 # construct json tree of bars, 
 # topmost node being a special case node
 #
-exports.init = (navBarsData, svgHookPoint) ->
+exports.init = (navBarsData, svgHookPoint, categorizedTextTreeInput) ->
 
+  categorizedTextTree = categorizedTextTreeInput  # simply attach to module convenience global
   console.log 'navBars init started'
   console.log 'navBarsData object:'
   console.dir navBarsData
@@ -100,6 +129,7 @@ exports.init = (navBarsData, svgHookPoint) ->
 
     if bar.name is "Abstract"
       bar.viewStatus = 'selected'
+      display(bar)
 
   #
   # recursive derivation of a bar and its children bars,
@@ -123,6 +153,9 @@ exports.init = (navBarsData, svgHookPoint) ->
       'nestLevel'  : nestLevel
       'viewStatus' : 'hidden' # everything hidden till marked otherwise
       'emphasis'   : barData.emphasis
+      'select'     : () -> display(this)
+
+    console.dir bar
 
     initialViewStatus(bar)
 
@@ -156,6 +189,8 @@ exports.init = (navBarsData, svgHookPoint) ->
              barUnselect(sibling)             
 
         bar.viewStatus = 'selected'
+        bar.select()
+
         # make children, if any, visible
         if bar.children?
           for child in bar.children
