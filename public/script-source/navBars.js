@@ -237,12 +237,12 @@ redraw = function(bars, borderColor) {
     bar.element.rectangle.transition().ease('linear').duration(400).attr(bar.geometry).style('fill', bar.color);
     if (visibleChildren) {
       childGeometryPadding = {
-        x: 6,
+        x: 12,
         y: 5
       };
       bar.childrenGeometry = {
         x: bar.geometry.x + childGeometryPadding.x,
-        width: bar.geometry.width - (childGeometryPadding.x * 2),
+        width: bar.geometry.width - (childGeometryPadding.x * 1),
         y: bar.geometry.y + childGeometryPadding.y + bar.innerExtraPadding.top,
         height: bar.geometry.height - (childGeometryPadding.y * 2) - (bar.innerExtraPadding.top + bar.innerExtraPadding.bottom)
       };
@@ -267,10 +267,10 @@ redraw = function(bars, borderColor) {
 exports.redraw = function(geometry) {
   root.geometry = geometry;
   root.childrenGeometry = {
-    x: root.geometry.x + 5,
-    width: root.geometry.width - (5 * 2),
-    y: root.geometry.y + 5,
-    height: root.geometry.height - (5 * 2)
+    x: root.geometry.x,
+    width: root.geometry.width,
+    y: root.geometry.y,
+    height: root.geometry.height
   };
   return redraw(bars);
 };
