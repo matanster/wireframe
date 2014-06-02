@@ -204,21 +204,28 @@ sceneDefine = () ->
 
 
   rightPane = ->
-    sceneObject.rightPane = {}
-    sceneObject.rightPane.element = sceneHook.svg.append('rect')
-                                    #.style('fill', '#ccccff')
-                                    .style('fill', '#999999') #888888
-                                    #.style('stroke-width', '1px')
-                                    #.style('stroke', '#bbbbee')
-                                    .style('fill-opacity', '1')
+    styles = 
+      rectangle:
+        'fill'         : '#999999' #888888 ccccff
+        'fill-opacity' : '0.5'
+      text:
+        'font-family' : 'verdana'
+        'fill'        : '#888895'
+        'font-weight' : 'bold'
+        'font-size'   : '35px'
+
+    textRect = svgUtil.textRectFactory(sceneHook.svg, 'TOC', styles, 'visible')
+    sceneObject.rightPane = 
+      element  :  textRect.rectangle
+      textElem : textRect.text
 
     sceneObject.rightPane.geometry = {}
     sceneObject.rightPane.geometry = 
-      'hoverIgnoreAreaX': 30, # need to adjust to Y value, per screen aspect ratio
-      'hoverIgnoreAreaY': 30  # need to adjust to X value, per screen aspect ratio
-                                    
+      'hoverIgnoreAreaX': undefined
+      'hoverIgnoreAreaY': undefined
+                                      
     sceneObject.rightPane.element.on('mouseover', () ->
-
+      console.log 'mouseover'
       sceneObject.rightPane.element.on('mousemove', () -> # to do: replace with a more circular area of tolerance
         if event.x > layout.separator.right.x + sceneObject.rightPane.geometry.hoverIgnoreAreaX
           if event.y > layout.separator.top.y + sceneObject.rightPane.geometry.hoverIgnoreAreaY and
@@ -246,16 +253,30 @@ sceneDefine = () ->
 
     sceneObject.rightPane.redraw = ->
 
-      #console.log 'right pane redraw'
+      sceneObject.rightPane.geometry = 
+        'hoverIgnoreAreaX': (viewport.width - layout.separator.right.x) / 3  # need to adjust to Y value, per screen aspect ratio
+        'hoverIgnoreAreaY': (viewport.height - layout.separator.top.y) / 3   # need to adjust to X value, per screen aspect ratio
 
       if states.showTOC is 'in progress'
         sceneObject.rightPane.geometry.width = sceneObject.TOC.geometry.width
       else 
-        sceneObject.rightPane.geometry.width = viewport.width - (layout.separator.right.x - layout.separator.left.x.current)
+        sceneObject.rightPane.geometry.width = viewport.width - (layout.separator.right.x)
 
       sceneObject.rightPane.geometry.x = layout.separator.right.x
       sceneObject.rightPane.geometry.y = layout.separator.top.y
       sceneObject.rightPane.geometry.height = coreH
+
+      middle = (point, lengthFrom) ->
+        parseFloat(point + (lengthFrom / 2))
+
+      sceneObject.rightPane.textElem.attr('x', middle(sceneObject.rightPane.geometry.x, sceneObject.rightPane.geometry.width))
+                                    .attr('y', middle(sceneObject.rightPane.geometry.y, sceneObject.rightPane.geometry.height))
+
+
+
+
+
+
 
       if states.showTOC is 'in progress'
         svgUtil.sync(sceneObject.rightPane, sceneObject.TOC.redraw)

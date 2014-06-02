@@ -33,6 +33,22 @@ colors = {
 
 categorizedTextTree = void 0;
 
+textRectFactory = function(svgHookPoint, rectText) {
+  var styles;
+  styles = {
+    text: {
+      'font-family': 'verdana',
+      'fill': '#EEEEEE',
+      'font-weight': 'bold'
+    },
+    rectangle: {
+      'stroke-width': '0px',
+      'fill-opacity': '1'
+    }
+  };
+  return svgUtil.textRectFactory(svgHookPoint, rectText, styles, 'hidden');
+};
+
 searchCategories = function(categoryNodes, catName) {
   var categoryNode, _i, _len;
   for (_i = 0, _len = categoryNodes.length; _i < _len; _i++) {
@@ -95,28 +111,6 @@ sessionSetDisplayType = function(bar) {
   } else {
     return session.display = 'fluent';
   }
-};
-
-textRectFactory = function(svgHookPoint, rectText) {
-  var group, rectangle, text, textDims;
-  group = svgHookPoint.append('g').style('-webkit-user-select', 'none').style('-webkit-touch-callout', 'none').style('user-select', 'none').attr('id', rectText).attr('visibility', 'hidden');
-  rectangle = group.append('rect').style('stroke-width', '0px').style('fill-opacity', '1');
-  if (rectText != null) {
-    text = group.append('text').text(rectText).style("text-anchor", "middle").attr("dominant-baseline", "central").style("font-family", "verdana").style('fill', '#EEEEEE').style("font-weight", "bold");
-    textDims = {
-      width: text.node().getBBox().width,
-      height: text.node().getBBox().height
-    };
-  } else {
-    text = null;
-  }
-  sceneObject = {
-    group: group,
-    rectangle: rectangle,
-    text: text,
-    textDims: textDims
-  };
-  return sceneObject;
 };
 
 barUnselect = function(bar) {

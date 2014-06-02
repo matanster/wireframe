@@ -1,3 +1,11 @@
+#
+# module for showing and interacting the special navigation bars.
+#
+# this module started with a pure recursive approach to bars,
+# then deteriorated to being somewhat specific to just two levels.
+# more levels may anyhow require special handling to support user cognition.
+#
+
 util              = require './util'
 svgUtil           = require './svgUtil'
 textportFluent    = require './textportFluent'
@@ -20,6 +28,22 @@ colors =
   selection  : '#999999'  # '#333333'
 
 categorizedTextTree = undefined
+
+#
+# create a hidden text filled rectangle, under a new svg group element,
+# ready to be later made visible.
+#
+textRectFactory = (svgHookPoint, rectText) ->
+  styles = 
+    text:
+      'font-family' : 'verdana'
+      'fill'        : '#EEEEEE'
+      'font-weight' : 'bold'
+    rectangle:
+      'stroke-width': '0px'
+      'fill-opacity': '1'
+
+  svgUtil.textRectFactory(svgHookPoint, rectText, styles, 'hidden')
 
 searchCategories = (categoryNodes, catName) ->
   for categoryNode in categoryNodes
@@ -81,42 +105,6 @@ sessionSetDisplayType = (bar) ->
     session.display = 'segmented'
   else
     session.display = 'fluent'      
-
-#
-# create a hidden text filled rectangle, under a new svg group element,
-# ready to be later made visible.
-#
-textRectFactory = (svgHookPoint, rectText) -> # sceneObject.main
-  group = svgHookPoint.append('g')
-                        .style('-webkit-user-select', 'none')      # avoid standard text handling of the category texts (selection, touch callouts)
-                        .style('-webkit-touch-callout', 'none')    # avoid standard text handling of the category texts (selection, touch callouts) 
-                        .style('user-select', 'none') # future compatibility
-                        .attr('id', rectText)
-                        .attr('visibility', 'hidden')
-
-  rectangle = group.append('rect')
-                       #.style('fill', colorScale(box))   
-                       .style('stroke-width', '0px')
-                       .style('fill-opacity', '1')
-
-  # skip text node if no text is provided
-  if rectText?
-    text = group.append('text').text(rectText)
-                                     .style("text-anchor", "middle")
-                                     .attr("dominant-baseline", "central")
-                                     .style("font-family", "verdana")
-                                     .style('fill', '#EEEEEE')
-                                     .style("font-weight", "bold")
-    textDims = 
-      width  : text.node().getBBox().width
-      height : text.node().getBBox().height
-
-  else 
-    text = null
-
-  sceneObject = { group, rectangle, text, textDims }
-  return sceneObject
-
 
 #
 # revoke 'selected' status off bar, reflecting the change

@@ -178,14 +178,31 @@ sceneDefine = function() {
     return sceneObject.title = d3.select('#titleSVG').append('text').text("  The Relationship Between Human Capital and Firm Performance").attr("id", "title").attr("dominant-baseline", "central").style("text-anchor", "middle").style('fill', "#EEEEEE");
   };
   rightPane = function() {
-    sceneObject.rightPane = {};
-    sceneObject.rightPane.element = sceneHook.svg.append('rect').style('fill', '#999999').style('fill-opacity', '1');
+    var styles, textRect;
+    styles = {
+      rectangle: {
+        'fill': '#999999',
+        'fill-opacity': '0.5'
+      },
+      text: {
+        'font-family': 'verdana',
+        'fill': '#888895',
+        'font-weight': 'bold',
+        'font-size': '35px'
+      }
+    };
+    textRect = svgUtil.textRectFactory(sceneHook.svg, 'TOC', styles, 'visible');
+    sceneObject.rightPane = {
+      element: textRect.rectangle,
+      textElem: textRect.text
+    };
     sceneObject.rightPane.geometry = {};
     sceneObject.rightPane.geometry = {
-      'hoverIgnoreAreaX': 30,
-      'hoverIgnoreAreaY': 30
+      'hoverIgnoreAreaX': void 0,
+      'hoverIgnoreAreaY': void 0
     };
     sceneObject.rightPane.element.on('mouseover', function() {
+      console.log('mouseover');
       return sceneObject.rightPane.element.on('mousemove', function() {
         if (event.x > layout.separator.right.x + sceneObject.rightPane.geometry.hoverIgnoreAreaX) {
           if (event.y > layout.separator.top.y + sceneObject.rightPane.geometry.hoverIgnoreAreaY && event.y < viewport.height - sceneObject.rightPane.geometry.hoverIgnoreAreaY) {
@@ -201,14 +218,23 @@ sceneDefine = function() {
       });
     });
     return sceneObject.rightPane.redraw = function() {
+      var middle;
+      sceneObject.rightPane.geometry = {
+        'hoverIgnoreAreaX': (viewport.width - layout.separator.right.x) / 3,
+        'hoverIgnoreAreaY': (viewport.height - layout.separator.top.y) / 3
+      };
       if (states.showTOC === 'in progress') {
         sceneObject.rightPane.geometry.width = sceneObject.TOC.geometry.width;
       } else {
-        sceneObject.rightPane.geometry.width = viewport.width - (layout.separator.right.x - layout.separator.left.x.current);
+        sceneObject.rightPane.geometry.width = viewport.width - layout.separator.right.x;
       }
       sceneObject.rightPane.geometry.x = layout.separator.right.x;
       sceneObject.rightPane.geometry.y = layout.separator.top.y;
       sceneObject.rightPane.geometry.height = coreH;
+      middle = function(point, lengthFrom) {
+        return parseFloat(point + (lengthFrom / 2));
+      };
+      sceneObject.rightPane.textElem.attr('x', middle(sceneObject.rightPane.geometry.x, sceneObject.rightPane.geometry.width)).attr('y', middle(sceneObject.rightPane.geometry.y, sceneObject.rightPane.geometry.height));
       if (states.showTOC === 'in progress') {
         return svgUtil.sync(sceneObject.rightPane, sceneObject.TOC.redraw);
       } else {

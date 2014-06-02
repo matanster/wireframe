@@ -1,3 +1,33 @@
+#
+# create a hidden text filled rectangle, under a new svg group element
+#
+exports.textRectFactory = (svgHookPoint, rectText, styles, visibility) -> # sceneObject.main
+  group = svgHookPoint.append('g')
+                        .style('-webkit-user-select', 'none')      # avoid standard text handling of the category texts (selection, touch callouts)
+                        .style('-webkit-touch-callout', 'none')    # avoid standard text handling of the category texts (selection, touch callouts) 
+                        .style('user-select', 'none') # future compatibility
+                        .attr('id', rectText)
+                        .attr('visibility', visibility)
+
+  rectangle = group.append('rect').style(styles.rectangle)
+
+  # skip text node if no text is provided
+  if rectText?
+    text = group.append('text').text(rectText)
+                                     .attr("dominant-baseline", "central")
+                                     .style("text-anchor", "middle")
+                                     .style(styles.text)
+
+    textDims = 
+      width  : text.node().getBBox().width
+      height : text.node().getBBox().height
+
+  else 
+    text = null
+
+  sceneObject = { group, rectangle, text, textDims }
+  return sceneObject
+
 exports.sync = (item, callback) ->
 
   if item.mode 
