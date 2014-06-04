@@ -14,13 +14,13 @@ module.exports = (text) ->
       tokens.push 
         'text': token.substr(1, token.length-2)
         'mark': 1
-      console.log 'highlighting word/s: ' + token.text        
+      #console.log 'highlighting word/s: ' + token.text        
     else  
       tokens.push 
         'text': token,
         'mark': 0
     
-  console.dir tokens
+  #console.dir tokens
   return tokens
 
 
@@ -47,5 +47,5 @@ old = (text) ->
       'text': textArray[t],
       'mark': 0
     
-  console.dir tokens
+  #console.dir tokens
   return tokens

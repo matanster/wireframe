@@ -74,7 +74,6 @@ getCategoryText = function(catName) {
 textportRefresh = function(fontSizeChange, scroll, mode) {
   var rawSegment, rawSentence, rawTextArray, segment, segments, sentence, sentences, _i, _j, _len, _len1;
   rawTextArray = getCategoryText(session.selected.name);
-  console.dir(rawTextArray);
   if (rawTextArray) {
     switch (session.display) {
       case 'segmented':
@@ -87,7 +86,6 @@ textportRefresh = function(fontSizeChange, scroll, mode) {
           };
           segments.push(segment);
         }
-        console.dir(segments);
         return textportSegmented(segments, fontSizeChange, scroll, mode);
       case 'fluent':
         sentences = [];
@@ -171,7 +169,6 @@ exports.init = function(navBarsData, svgHookPoint, categorizedTextTreeInput) {
       'viewStatus': 'hidden',
       'emphasis': barData.emphasis,
       'select': (function() {
-        console.dir(this);
         session.selected = this;
         sessionSetDisplayType(this);
         return textportRefresh();

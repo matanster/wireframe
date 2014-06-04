@@ -68,7 +68,7 @@ getCategoryText = (catName) ->
 textportRefresh = (fontSizeChange, scroll, mode) ->
 
   rawTextArray = getCategoryText(session.selected.name)
-  console.dir rawTextArray
+  #console.dir rawTextArray
 
   if rawTextArray
     switch session.display
@@ -82,7 +82,7 @@ textportRefresh = (fontSizeChange, scroll, mode) ->
             tokens   : tokenize(rawSegment)
           segments.push segment
 
-        console.dir segments
+        #console.dir segments
         textportSegmented(segments, fontSizeChange, scroll, mode)
 
       when 'fluent'
@@ -182,7 +182,7 @@ exports.init = (navBarsData, svgHookPoint, categorizedTextTreeInput) ->
       'viewStatus' : 'hidden' # everything hidden till marked otherwise
       'emphasis'   : barData.emphasis
       'select'     : (() -> 
-                       console.dir this
+                       #console.dir this
                        session.selected = this
                        sessionSetDisplayType(this)
                        textportRefresh()

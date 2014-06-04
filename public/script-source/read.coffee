@@ -18,7 +18,10 @@ firstEntry = true
 
 # Globals
 viewport  = null
-states    = {}
+
+states = 
+  rightPane: 'toc-invitation'
+    
 colors =
   scaleStart : '#87CEFA'
   scaleEnd   : '#00BFFF'
@@ -73,7 +76,7 @@ sceneDefine = () ->
                                  .style('font-size',fontSize)
 
 
-    # derive tokens we can work with, and and get ready to display them 
+    # derive tokens we can work with, and get ready to display them 
     # (create svg elements, get needed overall width)
     maxLen = 0
     for token in TOCTokens 
@@ -244,7 +247,7 @@ sceneDefine = () ->
             sceneObject.textPortBoundary.mode = 'animate'
             sceneObject.textPort.mode = 'animate'
             layout.separator.right.x = viewport.width - sceneObject.TOC.geometry.width
-            states.showTOC = 'in progress'
+            states.rightPane = 'toc-unveiling'
             sceneSync('animate')
             #sceneObject.rightPane.element.transition().duration(300).attr('x', layout.separator.right.x)
             #sceneObject.rightPane.element.transition().duration(300).attr('width', sceneObject.TOC.geometry.width)
@@ -253,14 +256,18 @@ sceneDefine = () ->
 
     sceneObject.rightPane.redraw = ->
 
+      console.log 'rightpane redraw started'
       sceneObject.rightPane.geometry = 
         'hoverIgnoreAreaX': (viewport.width - layout.separator.right.x) / 3  # need to adjust to Y value, per screen aspect ratio
         'hoverIgnoreAreaY': (viewport.height - layout.separator.top.y) / 3   # need to adjust to X value, per screen aspect ratio
 
-      if states.showTOC is 'in progress'
+      sceneObject.rightPane.geometry.width = viewport.width - (layout.separator.right.x)
+      ###
+      if states.rightPane is 'in progress'
         sceneObject.rightPane.geometry.width = sceneObject.TOC.geometry.width
       else 
         sceneObject.rightPane.geometry.width = viewport.width - (layout.separator.right.x)
+      ###
 
       sceneObject.rightPane.geometry.x = layout.separator.right.x
       sceneObject.rightPane.geometry.y = layout.separator.top.y
@@ -272,17 +279,17 @@ sceneDefine = () ->
       sceneObject.rightPane.textElem.attr('x', middle(sceneObject.rightPane.geometry.x, sceneObject.rightPane.geometry.width))
                                     .attr('y', middle(sceneObject.rightPane.geometry.y, sceneObject.rightPane.geometry.height))
 
-
-
-
-
-
-
-      if states.showTOC is 'in progress'
-        svgUtil.sync(sceneObject.rightPane, sceneObject.TOC.redraw)
-        #sceneObject.rightPane.element.transition().delay(400).duration(250).style('fill', '#888888') 
-      else
-        svgUtil.sync(sceneObject.rightPane)
+      switch states.rightPane
+        when 'toc-unveiling'
+          sceneObject.rightPane.textElem.attr('visibility', 'hidden')
+          svgUtil.sync(sceneObject.rightPane, sceneObject.TOC.redraw)
+          states.rightPane = 'toc-on'
+          #sceneObject.rightPane.element.transition().delay(400).duration(250).style('fill', '#888888') 
+        when 'toc-on'
+          sceneObject.TOC.subElement.remove()
+          sceneObject.TOC.redraw()
+        else
+          svgUtil.sync(sceneObject.rightPane)
 
   main()
   
@@ -495,6 +502,8 @@ sceneSync = (mode) ->
 
   sceneObject.TOC.redraw = () ->
 
+    console.log 'redraw toc started'
+
     #console.log 'starting TOC redraw'
     # get the width of a space character
     spaceWidth = textDraw.tokenToViewable('a a', sceneObject.TOC.subElement).width - textDraw.tokenToViewable('aa', sceneObject.TOC.subElement).width
@@ -509,7 +518,6 @@ sceneSync = (mode) ->
       .attr('width',  parseFloat sceneObject.rightPane.element.attr('width')  - (paddingX * 2))
       .attr('y',      parseFloat(sceneObject.rightPane.element.attr('y')) + paddingY)
       .attr('height', parseFloat sceneObject.rightPane.element.attr('height') - (paddingY * 2))
-
 
     viewPortFull = false
     y = 0
@@ -543,7 +551,7 @@ sceneSync = (mode) ->
       # add word space 
       x += spaceWidth
     
-  #if states.showTOC is 'drawn'
+  #if states.rightPane is 'drawn'
   #  sceneObject.TOC.redraw()
   
 

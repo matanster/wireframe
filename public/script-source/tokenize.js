@@ -12,7 +12,6 @@ module.exports = function(text) {
         'text': token.substr(1, token.length - 2),
         'mark': 1
       });
-      console.log('highlighting word/s: ' + token.text);
     } else {
       tokens.push({
         'text': token,
@@ -20,7 +19,6 @@ module.exports = function(text) {
       });
     }
   }
-  console.dir(tokens);
   return tokens;
 };
 
@@ -42,6 +40,5 @@ old = function(text) {
       'mark': 0
     });
   }
-  console.dir(tokens);
   return tokens;
 };

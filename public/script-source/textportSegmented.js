@@ -29,7 +29,6 @@ module.exports = function(segments, fontSizeChange, scroll, mode) {
     sceneObject.textPortInnerSVG.element.remove();
   }
   sceneObject.textPortInnerSVG = {};
-  console.dir(sceneHook.svg);
   sceneObject.textPortInnerSVG.element = sceneHook.svg.append('svg');
   sceneObject.textPortInnerSVG.subElement = sceneObject.textPortInnerSVG.element.append('g').style('text-anchor', 'start').style('font-family', fontFamily).style('font-size', fontSize);
   spaceWidth = textDraw.tokenToViewable('a a', sceneObject.textPortInnerSVG.subElement).width - textDraw.tokenToViewable('aa', sceneObject.textPortInnerSVG.subElement).width;
@@ -42,7 +41,6 @@ module.exports = function(segments, fontSizeChange, scroll, mode) {
     paddingY: 15
   };
   segments.spacingY = 20;
-  console.dir(parseFloat(sceneObject.textPort.element.attr('x')) + paddingX + 3);
   sceneObject.textPortInnerSVG.element.attr('x', parseFloat(sceneObject.textPort.element.attr('x')) + paddingX + 3).attr('width', parseFloat(sceneObject.textPort.element.attr('width') - (paddingX * 2) - 3)).attr('y', parseFloat(sceneObject.textPort.element.attr('y')) + paddingY).attr('height', parseFloat(sceneObject.textPort.element.attr('height') - (paddingY * 2) - 50));
   redraw = function() {
     var segment, segmentTokens, textToken, tokenViewable, viewPortFull, x, y, _i, _j, _len, _len1, _ref, _results;

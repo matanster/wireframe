@@ -46,7 +46,9 @@ firstEntry = true;
 
 viewport = null;
 
-states = {};
+states = {
+  rightPane: 'toc-invitation'
+};
 
 colors = {
   scaleStart: '#87CEFA',
@@ -228,7 +230,7 @@ sceneDefine = function() {
             sceneObject.textPortBoundary.mode = 'animate';
             sceneObject.textPort.mode = 'animate';
             layout.separator.right.x = viewport.width - sceneObject.TOC.geometry.width;
-            states.showTOC = 'in progress';
+            states.rightPane = 'toc-unveiling';
             return sceneSync('animate');
           }
         }
@@ -236,15 +238,19 @@ sceneDefine = function() {
     });
     return sceneObject.rightPane.redraw = function() {
       var middle;
+      console.log('rightpane redraw started');
       sceneObject.rightPane.geometry = {
         'hoverIgnoreAreaX': (viewport.width - layout.separator.right.x) / 3,
         'hoverIgnoreAreaY': (viewport.height - layout.separator.top.y) / 3
       };
-      if (states.showTOC === 'in progress') {
-        sceneObject.rightPane.geometry.width = sceneObject.TOC.geometry.width;
-      } else {
-        sceneObject.rightPane.geometry.width = viewport.width - layout.separator.right.x;
-      }
+      sceneObject.rightPane.geometry.width = viewport.width - layout.separator.right.x;
+      /*
+      if states.rightPane is 'in progress'
+        sceneObject.rightPane.geometry.width = sceneObject.TOC.geometry.width
+      else 
+        sceneObject.rightPane.geometry.width = viewport.width - (layout.separator.right.x)
+      */
+
       sceneObject.rightPane.geometry.x = layout.separator.right.x;
       sceneObject.rightPane.geometry.y = layout.separator.top.y;
       sceneObject.rightPane.geometry.height = coreH;
@@ -252,10 +258,16 @@ sceneDefine = function() {
         return parseFloat(point + (lengthFrom / 2));
       };
       sceneObject.rightPane.textElem.attr('x', middle(sceneObject.rightPane.geometry.x, sceneObject.rightPane.geometry.width)).attr('y', middle(sceneObject.rightPane.geometry.y, sceneObject.rightPane.geometry.height));
-      if (states.showTOC === 'in progress') {
-        return svgUtil.sync(sceneObject.rightPane, sceneObject.TOC.redraw);
-      } else {
-        return svgUtil.sync(sceneObject.rightPane);
+      switch (states.rightPane) {
+        case 'toc-unveiling':
+          sceneObject.rightPane.textElem.attr('visibility', 'hidden');
+          svgUtil.sync(sceneObject.rightPane, sceneObject.TOC.redraw);
+          return states.rightPane = 'toc-on';
+        case 'toc-on':
+          sceneObject.TOC.subElement.remove();
+          return sceneObject.TOC.redraw();
+        default:
+          return svgUtil.sync(sceneObject.rightPane);
       }
     };
   };
@@ -391,6 +403,7 @@ sceneSync = function(mode) {
   navBars.redraw(leftPane.geometry);
   return sceneObject.TOC.redraw = function() {
     var TOCToken, lHeight, paddingX, paddingY, spaceWidth, tokenViewable, viewPortFull, x, y, _i, _len, _results;
+    console.log('redraw toc started');
     spaceWidth = textDraw.tokenToViewable('a a', sceneObject.TOC.subElement).width - textDraw.tokenToViewable('aa', sceneObject.TOC.subElement).width;
     lHeight = textDraw.tokenToViewable('l', sceneObject.TOC.subElement).height;
     paddingX = 30;
@@ -603,7 +616,6 @@ getCategoryText = function(catName) {
 textportRefresh = function(fontSizeChange, scroll, mode) {
   var rawSegment, rawSentence, rawTextArray, segment, segments, sentence, sentences, _i, _j, _len, _len1;
   rawTextArray = getCategoryText(session.selected.name);
-  console.dir(rawTextArray);
   if (rawTextArray) {
     switch (session.display) {
       case 'segmented':
@@ -616,7 +628,6 @@ textportRefresh = function(fontSizeChange, scroll, mode) {
           };
           segments.push(segment);
         }
-        console.dir(segments);
         return textportSegmented(segments, fontSizeChange, scroll, mode);
       case 'fluent':
         sentences = [];
@@ -700,7 +711,6 @@ exports.init = function(navBarsData, svgHookPoint, categorizedTextTreeInput) {
       'viewStatus': 'hidden',
       'emphasis': barData.emphasis,
       'select': (function() {
-        console.dir(this);
         session.selected = this;
         sessionSetDisplayType(this);
         return textportRefresh();
@@ -1122,7 +1132,6 @@ module.exports = function(segments, fontSizeChange, scroll, mode) {
     sceneObject.textPortInnerSVG.element.remove();
   }
   sceneObject.textPortInnerSVG = {};
-  console.dir(sceneHook.svg);
   sceneObject.textPortInnerSVG.element = sceneHook.svg.append('svg');
   sceneObject.textPortInnerSVG.subElement = sceneObject.textPortInnerSVG.element.append('g').style('text-anchor', 'start').style('font-family', fontFamily).style('font-size', fontSize);
   spaceWidth = textDraw.tokenToViewable('a a', sceneObject.textPortInnerSVG.subElement).width - textDraw.tokenToViewable('aa', sceneObject.textPortInnerSVG.subElement).width;
@@ -1135,7 +1144,6 @@ module.exports = function(segments, fontSizeChange, scroll, mode) {
     paddingY: 15
   };
   segments.spacingY = 20;
-  console.dir(parseFloat(sceneObject.textPort.element.attr('x')) + paddingX + 3);
   sceneObject.textPortInnerSVG.element.attr('x', parseFloat(sceneObject.textPort.element.attr('x')) + paddingX + 3).attr('width', parseFloat(sceneObject.textPort.element.attr('width') - (paddingX * 2) - 3)).attr('y', parseFloat(sceneObject.textPort.element.attr('y')) + paddingY).attr('height', parseFloat(sceneObject.textPort.element.attr('height') - (paddingY * 2) - 50));
   redraw = function() {
     var segment, segmentTokens, textToken, tokenViewable, viewPortFull, x, y, _i, _j, _len, _len1, _ref, _results;
@@ -1212,7 +1220,6 @@ module.exports = function(text) {
         'text': token.substr(1, token.length - 2),
         'mark': 1
       });
-      console.log('highlighting word/s: ' + token.text);
     } else {
       tokens.push({
         'text': token,
@@ -1220,7 +1227,6 @@ module.exports = function(text) {
       });
     }
   }
-  console.dir(tokens);
   return tokens;
 };
 
@@ -1242,7 +1248,6 @@ old = function(text) {
       'mark': 0
     });
   }
-  console.dir(tokens);
   return tokens;
 };
 

@@ -34,8 +34,6 @@ module.exports = (segments, fontSizeChange, scroll, mode) ->
   # and a 'g' element to afford treating the whole bunch as one group
   #
 
-  console.dir sceneHook.svg
-
   sceneObject.textPortInnerSVG.element = sceneHook.svg.append('svg')
 
   sceneObject.textPortInnerSVG.subElement = sceneObject.textPortInnerSVG.element.append('g')
@@ -60,7 +58,6 @@ module.exports = (segments, fontSizeChange, scroll, mode) ->
   segments.spacingY = 20
 
   #console.log sceneObject.textPort.element.attr('width')  - (paddingX * 2)
-  console.dir parseFloat(sceneObject.textPort.element.attr('x')) + paddingX + 3
 
   sceneObject.textPortInnerSVG.element
     .attr('x',      parseFloat(sceneObject.textPort.element.attr('x')) + paddingX + 3)

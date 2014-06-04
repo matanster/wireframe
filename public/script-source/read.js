@@ -29,7 +29,9 @@ firstEntry = true;
 
 viewport = null;
 
-states = {};
+states = {
+  rightPane: 'toc-invitation'
+};
 
 colors = {
   scaleStart: '#87CEFA',
@@ -211,7 +213,7 @@ sceneDefine = function() {
             sceneObject.textPortBoundary.mode = 'animate';
             sceneObject.textPort.mode = 'animate';
             layout.separator.right.x = viewport.width - sceneObject.TOC.geometry.width;
-            states.showTOC = 'in progress';
+            states.rightPane = 'toc-unveiling';
             return sceneSync('animate');
           }
         }
@@ -219,15 +221,19 @@ sceneDefine = function() {
     });
     return sceneObject.rightPane.redraw = function() {
       var middle;
+      console.log('rightpane redraw started');
       sceneObject.rightPane.geometry = {
         'hoverIgnoreAreaX': (viewport.width - layout.separator.right.x) / 3,
         'hoverIgnoreAreaY': (viewport.height - layout.separator.top.y) / 3
       };
-      if (states.showTOC === 'in progress') {
-        sceneObject.rightPane.geometry.width = sceneObject.TOC.geometry.width;
-      } else {
-        sceneObject.rightPane.geometry.width = viewport.width - layout.separator.right.x;
-      }
+      sceneObject.rightPane.geometry.width = viewport.width - layout.separator.right.x;
+      /*
+      if states.rightPane is 'in progress'
+        sceneObject.rightPane.geometry.width = sceneObject.TOC.geometry.width
+      else 
+        sceneObject.rightPane.geometry.width = viewport.width - (layout.separator.right.x)
+      */
+
       sceneObject.rightPane.geometry.x = layout.separator.right.x;
       sceneObject.rightPane.geometry.y = layout.separator.top.y;
       sceneObject.rightPane.geometry.height = coreH;
@@ -235,10 +241,16 @@ sceneDefine = function() {
         return parseFloat(point + (lengthFrom / 2));
       };
       sceneObject.rightPane.textElem.attr('x', middle(sceneObject.rightPane.geometry.x, sceneObject.rightPane.geometry.width)).attr('y', middle(sceneObject.rightPane.geometry.y, sceneObject.rightPane.geometry.height));
-      if (states.showTOC === 'in progress') {
-        return svgUtil.sync(sceneObject.rightPane, sceneObject.TOC.redraw);
-      } else {
-        return svgUtil.sync(sceneObject.rightPane);
+      switch (states.rightPane) {
+        case 'toc-unveiling':
+          sceneObject.rightPane.textElem.attr('visibility', 'hidden');
+          svgUtil.sync(sceneObject.rightPane, sceneObject.TOC.redraw);
+          return states.rightPane = 'toc-on';
+        case 'toc-on':
+          sceneObject.TOC.subElement.remove();
+          return sceneObject.TOC.redraw();
+        default:
+          return svgUtil.sync(sceneObject.rightPane);
       }
     };
   };
@@ -374,6 +386,7 @@ sceneSync = function(mode) {
   navBars.redraw(leftPane.geometry);
   return sceneObject.TOC.redraw = function() {
     var TOCToken, lHeight, paddingX, paddingY, spaceWidth, tokenViewable, viewPortFull, x, y, _i, _len, _results;
+    console.log('redraw toc started');
     spaceWidth = textDraw.tokenToViewable('a a', sceneObject.TOC.subElement).width - textDraw.tokenToViewable('aa', sceneObject.TOC.subElement).width;
     lHeight = textDraw.tokenToViewable('l', sceneObject.TOC.subElement).height;
     paddingX = 30;
