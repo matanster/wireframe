@@ -68,10 +68,10 @@ getCategoryText = (catName) ->
 textportRefresh = (fontSizeChange, scroll, mode) ->
 
   rawTextArray = getCategoryText(session.selected.name)
-  #console.dir rawTextArray
 
   if rawTextArray
     switch session.display
+
       when 'segmented'
 
         # restructure into segments  
@@ -82,11 +82,9 @@ textportRefresh = (fontSizeChange, scroll, mode) ->
             tokens   : tokenize(rawSegment)
           segments.push segment
 
-        #console.dir segments
         textportSegmented(segments, fontSizeChange, scroll, mode)
 
       when 'fluent'
-
         sentences = []
         for rawSentence in rawTextArray
           sentence = 

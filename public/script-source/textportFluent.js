@@ -19,6 +19,11 @@ fontFamily = 'Helvetica';
 
 module.exports = function(sentences, fontSizeChange, scroll, mode) {
   var lHeight, paddingX, paddingY, redraw, spaceWidth;
+  if (scroll != null) {
+    console.log(scroll);
+    sceneObject.textPortInnerSVG.element.transition().ease('sin').duration(2000).attr('y', 0);
+    return;
+  }
   console.log('fluent textPorting started ' + '(mode ' + mode + ')');
   if (fontSizeChange != null) {
     fontSize = parseFloat(fontSize) + fontSizeChange + 'px';
@@ -58,15 +63,13 @@ module.exports = function(sentences, fontSizeChange, scroll, mode) {
               tokenViewable.svg.style('fill', 'rgb(100,200,200)');
           }
           if (x + tokenViewable.width < sceneObject.textPortInnerSVG.element.attr('width')) {
-            tokenViewable.svg.attr('x', x);
-            tokenViewable.svg.attr('y', y);
+            tokenViewable.svg.attr('x', x).attr('y', y);
             x += tokenViewable.width;
           } else {
             if (y + tokenViewable.height + lHeight < sceneObject.textPortInnerSVG.element.attr('height')) {
               x = 0;
               y += tokenViewable.height;
-              tokenViewable.svg.attr('x', x);
-              tokenViewable.svg.attr('y', y);
+              tokenViewable.svg.attr('x', x).attr('y', y);
               x += tokenViewable.width;
             } else {
               console.log('text port full');

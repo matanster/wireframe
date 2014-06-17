@@ -94,11 +94,7 @@ boxH = null;
 end = null;
 
 sceneDefine = function() {
-  var TOC, main, mainPanes, navBarHook, rightPane, textPort, titlePort;
-  main = function() {
-    sceneHook.svg = d3.select('body').append('svg').style('background-color', '#999999');
-    return sceneObject.categories = {};
-  };
+  var TOC, downButton, fontSizeButton, mainPanes, navBarHook, rightPane, textPort, titlePort;
   TOC = function() {
     var fontFamily, fontSize, maxLen, token, tokenViewable, _i, _len;
     sceneObject.TOC = {};
@@ -271,43 +267,51 @@ sceneDefine = function() {
       }
     };
   };
-  main();
+  sceneHook.svg = d3.select('body').append('svg').style('background-color', '#999999');
+  sceneObject.categories = {};
   navBarHook = sceneHook.svg.append('g');
   rightPane();
   textPort();
   navBars.init(navBarsTree, navBarHook, categorizedTextTree);
   titlePort();
   TOC();
-  sceneObject.fontSize = {
-    element: sceneHook.svg.append("g")
+  fontSizeButton = function() {
+    sceneObject.fontSize = {
+      element: sceneHook.svg.append("g")
+    };
+    sceneObject.fontDecreaseButton = sceneObject.fontSize.element.append("svg:image").attr("xlink:href", "fontSmall.svg");
+    sceneObject.fontIncreaseButton = sceneObject.fontSize.element.append("svg:image").attr("xlink:href", "fontLarge.svg");
+    sceneObject.fontDecreaseButton.on('mouseover', function() {
+      return console.log('hover');
+    }).on('mousedown', function() {
+      console.log('click font decrease');
+      return navBars.textportRefresh(-2);
+    });
+    return sceneObject.fontIncreaseButton.on('mouseover', function() {
+      return console.log('hover');
+    }).on('mousedown', function() {
+      console.log('click font increase');
+      return navBars.textportRefresh(2);
+    });
   };
-  sceneObject.fontDecreaseButton = sceneObject.fontSize.element.append("svg:image").attr("xlink:href", "fontSmall.svg");
-  sceneObject.fontIncreaseButton = sceneObject.fontSize.element.append("svg:image").attr("xlink:href", "fontLarge.svg");
-  sceneObject.fontDecreaseButton.on('mouseover', function() {
-    return console.log('hover');
-  }).on('mousedown', function() {
-    console.log('click font decrease');
-    return navBars.textportRefresh(-2);
-  });
-  sceneObject.fontIncreaseButton.on('mouseover', function() {
-    return console.log('hover');
-  }).on('mousedown', function() {
-    console.log('click font increase');
-    return navBars.textportRefresh(2);
-  });
-  sceneObject.downButton = {};
-  sceneObject.downButton.geometry = {
-    'paddingY': 15,
-    'paddingX': 30,
-    'height': 35
+  fontSizeButton();
+  downButton = function() {
+    sceneObject.downButton = {};
+    sceneObject.downButton.geometry = {
+      'paddingY': 15,
+      'paddingX': 30,
+      'height': 35
+    };
+    return sceneObject.downButton.element = sceneHook.svg.append('svg:image').attr('xlink:href', 'images/downScroll5.svg').attr('preserveAspectRatio', 'none').on('mouseover', function() {
+      return sceneObject.downButton.element.transition().ease('sin').duration(200).attr('height', sceneObject.downButton.geometry.height + (sceneObject.downButton.geometry.paddingY * 2 / 3));
+    }).on('mouseout', function() {
+      return sceneObject.downButton.element.transition().duration(400).attr('height', sceneObject.downButton.geometry.height);
+    }).on('mousedown', function() {
+      console.log('scroll');
+      return navBars.textportRefresh(0, true);
+    });
   };
-  return sceneObject.downButton.element = sceneHook.svg.append('svg:image').attr('xlink:href', 'images/downScroll5.svg').attr('preserveAspectRatio', 'none').on('mouseover', function() {
-    return sceneObject.downButton.element.transition().ease('sin').duration(200).attr('height', sceneObject.downButton.geometry.height + (sceneObject.downButton.geometry.paddingY * 2 / 3));
-  }).on('mouseout', function() {
-    return sceneObject.downButton.element.transition().duration(400).attr('height', sceneObject.downButton.geometry.height);
-  }).on('mousedown', function() {
-    return navBars.textportRefresh(0, true);
-  });
+  return downButton();
 };
 
 sceneSync = function(mode) {
@@ -1031,6 +1035,11 @@ fontFamily = 'Helvetica';
 
 module.exports = function(sentences, fontSizeChange, scroll, mode) {
   var lHeight, paddingX, paddingY, redraw, spaceWidth;
+  if (scroll != null) {
+    console.log(scroll);
+    sceneObject.textPortInnerSVG.element.transition().ease('sin').duration(2000).attr('y', 0);
+    return;
+  }
   console.log('fluent textPorting started ' + '(mode ' + mode + ')');
   if (fontSizeChange != null) {
     fontSize = parseFloat(fontSize) + fontSizeChange + 'px';
@@ -1070,15 +1079,13 @@ module.exports = function(sentences, fontSizeChange, scroll, mode) {
               tokenViewable.svg.style('fill', 'rgb(100,200,200)');
           }
           if (x + tokenViewable.width < sceneObject.textPortInnerSVG.element.attr('width')) {
-            tokenViewable.svg.attr('x', x);
-            tokenViewable.svg.attr('y', y);
+            tokenViewable.svg.attr('x', x).attr('y', y);
             x += tokenViewable.width;
           } else {
             if (y + tokenViewable.height + lHeight < sceneObject.textPortInnerSVG.element.attr('height')) {
               x = 0;
               y += tokenViewable.height;
-              tokenViewable.svg.attr('x', x);
-              tokenViewable.svg.attr('y', y);
+              tokenViewable.svg.attr('x', x).attr('y', y);
               x += tokenViewable.width;
             } else {
               console.log('text port full');

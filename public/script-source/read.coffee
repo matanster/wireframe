@@ -57,10 +57,6 @@ end    = null
 #####################################################################
 sceneDefine = () ->
 
-  main = () ->
-    sceneHook.svg = d3.select('body').append('svg').style('background-color', '#999999')   
-    sceneObject.categories = {} # can move this elsewhere
-
   TOC = () -> 
 
     sceneObject.TOC = {} 
@@ -291,9 +287,10 @@ sceneDefine = () ->
         else
           svgUtil.sync(sceneObject.rightPane)
 
-  main()
-  
+  sceneHook.svg = d3.select('body').append('svg').style('background-color', '#999999')   
+  sceneObject.categories = {} # can move this elsewhere
   navBarHook = sceneHook.svg.append('g')
+
   rightPane()
   textPort()
   navBars.init(navBarsTree, navBarHook, categorizedTextTree)  
@@ -301,47 +298,51 @@ sceneDefine = () ->
   TOC()
 
   # font buttons
-  sceneObject.fontSize = 
-    element: sceneHook.svg.append("g")
+  fontSizeButton = () ->
+    sceneObject.fontSize = 
+      element: sceneHook.svg.append("g")
 
-  sceneObject.fontDecreaseButton = sceneObject.fontSize.element.append("svg:image")
-    .attr("xlink:href","fontSmall.svg")
-  sceneObject.fontIncreaseButton = sceneObject.fontSize.element.append("svg:image")
-    .attr("xlink:href","fontLarge.svg")
+    sceneObject.fontDecreaseButton = sceneObject.fontSize.element.append("svg:image")
+      .attr("xlink:href","fontSmall.svg")
+    sceneObject.fontIncreaseButton = sceneObject.fontSize.element.append("svg:image")
+      .attr("xlink:href","fontLarge.svg")
 
-  sceneObject.fontDecreaseButton
-    .on('mouseover', () -> console.log('hover'))
-    .on('mousedown', () -> 
-      console.log('click font decrease')
-      navBars.textportRefresh(-2))
-  sceneObject.fontIncreaseButton 
-    .on('mouseover', () -> console.log('hover'))
-    .on('mousedown', () -> 
-      console.log('click font increase')
-      navBars.textportRefresh(2)) 
+    sceneObject.fontDecreaseButton
+      .on('mouseover', () -> console.log('hover'))
+      .on('mousedown', () -> 
+        console.log('click font decrease')
+        navBars.textportRefresh(-2))
+    sceneObject.fontIncreaseButton 
+      .on('mouseover', () -> console.log('hover'))
+      .on('mousedown', () -> 
+        console.log('click font increase')
+        navBars.textportRefresh(2)) 
+
+  fontSizeButton()
 
   # viewport down button 
-  sceneObject.downButton = {}
+  downButton = () ->
+    sceneObject.downButton = {}
 
-  sceneObject.downButton.geometry = 
-    'paddingY': 15,
-    'paddingX': 30, 
-    'height': 35
+    sceneObject.downButton.geometry = 
+      'paddingY': 15,
+      'paddingX': 30, 
+      'height': 35
 
-  sceneObject.downButton.element = sceneHook.svg.append('svg:image')
-    .attr('xlink:href','images/downScroll5.svg')
-    .attr('preserveAspectRatio', 'none')
-    .on('mouseover', () -> 
-      #console.log('hover')
-      sceneObject.downButton.element.transition().ease('sin').duration(200).attr('height', sceneObject.downButton.geometry.height + (sceneObject.downButton.geometry.paddingY *2/3)))
-    .on('mouseout', () -> 
-      #console.log('hover')
-      sceneObject.downButton.element.transition().duration(400).attr('height', sceneObject.downButton.geometry.height))
-    .on('mousedown', () -> 
-      #console.log('scroll')
-      navBars.textportRefresh(0, true)) 
+    sceneObject.downButton.element = sceneHook.svg.append('svg:image')
+      .attr('xlink:href','images/downScroll5.svg')
+      .attr('preserveAspectRatio', 'none')
+      .on('mouseover', () -> 
+        #console.log('hover')
+        sceneObject.downButton.element.transition().ease('sin').duration(200).attr('height', sceneObject.downButton.geometry.height + (sceneObject.downButton.geometry.paddingY *2/3)))
+      .on('mouseout', () -> 
+        #console.log('hover')
+        sceneObject.downButton.element.transition().duration(400).attr('height', sceneObject.downButton.geometry.height))
+      .on('mousedown', () -> 
+        console.log('scroll')
+        navBars.textportRefresh(0, true)) 
 
-
+  downButton()
 
 ######################################################
 #

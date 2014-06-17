@@ -13,6 +13,12 @@ fontFamily = 'Helvetica' # for now
 
 module.exports = (sentences, fontSizeChange, scroll, mode) ->
 
+  if scroll?
+    console.log scroll
+    sceneObject.textPortInnerSVG.element.transition().ease('sin').duration(2000).attr('y', 0)
+    #sceneObject.textPortInnerSVG.subElement.transition().ease('sin').duration(2000).attr('transform', 'translate(0,-300)')
+    return
+
   console.log 'fluent textPorting started ' + '(mode ' + mode + ')'
 
   if fontSizeChange?
@@ -71,6 +77,9 @@ module.exports = (sentences, fontSizeChange, scroll, mode) ->
       for token in sentence.text
 
         tokenViewable = textDraw.tokenToViewable(token.text, sceneObject.textPortInnerSVG.subElement)
+        #randx = Math.floor(Math.random() * 500)
+        #randy = 1000 #Math.floor(Math.random() * 1000)
+        #tokenViewable.svg.attr('x', randx).attr('y', randy)
         #console.log token.mark
         
         #
@@ -86,7 +95,7 @@ module.exports = (sentences, fontSizeChange, scroll, mode) ->
         if x + tokenViewable.width < sceneObject.textPortInnerSVG.element.attr('width')
           #console.log 'adding to line'
           tokenViewable.svg.attr('x', x)
-          tokenViewable.svg.attr('y', y)
+                           .attr('y', y)
           x += tokenViewable.width
         else  
           if y + tokenViewable.height + lHeight < sceneObject.textPortInnerSVG.element.attr('height')
@@ -94,7 +103,7 @@ module.exports = (sentences, fontSizeChange, scroll, mode) ->
             x = 0
             y += tokenViewable.height
             tokenViewable.svg.attr('x', x)
-            tokenViewable.svg.attr('y', y)
+                             .attr('y', y)
             x += tokenViewable.width  
             #console.log y  
             #console.dir textPort  
@@ -118,6 +127,4 @@ module.exports = (sentences, fontSizeChange, scroll, mode) ->
   # Remove Down Button when reached bottom
   # Add Up button after initial scroll
   #
-  #if scroll?
-  #  sceneObject.textPortInnerSVG.subElement.transition().duration(...)
  
