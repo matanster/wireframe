@@ -300,7 +300,7 @@ sceneDefine = function() {
     sceneObject.downButton.geometry = {
       'paddingY': 15,
       'paddingX': 30,
-      'height': 35
+      'height': 25
     };
     return sceneObject.downButton.element = sceneHook.svg.append('svg:image').attr('xlink:href', 'images/downScroll5.svg').attr('preserveAspectRatio', 'none').on('mouseover', function() {
       return sceneObject.downButton.element.transition().ease('sin').duration(200).attr('height', sceneObject.downButton.geometry.height + (sceneObject.downButton.geometry.paddingY * 2 / 3));
@@ -389,8 +389,8 @@ sceneSync = function(mode) {
     }
   }
   sceneObject.downButton.redraw = function() {
-    sceneObject.downButton.geometry.x = layout.separator.left.x.current + sceneObject.downButton.geometry.paddingX;
-    sceneObject.downButton.geometry.width = layout.separator.right.x - layout.separator.left.x.current - (2 * sceneObject.downButton.geometry.paddingX);
+    sceneObject.downButton.geometry.width = (layout.separator.right.x - layout.separator.left.x.current) / 5;
+    sceneObject.downButton.geometry.x = layout.separator.left.x.current + (((layout.separator.right.x - layout.separator.left.x.current) - sceneObject.downButton.geometry.width) / 2);
     sceneObject.downButton.geometry.y = sceneHook.svg.attr('height') - sceneObject.downButton.geometry.height - sceneObject.downButton.geometry.paddingY;
     return sceneObject.downButton.element.attr('x', sceneObject.downButton.geometry.x).attr('width', sceneObject.downButton.geometry.width).attr('y', sceneObject.downButton.geometry.y).attr('height', sceneObject.downButton.geometry.height);
   };

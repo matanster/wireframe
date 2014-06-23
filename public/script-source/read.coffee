@@ -327,7 +327,7 @@ sceneDefine = () ->
     sceneObject.downButton.geometry = 
       'paddingY': 15,
       'paddingX': 30, 
-      'height': 35
+      'height': 25
 
     sceneObject.downButton.element = sceneHook.svg.append('svg:image')
       .attr('xlink:href','images/downScroll5.svg')
@@ -477,8 +477,12 @@ sceneSync = (mode) ->
 
   # draw down button
   sceneObject.downButton.redraw = () ->
-    sceneObject.downButton.geometry.x = layout.separator.left.x.current + sceneObject.downButton.geometry.paddingX
-    sceneObject.downButton.geometry.width = layout.separator.right.x - layout.separator.left.x.current - (2 * sceneObject.downButton.geometry.paddingX)
+    #sceneObject.downButton.geometry.x = layout.separator.left.x.current + sceneObject.downButton.geometry.paddingX
+    #sceneObject.downButton.geometry.width = layout.separator.right.x - layout.separator.left.x.current - (2 * sceneObject.downButton.geometry.paddingX)
+    sceneObject.downButton.geometry.width = (layout.separator.right.x - layout.separator.left.x.current) / 5
+    sceneObject.downButton.geometry.x = layout.separator.left.x.current + 
+                                        (((layout.separator.right.x - layout.separator.left.x.current) - sceneObject.downButton.geometry.width) / 2)
+      
 
     sceneObject.downButton.geometry.y = sceneHook.svg.attr('height') - sceneObject.downButton.geometry.height - sceneObject.downButton.geometry.paddingY # stick near bottom
 
