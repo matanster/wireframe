@@ -189,7 +189,7 @@ sceneDefine = function() {
         'font-size': '35px'
       }
     };
-    textRect = svgUtil.textRectFactory(sceneHook.svg, 'TOC', styles, 'visible');
+    textRect = svgUtil.textRectFactory(sceneHook.svg, 'Full Text', styles, 'visible');
     sceneObject.rightPane = {
       element: textRect.rectangle,
       textElem: textRect.text
