@@ -51,7 +51,7 @@ module.exports = function(segments, fontSizeChange, scroll, mode) {
       segment = segments[_i];
       segment.element = sceneObject.textPortInnerSVG.subElement.append('g').style('text-anchor', 'start').style('fill', '#EEEEEE').style('font-family', fontFamily).style('font-size', fontSize);
       segment.enclosure = {};
-      segment.enclosure.element = segment.element.append('rect').style('opacity', 0.9).style('fill', '#87CEFA');
+      segment.enclosure.element = segment.element.append('rect').style('opacity', 0.9).style('fill', '#555555');
       segmentTokens = [];
       x = enclosing.paddingX;
       segment.enclosure.geometry = {
@@ -67,10 +67,10 @@ module.exports = function(segments, fontSizeChange, scroll, mode) {
         tokenViewable = textDraw.tokenToViewable(textToken.text, segment.element);
         switch (textToken.mark) {
           case 1:
-            tokenViewable.svg.style('fill', '#2F4FFF');
+            tokenViewable.svg.style('fill', '#5599FE');
             break;
           case 2:
-            tokenViewable.svg.style('fill', 'rgb(100,200,200)');
+            tokenViewable.svg.style('fill', 'rgb(100,220,220)');
         }
         if (x + tokenViewable.width < sceneObject.textPortInnerSVG.element.attr('width') - enclosing.paddingX) {
           tokenViewable.svg.attr('x', x);

@@ -201,7 +201,7 @@ sceneDefine = function() {
       },
       text: {
         'font-family': 'verdana',
-        'fill': '#888895',
+        'fill': '#909092',
         'font-weight': 'bold',
         'font-size': '35px'
       }
@@ -303,9 +303,9 @@ sceneDefine = function() {
       'height': 25
     };
     return sceneObject.downButton.element = sceneHook.svg.append('svg:image').attr('xlink:href', 'images/downScroll5.svg').attr('preserveAspectRatio', 'none').on('mouseover', function() {
-      return sceneObject.downButton.element.transition().ease('sin').duration(200).attr('height', sceneObject.downButton.geometry.height + (sceneObject.downButton.geometry.paddingY * 2 / 3));
+      return sceneObject.downButton.element.transition().ease('sin').duration(400).attr('height', sceneObject.downButton.geometry.height + (sceneObject.downButton.geometry.paddingY * 2 / 3));
     }).on('mouseout', function() {
-      return sceneObject.downButton.element.transition().duration(400).attr('height', sceneObject.downButton.geometry.height);
+      return sceneObject.downButton.element.transition().duration(300).attr('height', sceneObject.downButton.geometry.height);
     }).on('mousedown', function() {
       console.log('scroll');
       return navBars.textportRefresh(0, true);
@@ -406,7 +406,8 @@ sceneSync = function(mode) {
   };
   navBars.redraw(leftPane.geometry);
   return sceneObject.TOC.redraw = function() {
-    var TOCToken, lHeight, paddingX, paddingY, spaceWidth, tokenViewable, viewPortFull, x, y, _i, _len, _results;
+    var TOCToken, lHeight, lineSpacing, paddingX, paddingY, spaceWidth, tokenViewable, viewPortFull, x, y, _i, _len, _results;
+    lineSpacing = 2;
     console.log('redraw toc started');
     spaceWidth = textDraw.tokenToViewable('a a', sceneObject.TOC.subElement).width - textDraw.tokenToViewable('aa', sceneObject.TOC.subElement).width;
     lHeight = textDraw.tokenToViewable('l', sceneObject.TOC.subElement).height;
@@ -431,7 +432,7 @@ sceneSync = function(mode) {
           x += 30;
       }
       if (y + tokenViewable.height + lHeight < sceneObject.TOC.element.attr('y') + sceneObject.TOC.element.attr('height')) {
-        y += tokenViewable.height;
+        y += tokenViewable.height + lineSpacing;
         tokenViewable.svg.attr('x', x);
         tokenViewable.svg.attr('y', y);
         x += tokenViewable.width;
@@ -1161,7 +1162,7 @@ module.exports = function(segments, fontSizeChange, scroll, mode) {
       segment = segments[_i];
       segment.element = sceneObject.textPortInnerSVG.subElement.append('g').style('text-anchor', 'start').style('fill', '#EEEEEE').style('font-family', fontFamily).style('font-size', fontSize);
       segment.enclosure = {};
-      segment.enclosure.element = segment.element.append('rect').style('opacity', 0.9).style('fill', '#87CEFA');
+      segment.enclosure.element = segment.element.append('rect').style('opacity', 0.9).style('fill', '#555555');
       segmentTokens = [];
       x = enclosing.paddingX;
       segment.enclosure.geometry = {
@@ -1177,10 +1178,10 @@ module.exports = function(segments, fontSizeChange, scroll, mode) {
         tokenViewable = textDraw.tokenToViewable(textToken.text, segment.element);
         switch (textToken.mark) {
           case 1:
-            tokenViewable.svg.style('fill', '#2F4FFF');
+            tokenViewable.svg.style('fill', '#5599FE');
             break;
           case 2:
-            tokenViewable.svg.style('fill', 'rgb(100,200,200)');
+            tokenViewable.svg.style('fill', 'rgb(100,220,220)');
         }
         if (x + tokenViewable.width < sceneObject.textPortInnerSVG.element.attr('width') - enclosing.paddingX) {
           tokenViewable.svg.attr('x', x);

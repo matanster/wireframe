@@ -209,7 +209,7 @@ sceneDefine = () ->
         'fill-opacity' : '0.5'
       text:
         'font-family' : 'verdana'
-        'fill'        : '#888895'
+        'fill'        : '#909092'
         'font-weight' : 'bold'
         'font-size'   : '35px'
 
@@ -334,10 +334,10 @@ sceneDefine = () ->
       .attr('preserveAspectRatio', 'none')
       .on('mouseover', () -> 
         #console.log('hover')
-        sceneObject.downButton.element.transition().ease('sin').duration(200).attr('height', sceneObject.downButton.geometry.height + (sceneObject.downButton.geometry.paddingY *2/3)))
+        sceneObject.downButton.element.transition().ease('sin').duration(400).attr('height', sceneObject.downButton.geometry.height + (sceneObject.downButton.geometry.paddingY *2/3)))
       .on('mouseout', () -> 
         #console.log('hover')
-        sceneObject.downButton.element.transition().duration(400).attr('height', sceneObject.downButton.geometry.height))
+        sceneObject.downButton.element.transition().duration(300).attr('height', sceneObject.downButton.geometry.height))
       .on('mousedown', () -> 
         console.log('scroll')
         navBars.textportRefresh(0, true)) 
@@ -507,6 +507,8 @@ sceneSync = (mode) ->
 
   sceneObject.TOC.redraw = () ->
 
+    lineSpacing = 2
+
     console.log 'redraw toc started'
 
     #console.log 'starting TOC redraw'
@@ -544,7 +546,7 @@ sceneSync = (mode) ->
           x += 30
 
       if y + tokenViewable.height + lHeight < sceneObject.TOC.element.attr('y') + sceneObject.TOC.element.attr('height')
-        y += tokenViewable.height
+        y += tokenViewable.height + lineSpacing
         tokenViewable.svg.attr('x', x)
         tokenViewable.svg.attr('y', y)
         x += tokenViewable.width  

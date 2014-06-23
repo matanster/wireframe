@@ -84,7 +84,7 @@ module.exports = (segments, fontSizeChange, scroll, mode) ->
 
       # add curvy rectangle for the group
       segment.enclosure = {}
-      segment.enclosure.element = segment.element.append('rect').style('opacity', 0.9).style('fill', '#87CEFA')  # 888888
+      segment.enclosure.element = segment.element.append('rect').style('opacity', 0.9).style('fill', '#555555')  # 888888 #87CEFA
 
       segmentTokens = []
       x = enclosing.paddingX
@@ -108,10 +108,10 @@ module.exports = (segments, fontSizeChange, scroll, mode) ->
         #
         switch textToken.mark
           when 1
-            tokenViewable.svg.style('fill', '#2F4FFF')
+            tokenViewable.svg.style('fill', '#5599FE') #2F4FFF
           when 2
             #tokenViewable.svg.style('fill', 'rgb(70,140,140)')
-            tokenViewable.svg.style('fill', 'rgb(100,200,200)')
+            tokenViewable.svg.style('fill', 'rgb(100,220,220)')
 
         if x + tokenViewable.width < sceneObject.textPortInnerSVG.element.attr('width') - enclosing.paddingX
           #console.log 'adding to line'

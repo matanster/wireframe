@@ -184,7 +184,7 @@ sceneDefine = function() {
       },
       text: {
         'font-family': 'verdana',
-        'fill': '#888895',
+        'fill': '#909092',
         'font-weight': 'bold',
         'font-size': '35px'
       }
@@ -286,9 +286,9 @@ sceneDefine = function() {
       'height': 25
     };
     return sceneObject.downButton.element = sceneHook.svg.append('svg:image').attr('xlink:href', 'images/downScroll5.svg').attr('preserveAspectRatio', 'none').on('mouseover', function() {
-      return sceneObject.downButton.element.transition().ease('sin').duration(200).attr('height', sceneObject.downButton.geometry.height + (sceneObject.downButton.geometry.paddingY * 2 / 3));
+      return sceneObject.downButton.element.transition().ease('sin').duration(400).attr('height', sceneObject.downButton.geometry.height + (sceneObject.downButton.geometry.paddingY * 2 / 3));
     }).on('mouseout', function() {
-      return sceneObject.downButton.element.transition().duration(400).attr('height', sceneObject.downButton.geometry.height);
+      return sceneObject.downButton.element.transition().duration(300).attr('height', sceneObject.downButton.geometry.height);
     }).on('mousedown', function() {
       console.log('scroll');
       return navBars.textportRefresh(0, true);
@@ -389,7 +389,8 @@ sceneSync = function(mode) {
   };
   navBars.redraw(leftPane.geometry);
   return sceneObject.TOC.redraw = function() {
-    var TOCToken, lHeight, paddingX, paddingY, spaceWidth, tokenViewable, viewPortFull, x, y, _i, _len, _results;
+    var TOCToken, lHeight, lineSpacing, paddingX, paddingY, spaceWidth, tokenViewable, viewPortFull, x, y, _i, _len, _results;
+    lineSpacing = 2;
     console.log('redraw toc started');
     spaceWidth = textDraw.tokenToViewable('a a', sceneObject.TOC.subElement).width - textDraw.tokenToViewable('aa', sceneObject.TOC.subElement).width;
     lHeight = textDraw.tokenToViewable('l', sceneObject.TOC.subElement).height;
@@ -414,7 +415,7 @@ sceneSync = function(mode) {
           x += 30;
       }
       if (y + tokenViewable.height + lHeight < sceneObject.TOC.element.attr('y') + sceneObject.TOC.element.attr('height')) {
-        y += tokenViewable.height;
+        y += tokenViewable.height + lineSpacing;
         tokenViewable.svg.attr('x', x);
         tokenViewable.svg.attr('y', y);
         x += tokenViewable.width;
