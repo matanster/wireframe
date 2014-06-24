@@ -69,6 +69,10 @@ textportRefresh = (fontSizeChange, scroll, mode) ->
 
   switch session.display
 
+
+    #
+    # Assumes segmented view is only used for non-subcategorized content
+    #
     when 'segmented'
 
       # get content to display
@@ -88,21 +92,7 @@ textportRefresh = (fontSizeChange, scroll, mode) ->
 
     when 'fluent'
 
-      for categoryNode in categorizedTextTree
-        if categoryNode.name is catName
-          if categoryNode.subs
-            for subCategory in categoryNode.subs
-              console.log 4
-          else
-            text = categoryNode.text
-
-      sentences = []
-      for rawSentence in rawTextArray
-        sentence = 
-          text: tokenize(rawSentence)        
-        sentences.push(sentence)
-
-      textportFluent(sentences, fontSizeChange, scroll, mode)
+      textportFluent(categorizedTextTree, fontSizeChange, scroll, mode)
 
 exports.textportRefresh = textportRefresh
 

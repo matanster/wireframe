@@ -21,8 +21,7 @@
           "name": "purpose"
         },
         {
-          "name": "hypotheses",
-          "display": "segmented"
+          "name": "hypotheses"
         }
       ]
     },

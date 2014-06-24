@@ -1,17 +1,17 @@
 # import global geometry
 globalDims   = require './globalDims'
 sceneObject  = globalDims.sceneObject
-sceneHook = globalDims.sceneHook
-layout = globalDims.layout
-session = require './session'
-
-textDraw = require './textDraw'
+sceneHook    = globalDims.sceneHook
+layout       = globalDims.layout
+session      = require './session'
+tokenize     = require './tokenize'
+textDraw     = require './textDraw'
 
 # module static variables
 fontSize  = '30px' # temporarily
 fontFamily = 'Helvetica' # for now
 
-module.exports = (sentences, fontSizeChange, scroll, mode) ->
+module.exports = (categorizedTextTree, fontSizeChange, scroll, mode) ->
 
   if scroll?
     console.log scroll
@@ -73,51 +73,65 @@ module.exports = (sentences, fontSizeChange, scroll, mode) ->
     viewPortFull = false
     x = 0
     y = 0
-    for sentence in sentences
-      for token in sentence.text
 
-        tokenViewable = textDraw.tokenToViewable(token.text, sceneObject.textPortInnerSVG.subElement)
-        #randx = Math.floor(Math.random() * 500)
-        #randy = 1000 #Math.floor(Math.random() * 1000)
-        #tokenViewable.svg.attr('x', randx).attr('y', randy)
-        #console.log token.mark
-        
-        #
-        # Apply word semantic styling
-        #
-        switch token.mark
-          when 1
-            tokenViewable.svg.style('fill', '#4488FE')  # 'rgb(120,240,240)'
-          when 2
-            #tokenViewable.svg.style('fill', 'rgb(70,140,140)')
-            tokenViewable.svg.style('fill', 'rgb(100,200,200)')
+    for categoryNode in categorizedTextTree
+      if categoryNode.name is session.selected.name
+        console.log """categroy #{session.selected.name} found"""
+        for subCategory in categoryNode.subs
 
-        if x + tokenViewable.width < sceneObject.textPortInnerSVG.element.attr('width')
-          #console.log 'adding to line'
-          tokenViewable.svg.attr('x', x)
-                           .attr('y', y)
-          x += tokenViewable.width
-        else  
-          if y + tokenViewable.height + lHeight < sceneObject.textPortInnerSVG.element.attr('height')
-            #console.log 'adding to new line'
+          # TBD - textport category title
+          
+          # tokenize all subcategory sentences 
+          sentences = []
+          for rawSentence in subCategory.text
+            sentence = 
+              text: tokenize(rawSentence)        
+            sentences.push(sentence)
+
+          console.log """subcategory #{subCategory.name} being handled"""
+
+          # textport all sentences
+          for sentence in sentences
+            for token in sentence.text
+
+              tokenViewable = textDraw.tokenToViewable(token.text, sceneObject.textPortInnerSVG.subElement)
+              
+              #
+              # Apply word semantic styling
+              #
+              switch token.mark
+                when 1
+                  tokenViewable.svg.style('fill', '#4488FE')  # 'rgb(120,240,240)'
+                when 2
+                  #tokenViewable.svg.style('fill', 'rgb(70,140,140)')
+                  tokenViewable.svg.style('fill', 'rgb(100,200,200)')
+
+              if x + tokenViewable.width < sceneObject.textPortInnerSVG.element.attr('width')
+                #console.log 'adding to line'
+                tokenViewable.svg.attr('x', x)
+                                 .attr('y', y)
+                x += tokenViewable.width
+              else  
+                if y + tokenViewable.height + lHeight < sceneObject.textPortInnerSVG.element.attr('height')
+                  #console.log 'adding to new line'
+                  x = 0
+                  y += tokenViewable.height
+                  tokenViewable.svg.attr('x', x)
+                                   .attr('y', y)
+                  x += tokenViewable.width  
+                  #console.log y  
+                  #console.dir textPort  
+                else
+                  console.log 'text port full'
+                  viewPortFull = true
+                  break
+              
+              # add word space unless end of line
+              if x + spaceWidth < sceneObject.textPortInnerSVG.element.attr('width')
+                x += spaceWidth
+                #console.log "x after space adding = " + x
+            y += (tokenViewable.height)*2.3
             x = 0
-            y += tokenViewable.height
-            tokenViewable.svg.attr('x', x)
-                             .attr('y', y)
-            x += tokenViewable.width  
-            #console.log y  
-            #console.dir textPort  
-          else
-            console.log 'text port full'
-            viewPortFull = true
-            break
-        
-        # add word space unless end of line
-        if x + spaceWidth < sceneObject.textPortInnerSVG.element.attr('width')
-          x += spaceWidth
-          #console.log "x after space adding = " + x
-      y += (tokenViewable.height)*2.3
-      x = 0
 
 
   redraw()  

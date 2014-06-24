@@ -72,7 +72,7 @@ getCategoryText = function(catName) {
 };
 
 textportRefresh = function(fontSizeChange, scroll, mode) {
-  var categoryNode, rawSegment, rawSentence, rawTextArray, segment, segments, sentence, sentences, subCategory, text, _i, _j, _k, _l, _len, _len1, _len2, _len3, _len4, _m, _ref;
+  var categoryNode, rawSegment, rawTextArray, segment, segments, _i, _j, _len, _len1;
   switch (session.display) {
     case 'segmented':
       for (_i = 0, _len = categorizedTextTree.length; _i < _len; _i++) {
@@ -92,29 +92,7 @@ textportRefresh = function(fontSizeChange, scroll, mode) {
       }
       return textportSegmented(segments, fontSizeChange, scroll, mode);
     case 'fluent':
-      for (_k = 0, _len2 = categorizedTextTree.length; _k < _len2; _k++) {
-        categoryNode = categorizedTextTree[_k];
-        if (categoryNode.name === catName) {
-          if (categoryNode.subs) {
-            _ref = categoryNode.subs;
-            for (_l = 0, _len3 = _ref.length; _l < _len3; _l++) {
-              subCategory = _ref[_l];
-              console.log(4);
-            }
-          } else {
-            text = categoryNode.text;
-          }
-        }
-      }
-      sentences = [];
-      for (_m = 0, _len4 = rawTextArray.length; _m < _len4; _m++) {
-        rawSentence = rawTextArray[_m];
-        sentence = {
-          text: tokenize(rawSentence)
-        };
-        sentences.push(sentence);
-      }
-      return textportFluent(sentences, fontSizeChange, scroll, mode);
+      return textportFluent(categorizedTextTree, fontSizeChange, scroll, mode);
   }
 };
 
