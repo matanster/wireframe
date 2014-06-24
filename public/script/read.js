@@ -1058,50 +1058,45 @@ module.exports = function(sentences, fontSizeChange, scroll, mode) {
   paddingY = 18;
   sceneObject.textPortInnerSVG.element.attr('x', parseFloat(sceneObject.textPort.element.attr('x')) + paddingX + 3).attr('width', parseFloat(sceneObject.textPort.element.attr('width') - (paddingX * 2) - 3)).attr('y', parseFloat(sceneObject.textPort.element.attr('y')) + paddingY).attr('height', parseFloat(sceneObject.textPort.element.attr('height') - (paddingY * 2) - 50));
   redraw = function() {
-    var sentence, token, tokenViewable, viewPortFull, x, y, _i, _len, _results;
+    var sentence, token, tokenViewable, viewPortFull, x, y, _i, _j, _len, _len1, _ref, _results;
     viewPortFull = false;
     x = 0;
     y = 0;
     _results = [];
     for (_i = 0, _len = sentences.length; _i < _len; _i++) {
       sentence = sentences[_i];
-      _results.push((function() {
-        var _j, _len1, _ref, _results1;
-        _ref = sentence.text;
-        _results1 = [];
-        for (_j = 0, _len1 = _ref.length; _j < _len1; _j++) {
-          token = _ref[_j];
-          tokenViewable = textDraw.tokenToViewable(token.text, sceneObject.textPortInnerSVG.subElement);
-          switch (token.mark) {
-            case 1:
-              tokenViewable.svg.style('fill', '#4488FE');
-              break;
-            case 2:
-              tokenViewable.svg.style('fill', 'rgb(100,200,200)');
-          }
-          if (x + tokenViewable.width < sceneObject.textPortInnerSVG.element.attr('width')) {
+      _ref = sentence.text;
+      for (_j = 0, _len1 = _ref.length; _j < _len1; _j++) {
+        token = _ref[_j];
+        tokenViewable = textDraw.tokenToViewable(token.text, sceneObject.textPortInnerSVG.subElement);
+        switch (token.mark) {
+          case 1:
+            tokenViewable.svg.style('fill', '#4488FE');
+            break;
+          case 2:
+            tokenViewable.svg.style('fill', 'rgb(100,200,200)');
+        }
+        if (x + tokenViewable.width < sceneObject.textPortInnerSVG.element.attr('width')) {
+          tokenViewable.svg.attr('x', x).attr('y', y);
+          x += tokenViewable.width;
+        } else {
+          if (y + tokenViewable.height + lHeight < sceneObject.textPortInnerSVG.element.attr('height')) {
+            x = 0;
+            y += tokenViewable.height;
             tokenViewable.svg.attr('x', x).attr('y', y);
             x += tokenViewable.width;
           } else {
-            if (y + tokenViewable.height + lHeight < sceneObject.textPortInnerSVG.element.attr('height')) {
-              x = 0;
-              y += tokenViewable.height;
-              tokenViewable.svg.attr('x', x).attr('y', y);
-              x += tokenViewable.width;
-            } else {
-              console.log('text port full');
-              viewPortFull = true;
-              break;
-            }
-          }
-          if (x + spaceWidth < sceneObject.textPortInnerSVG.element.attr('width')) {
-            _results1.push(x += spaceWidth);
-          } else {
-            _results1.push(void 0);
+            console.log('text port full');
+            viewPortFull = true;
+            break;
           }
         }
-        return _results1;
-      })());
+        if (x + spaceWidth < sceneObject.textPortInnerSVG.element.attr('width')) {
+          x += spaceWidth;
+        }
+      }
+      y += tokenViewable.height * 2.3;
+      _results.push(x = 0);
     }
     return _results;
   };

@@ -116,7 +116,10 @@ module.exports = (sentences, fontSizeChange, scroll, mode) ->
         if x + spaceWidth < sceneObject.textPortInnerSVG.element.attr('width')
           x += spaceWidth
           #console.log "x after space adding = " + x
-      
+      y += (tokenViewable.height)*2.3
+      x = 0
+
+
   redraw()  
 
   #
