@@ -11,7 +11,7 @@
       ]
     },
     {
-      "name": "Article's goals",
+      "name": "Goals",
       "subs": 
       [
         {
@@ -27,13 +27,17 @@
           "name": "Purpose",
           "text": 
           [
-            "To <clarify> what is known, <we> <meta-analyzed> <effects> drawn from 66 studies of the human capital–firm <performance> <relationship> and <investigated> <3> <moderators> <suggested> <by> resource-based <theory.>"
+            "To <clarify> what is known, <we> <meta-analyzed> <effects> drawn from 66 studies of the human capital–firm <performance> <relationship> and <investigated> <3> <moderators> <suggested> <by> resource-based <theory:>",
+            "(a) path dependence (i.e., cross-sectional vs. longitudinal study designs)", 
+            "(b) firm-specific versus general human capital, and",
+            "(c) operational versus global firm performance measures."
           ]
         },
         {
           "name": "Hypotheses",
           "text": 
           [
+            "Is human capital simply a direct precursor of performance, or is the relationship more complicated? At what point does the utility of human capital begin to diminish and lose its value?",
             "Human capital is <positively> <related> to performance.",
             "The <relationship> <between> human capital and performance is <stronger> among studies using longitudinal data than among studies using cross-sectional data.",
             "The <relationship> <between> human capital and performance is <stronger> when measures capture specific human capital rather than when measures capture general human capital.",
@@ -50,8 +54,7 @@
           "name": "Findings",
           "text": 
           [
-            "<We> <found> that human capital <relates> <strongly> to performance, <especially> when the human capital in question is <not> readily tradable in labor markets and when researchers use operational <performance> <measures> that are <not> subject to <profit> appropriation.",
-            "<Our> <results> <suggest> that managers <should> <invest> in programs that <increase> and <retain> firm-specific human capital."            
+            "<We> <found> that human capital <relates> <strongly> to performance, <especially> when the human capital in question is <not> readily tradable in labor markets and when researchers use operational <performance> <measures> that are <not> subject to <profit> appropriation."
           ]
         },
         {
@@ -80,7 +83,17 @@
           "name": "Implications",
           "text":
           [
+            "A key implication is that, to improve performance, firms not only should attract, invest in, and develop human capital but should also retain experienced managers and employees, because doing so pays off handsomely.",
             "A final implication involves our finding that <operational> <performance> <mediates> <the> <relationship> between human capital and performance."   
+          ]
+        },
+        {
+          "name": "Recommendations",
+          "text":
+          [
+            "<Our> <results> <suggest> that managers <should> <invest> in programs that <increase> and <retain> firm-specific human capital.",
+            "For managers, the results also suggest that they should strive to develop a long-tenured workforce whose skills are tied to the firm’s unique context.",
+            "For researchers, this finding suggests that, when possible, the levels of hierarchy used as data sources should be accounted for in empirical analyses."                        
           ]
         }
       ]

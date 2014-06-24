@@ -73,7 +73,7 @@ sceneDefine = () ->
                         
     sceneObject.TOC.subElement = sceneObject.TOC.element.append('g')
                                  .style('text-anchor', 'start')
-                                 .style('fill', 'rgb(50,50,240)')                                                                                                                                            
+                                 .style('fill', '#60cafb')  #rgb(50,50,240)
                                  .style('font-family',fontFamily)
                                  .style('font-size',fontSize)
 
@@ -205,7 +205,7 @@ sceneDefine = () ->
                                       .attr("id", "title")
                                       .attr("dominant-baseline", "central")
                                       .style("text-anchor", "middle")
-                                      .style('fill', "#EEEEEE")
+                                      .style('fill', "#999999") # "#EEEEEE"
 
 
   rightPane = ->
@@ -219,7 +219,7 @@ sceneDefine = () ->
         'font-weight' : 'bold'
         'font-size'   : '35px'
 
-    textRect = svgUtil.textRectFactory(sceneHook.svg, 'Full Text', styles, 'visible')
+    textRect = svgUtil.textRectFactory(sceneHook.svg, 'More', styles, 'visible')
     sceneObject.rightPane = 
       element  :  textRect.rectangle
       textElem : textRect.text
@@ -513,7 +513,7 @@ sceneSync = (mode) ->
 
   sceneObject.TOC.redraw = () ->
 
-    lineSpacing = 2
+    lineSpacing = 5
 
     console.log 'redraw toc started'
 
@@ -523,7 +523,7 @@ sceneSync = (mode) ->
     # get the maximum character height in the font
     lHeight    = textDraw.tokenToViewable('l', sceneObject.TOC.subElement).height
 
-    paddingX = 30
+    paddingX = 20
     paddingY = 10
 
     sceneObject.TOC.element

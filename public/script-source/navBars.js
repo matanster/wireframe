@@ -26,9 +26,9 @@ root = {};
 lookup = {};
 
 colors = {
-  scaleStart: '#87CEFA',
-  scaleEnd: '#00BFFF',
-  selection: '#999999'
+  scaleStart: '#999999',
+  scaleEnd: '#999999',
+  selection: '#60cafb'
 };
 
 categorizedTextTree = void 0;
@@ -142,7 +142,7 @@ exports.init = function(navBarsData, svgHookPoint, categorizedTextTreeInput) {
     if (bar.parentBar === null) {
       bar.viewStatus = 'visible';
     }
-    if (bar.name === "Shortest summary") {
+    if (bar.name === "Goals") {
       bar.viewStatus = 'selected';
       return bar.select();
     }
@@ -166,7 +166,7 @@ exports.init = function(navBarsData, svgHookPoint, categorizedTextTreeInput) {
       'select': (function() {
         session.selected = this;
         sessionSetDisplayType(this);
-        return textportRefresh();
+        return window.setTimeout(textportRefresh, 300);
       })
     };
     initialViewStatus(bar);
@@ -248,13 +248,12 @@ redraw = function(bars, borderColor) {
           bar.color = bar.baseColor;
         } else {
           bar.color = colors.selection;
+          bar.element.text.style('fill', '909092').attr("font-size", "20px").style("font-weight", "bold");
         }
         break;
       default:
         bar.color = bar.baseColor;
-    }
-    if (bar.emphasis != null) {
-      bar.element.text.style("font-weight", "normal");
+        bar.element.text.style('fill', '909092').attr("font-size", "16px").style("font-weight", "bold");
     }
   }
   if (anySelected) {

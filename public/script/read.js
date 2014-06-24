@@ -107,7 +107,7 @@ sceneDefine = function() {
     fontSize = '14px';
     fontFamily = 'verdana';
     sceneObject.TOC.element = sceneHook.svg.append('svg');
-    sceneObject.TOC.subElement = sceneObject.TOC.element.append('g').style('text-anchor', 'start').style('fill', 'rgb(50,50,240)').style('font-family', fontFamily).style('font-size', fontSize);
+    sceneObject.TOC.subElement = sceneObject.TOC.element.append('g').style('text-anchor', 'start').style('fill', '#60cafb').style('font-family', fontFamily).style('font-size', fontSize);
     maxLen = 0;
     for (_i = 0, _len = TOCTokens.length; _i < _len; _i++) {
       token = TOCTokens[_i];
@@ -196,7 +196,7 @@ sceneDefine = function() {
     sceneObject.titlePort = sceneHook.svg.append('g');
     sceneObject.titlePortRect = sceneObject.titlePort.append('rect').style('fill', '#60CAFB');
     sceneObject.titleForeignContainer = sceneObject.titlePort.append('foreignObject').append('xhtml:body').html("<svg style='-webkit-transform: perspective(40px) rotateX(2deg)' id='titleSVG'></svg>");
-    return sceneObject.title = d3.select('#titleSVG').append('text').text("  The Relationship Between Human Capital and Firm Performance").attr("id", "title").attr("dominant-baseline", "central").style("text-anchor", "middle").style('fill', "#EEEEEE");
+    return sceneObject.title = d3.select('#titleSVG').append('text').text("  The Relationship Between Human Capital and Firm Performance").attr("id", "title").attr("dominant-baseline", "central").style("text-anchor", "middle").style('fill', "#999999");
   };
   rightPane = function() {
     var styles, textRect;
@@ -212,7 +212,7 @@ sceneDefine = function() {
         'font-size': '35px'
       }
     };
-    textRect = svgUtil.textRectFactory(sceneHook.svg, 'Full Text', styles, 'visible');
+    textRect = svgUtil.textRectFactory(sceneHook.svg, 'More', styles, 'visible');
     sceneObject.rightPane = {
       element: textRect.rectangle,
       textElem: textRect.text
@@ -413,11 +413,11 @@ sceneSync = function(mode) {
   navBars.redraw(leftPane.geometry);
   return sceneObject.TOC.redraw = function() {
     var TOCToken, lHeight, lineSpacing, paddingX, paddingY, spaceWidth, tokenViewable, viewPortFull, x, y, _i, _len, _results;
-    lineSpacing = 2;
+    lineSpacing = 5;
     console.log('redraw toc started');
     spaceWidth = textDraw.tokenToViewable('a a', sceneObject.TOC.subElement).width - textDraw.tokenToViewable('aa', sceneObject.TOC.subElement).width;
     lHeight = textDraw.tokenToViewable('l', sceneObject.TOC.subElement).height;
-    paddingX = 30;
+    paddingX = 20;
     paddingY = 10;
     sceneObject.TOC.element.attr('x', parseFloat(sceneObject.rightPane.element.attr('x')) + paddingX).attr('width', parseFloat(sceneObject.rightPane.element.attr('width') - (paddingX * 2))).attr('y', parseFloat(sceneObject.rightPane.element.attr('y')) + paddingY).attr('height', parseFloat(sceneObject.rightPane.element.attr('height') - (paddingY * 2)));
     viewPortFull = false;
@@ -579,9 +579,9 @@ root = {};
 lookup = {};
 
 colors = {
-  scaleStart: '#87CEFA',
-  scaleEnd: '#00BFFF',
-  selection: '#999999'
+  scaleStart: '#999999',
+  scaleEnd: '#999999',
+  selection: '#60cafb'
 };
 
 categorizedTextTree = void 0;
@@ -695,7 +695,7 @@ exports.init = function(navBarsData, svgHookPoint, categorizedTextTreeInput) {
     if (bar.parentBar === null) {
       bar.viewStatus = 'visible';
     }
-    if (bar.name === "Shortest summary") {
+    if (bar.name === "Goals") {
       bar.viewStatus = 'selected';
       return bar.select();
     }
@@ -719,7 +719,7 @@ exports.init = function(navBarsData, svgHookPoint, categorizedTextTreeInput) {
       'select': (function() {
         session.selected = this;
         sessionSetDisplayType(this);
-        return textportRefresh();
+        return window.setTimeout(textportRefresh, 300);
       })
     };
     initialViewStatus(bar);
@@ -801,13 +801,12 @@ redraw = function(bars, borderColor) {
           bar.color = bar.baseColor;
         } else {
           bar.color = colors.selection;
+          bar.element.text.style('fill', '909092').attr("font-size", "20px").style("font-weight", "bold");
         }
         break;
       default:
         bar.color = bar.baseColor;
-    }
-    if (bar.emphasis != null) {
-      bar.element.text.style("font-weight", "normal");
+        bar.element.text.style('fill', '909092').attr("font-size", "16px").style("font-weight", "bold");
     }
   }
   if (anySelected) {
@@ -1406,7 +1405,7 @@ tokenize = require('./tokenize');
 
 textDraw = require('./textDraw');
 
-fontSize = '30px';
+fontSize = '22px';
 
 fontFamily = 'Helvetica';
 
@@ -1445,6 +1444,9 @@ module.exports = function(categorizedTextTree, fontSizeChange, scroll, mode) {
         _ref = categoryNode.subs;
         for (_j = 0, _len1 = _ref.length; _j < _len1; _j++) {
           subCategory = _ref[_j];
+          if (y !== 0) {
+            y += 30;
+          }
           tokenViewable = textDraw.tokenToViewable(subCategory.name, sceneObject.textPortInnerSVG.subElement);
           tokenViewable.svg.attr('x', sceneObject.textPortInnerSVG.element.attr('width') / 2).attr('y', y).style("text-anchor", "middle").attr("dominant-baseline", "central").style("font-family", "Helvetica").style("font-weight", "bold").attr("font-size", "30px").style('fill', '#999999');
           y += 40;
@@ -1490,7 +1492,7 @@ module.exports = function(categorizedTextTree, fontSizeChange, scroll, mode) {
                 x += spaceWidth;
               }
             }
-            y += tokenViewable.height * 2.3;
+            y += tokenViewable.height * 2;
             x = 0;
           }
         }

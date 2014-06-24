@@ -15,7 +15,7 @@ tokenize = require('./tokenize');
 
 textDraw = require('./textDraw');
 
-fontSize = '30px';
+fontSize = '22px';
 
 fontFamily = 'Helvetica';
 
@@ -54,6 +54,9 @@ module.exports = function(categorizedTextTree, fontSizeChange, scroll, mode) {
         _ref = categoryNode.subs;
         for (_j = 0, _len1 = _ref.length; _j < _len1; _j++) {
           subCategory = _ref[_j];
+          if (y !== 0) {
+            y += 30;
+          }
           tokenViewable = textDraw.tokenToViewable(subCategory.name, sceneObject.textPortInnerSVG.subElement);
           tokenViewable.svg.attr('x', sceneObject.textPortInnerSVG.element.attr('width') / 2).attr('y', y).style("text-anchor", "middle").attr("dominant-baseline", "central").style("font-family", "Helvetica").style("font-weight", "bold").attr("font-size", "30px").style('fill', '#999999');
           y += 40;
@@ -99,7 +102,7 @@ module.exports = function(categorizedTextTree, fontSizeChange, scroll, mode) {
                 x += spaceWidth;
               }
             }
-            y += tokenViewable.height * 2.3;
+            y += tokenViewable.height * 2;
             x = 0;
           }
         }

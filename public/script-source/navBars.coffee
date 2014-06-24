@@ -23,9 +23,9 @@ bars = []
 root = {}
 lookup = {}
 colors =
-  scaleStart : '#87CEFA'  # '#A3B1BA'
-  scaleEnd   : '#00BFFF'  # '#87CEFA'
-  selection  : '#999999'  # '#333333'
+  scaleStart : '#999999' #'#87cefa'
+  scaleEnd   : '#999999'  #'#2dc4fd'
+  selection  : '#60cafb' 
 
 categorizedTextTree = undefined
 
@@ -154,7 +154,7 @@ exports.init = (navBarsData, svgHookPoint, categorizedTextTreeInput) ->
     if bar.parentBar is null
       bar.viewStatus = 'visible'
 
-    if bar.name is "Shortest summary"
+    if bar.name is "Goals"
       bar.viewStatus = 'selected'
       bar.select()
 
@@ -185,7 +185,7 @@ exports.init = (navBarsData, svgHookPoint, categorizedTextTreeInput) ->
                        #console.dir this
                        session.selected = this
                        sessionSetDisplayType(this)
-                       textportRefresh()
+                       window.setTimeout(textportRefresh, 300)
                      )
 
     initialViewStatus(bar)
@@ -282,13 +282,15 @@ redraw = (bars, borderColor) ->
           bar.color = bar.baseColor
         else  
           bar.color = colors.selection
-        #bar.element.text.style("font-weight", "bold")
+          bar.element.text.style('fill', '909092').attr("font-size", "20px").style("font-weight", "bold")        
+
       else      
         bar.color = bar.baseColor
+        bar.element.text.style('fill', '909092').attr("font-size", "16px").style("font-weight", "bold")
         #bar.element.text.style("font-weight", "normal")        
   
-    if bar.emphasis?
-      bar.element.text.style("font-weight", "normal")        
+    #if bar.emphasis?
+    #  bar.element.text.style("font-weight", "normal")        
 
   #
   # determine height calculation type
@@ -351,6 +353,7 @@ redraw = (bars, borderColor) ->
     # apply geometry and fill to bar's rectangle
     bar.element.rectangle.transition().ease('linear').duration(400).attr(bar.geometry)
                                                                    .style('fill', bar.color)
+
     if visibleChildren
       #
       # take care of allowed geometry for child bars, if any
@@ -387,9 +390,10 @@ redraw = (bars, borderColor) ->
 
     # apply geometry and fill to bar's text
     bar.element.text.transition().ease('linear').duration(200).attr(textGeometry)
+                                                              
     # make it visible
     bar.element.group.attr('visibility', 'visible')
-
+    
     #
     # advance starting point for next bar if any
     #

@@ -8,7 +8,7 @@ tokenize     = require './tokenize'
 textDraw     = require './textDraw'
 
 # module static variables
-fontSize  = '30px' # temporarily
+fontSize  = '22px' # temporarily
 fontFamily = 'Helvetica' # for now
 
 module.exports = (categorizedTextTree, fontSizeChange, scroll, mode) ->
@@ -79,7 +79,11 @@ module.exports = (categorizedTextTree, fontSizeChange, scroll, mode) ->
         console.log """categroy #{session.selected.name} found"""
         for subCategory in categoryNode.subs
 
-          # TBD - textport category title
+          # textport category title
+
+          unless y is 0
+            y += 30
+
           tokenViewable = textDraw.tokenToViewable(subCategory.name, sceneObject.textPortInnerSVG.subElement)
           tokenViewable.svg.attr('x', sceneObject.textPortInnerSVG.element.attr('width') / 2)
                            .attr('y', y)
@@ -141,7 +145,7 @@ module.exports = (categorizedTextTree, fontSizeChange, scroll, mode) ->
               if x + spaceWidth < sceneObject.textPortInnerSVG.element.attr('width')
                 x += spaceWidth
                 #console.log "x after space adding = " + x
-            y += (tokenViewable.height)*2.3
+            y += (tokenViewable.height)*2
             x = 0
     return viewPortFull        
 

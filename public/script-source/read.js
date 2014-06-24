@@ -90,7 +90,7 @@ sceneDefine = function() {
     fontSize = '14px';
     fontFamily = 'verdana';
     sceneObject.TOC.element = sceneHook.svg.append('svg');
-    sceneObject.TOC.subElement = sceneObject.TOC.element.append('g').style('text-anchor', 'start').style('fill', 'rgb(50,50,240)').style('font-family', fontFamily).style('font-size', fontSize);
+    sceneObject.TOC.subElement = sceneObject.TOC.element.append('g').style('text-anchor', 'start').style('fill', '#60cafb').style('font-family', fontFamily).style('font-size', fontSize);
     maxLen = 0;
     for (_i = 0, _len = TOCTokens.length; _i < _len; _i++) {
       token = TOCTokens[_i];
@@ -179,7 +179,7 @@ sceneDefine = function() {
     sceneObject.titlePort = sceneHook.svg.append('g');
     sceneObject.titlePortRect = sceneObject.titlePort.append('rect').style('fill', '#60CAFB');
     sceneObject.titleForeignContainer = sceneObject.titlePort.append('foreignObject').append('xhtml:body').html("<svg style='-webkit-transform: perspective(40px) rotateX(2deg)' id='titleSVG'></svg>");
-    return sceneObject.title = d3.select('#titleSVG').append('text').text("  The Relationship Between Human Capital and Firm Performance").attr("id", "title").attr("dominant-baseline", "central").style("text-anchor", "middle").style('fill', "#EEEEEE");
+    return sceneObject.title = d3.select('#titleSVG').append('text').text("  The Relationship Between Human Capital and Firm Performance").attr("id", "title").attr("dominant-baseline", "central").style("text-anchor", "middle").style('fill', "#999999");
   };
   rightPane = function() {
     var styles, textRect;
@@ -195,7 +195,7 @@ sceneDefine = function() {
         'font-size': '35px'
       }
     };
-    textRect = svgUtil.textRectFactory(sceneHook.svg, 'Full Text', styles, 'visible');
+    textRect = svgUtil.textRectFactory(sceneHook.svg, 'More', styles, 'visible');
     sceneObject.rightPane = {
       element: textRect.rectangle,
       textElem: textRect.text
@@ -396,11 +396,11 @@ sceneSync = function(mode) {
   navBars.redraw(leftPane.geometry);
   return sceneObject.TOC.redraw = function() {
     var TOCToken, lHeight, lineSpacing, paddingX, paddingY, spaceWidth, tokenViewable, viewPortFull, x, y, _i, _len, _results;
-    lineSpacing = 2;
+    lineSpacing = 5;
     console.log('redraw toc started');
     spaceWidth = textDraw.tokenToViewable('a a', sceneObject.TOC.subElement).width - textDraw.tokenToViewable('aa', sceneObject.TOC.subElement).width;
     lHeight = textDraw.tokenToViewable('l', sceneObject.TOC.subElement).height;
-    paddingX = 30;
+    paddingX = 20;
     paddingY = 10;
     sceneObject.TOC.element.attr('x', parseFloat(sceneObject.rightPane.element.attr('x')) + paddingX).attr('width', parseFloat(sceneObject.rightPane.element.attr('width') - (paddingX * 2))).attr('y', parseFloat(sceneObject.rightPane.element.attr('y')) + paddingY).attr('height', parseFloat(sceneObject.rightPane.element.attr('height') - (paddingY * 2)));
     viewPortFull = false;
