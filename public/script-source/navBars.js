@@ -142,7 +142,7 @@ exports.init = function(navBarsData, svgHookPoint, categorizedTextTreeInput) {
     if (bar.parentBar === null) {
       bar.viewStatus = 'visible';
     }
-    if (bar.name === "Abstract") {
+    if (bar.name === "Shortest summary") {
       bar.viewStatus = 'selected';
       return bar.select();
     }

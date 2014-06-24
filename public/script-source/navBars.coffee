@@ -153,7 +153,7 @@ exports.init = (navBarsData, svgHookPoint, categorizedTextTreeInput) ->
     if bar.parentBar is null
       bar.viewStatus = 'visible'
 
-    if bar.name is "Abstract"
+    if bar.name is "Shortest summary"
       bar.viewStatus = 'selected'
       bar.select()
 

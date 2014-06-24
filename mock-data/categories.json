@@ -1,7 +1,7 @@
 { "root": 
   [
     { 
-      "name": "Abstract",
+      "name": "Shortest summary",
       "emphasis": "less",
       "display": "segmented",
       "segmentRole": "yes"
