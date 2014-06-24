@@ -72,49 +72,32 @@ getCategoryText = function(catName) {
 };
 
 textportRefresh = function(fontSizeChange, scroll, mode) {
-  var categoryNode, rawSegment, rawSentence, rawTextArray, segment, segments, sentence, sentences, subCategory, text, _i, _j, _k, _l, _len, _len1, _len2, _len3, _len4, _m, _ref;
-  switch (session.display) {
-    case 'segmented':
-      for (_i = 0, _len = categorizedTextTree.length; _i < _len; _i++) {
-        categoryNode = categorizedTextTree[_i];
-        if (categoryNode.name === session.selected.name) {
-          rawTextArray = categoryNode.text;
+  var rawSegment, rawSentence, rawTextArray, segment, segments, sentence, sentences, _i, _j, _len, _len1;
+  rawTextArray = getCategoryText(session.selected.name);
+  if (rawTextArray) {
+    switch (session.display) {
+      case 'segmented':
+        segments = [];
+        for (_i = 0, _len = rawTextArray.length; _i < _len; _i++) {
+          rawSegment = rawTextArray[_i];
+          segment = {
+            category: null,
+            tokens: tokenize(rawSegment)
+          };
+          segments.push(segment);
         }
-      }
-      segments = [];
-      for (_j = 0, _len1 = rawTextArray.length; _j < _len1; _j++) {
-        rawSegment = rawTextArray[_j];
-        segment = {
-          category: null,
-          tokens: tokenize(rawSegment)
-        };
-        segments.push(segment);
-      }
-      return textportSegmented(segments, fontSizeChange, scroll, mode);
-    case 'fluent':
-      for (_k = 0, _len2 = categorizedTextTree.length; _k < _len2; _k++) {
-        categoryNode = categorizedTextTree[_k];
-        if (categoryNode.name === catName) {
-          if (categoryNode.subs) {
-            _ref = categoryNode.subs;
-            for (_l = 0, _len3 = _ref.length; _l < _len3; _l++) {
-              subCategory = _ref[_l];
-              console.log(4);
-            }
-          } else {
-            text = categoryNode.text;
-          }
+        return textportSegmented(segments, fontSizeChange, scroll, mode);
+      case 'fluent':
+        sentences = [];
+        for (_j = 0, _len1 = rawTextArray.length; _j < _len1; _j++) {
+          rawSentence = rawTextArray[_j];
+          sentence = {
+            text: tokenize(rawSentence)
+          };
+          sentences.push(sentence);
         }
-      }
-      sentences = [];
-      for (_m = 0, _len4 = rawTextArray.length; _m < _len4; _m++) {
-        rawSentence = rawTextArray[_m];
-        sentence = {
-          text: tokenize(rawSentence)
-        };
-        sentences.push(sentence);
-      }
-      return textportFluent(sentences, fontSizeChange, scroll, mode);
+        return textportFluent(sentences, fontSizeChange, scroll, mode);
+    }
   }
 };
 
@@ -170,7 +153,7 @@ exports.init = function(navBarsData, svgHookPoint, categorizedTextTreeInput) {
     }
   };
   barCreate = function(svgHookPoint, barData, parentBar, baseColor) {
-    var bar, nestLevel;
+    var bar, barDataSub, nestLevel, subBar, _i, _len, _ref;
     if (parentBar === null) {
       nestLevel = 0;
     } else {
@@ -193,26 +176,26 @@ exports.init = function(navBarsData, svgHookPoint, categorizedTextTreeInput) {
     };
     initialViewStatus(bar);
     lookup[bar.element.group.attr('id')] = bar;
-    /*
-    # proceed to recursion over bar subs, if any
-    if barData.subs?
-      bar.children = []
-      for barDataSub in barData.subs
-        subBar = barCreate(svgHookPoint, barDataSub, bar, '#BBBBBB')
-        bar.children.push(subBar)
-    */
-
+    if (barData.subs != null) {
+      bar.children = [];
+      _ref = barData.subs;
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        barDataSub = _ref[_i];
+        subBar = barCreate(svgHookPoint, barDataSub, bar, '#BBBBBB');
+        bar.children.push(subBar);
+      }
+    }
     bar.element.group.on('mouseover', function() {
       return null;
     }).on('mouseout', function() {
       return null;
     }).on('mousedown', function() {
-      var child, sibling, _i, _j, _len, _len1, _ref, _ref1;
+      var child, sibling, _j, _k, _len1, _len2, _ref1, _ref2;
       bar = lookup[this.getAttribute('id')];
       if (bar.parent != null) {
-        _ref = bar.parent.children;
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          sibling = _ref[_i];
+        _ref1 = bar.parent.children;
+        for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+          sibling = _ref1[_j];
           if (sibling.viewStatus === 'selected') {
             barUnselect(sibling);
           }
@@ -221,9 +204,9 @@ exports.init = function(navBarsData, svgHookPoint, categorizedTextTreeInput) {
       bar.viewStatus = 'selected';
       bar.select();
       if (bar.children != null) {
-        _ref1 = bar.children;
-        for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
-          child = _ref1[_j];
+        _ref2 = bar.children;
+        for (_k = 0, _len2 = _ref2.length; _k < _len2; _k++) {
+          child = _ref2[_k];
           child.viewStatus = 'visible';
         }
       }

@@ -3,7 +3,8 @@
     { 
       "name": "Abstract",
       "emphasis": "less",
-      "display": "segmented"
+      "display": "segmented",
+      "segmentRole": "yes"
     },
     { 
       "name":   "Introduction",
@@ -24,9 +25,6 @@
           "display": "segmented"
         }
       ]
-    },
-    {
-      "name": "How was the research done?"
     },
     {
       "name":"What did they find?",

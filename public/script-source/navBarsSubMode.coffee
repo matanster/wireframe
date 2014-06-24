@@ -67,42 +67,31 @@ getCategoryText = (catName) ->
 #
 textportRefresh = (fontSizeChange, scroll, mode) ->
 
-  switch session.display
+  rawTextArray = getCategoryText(session.selected.name)
 
-    when 'segmented'
+  if rawTextArray
+    switch session.display
 
-      # get content to display
-      for categoryNode in categorizedTextTree
-        if categoryNode.name is session.selected.name
-          rawTextArray = categoryNode.text
+      when 'segmented'
 
-      # restructure into segments  
-      segments = []
-      for rawSegment in rawTextArray
-        segment = 
-          category : null
-          tokens   : tokenize(rawSegment)
-        segments.push segment
+        # restructure into segments  
+        segments = []
+        for rawSegment in rawTextArray
+          segment = 
+            category : null
+            tokens   : tokenize(rawSegment)
+          segments.push segment
 
-      textportSegmented(segments, fontSizeChange, scroll, mode)
+        textportSegmented(segments, fontSizeChange, scroll, mode)
 
-    when 'fluent'
+      when 'fluent'
+        sentences = []
+        for rawSentence in rawTextArray
+          sentence = 
+            text: tokenize(rawSentence)        
+          sentences.push(sentence)
 
-      for categoryNode in categorizedTextTree
-        if categoryNode.name is catName
-          if categoryNode.subs
-            for subCategory in categoryNode.subs
-              console.log 4
-          else
-            text = categoryNode.text
-
-      sentences = []
-      for rawSentence in rawTextArray
-        sentence = 
-          text: tokenize(rawSentence)        
-        sentences.push(sentence)
-
-      textportFluent(sentences, fontSizeChange, scroll, mode)
+        textportFluent(sentences, fontSizeChange, scroll, mode)
 
 exports.textportRefresh = textportRefresh
 
@@ -203,14 +192,12 @@ exports.init = (navBarsData, svgHookPoint, categorizedTextTreeInput) ->
     # can access the control data they need to
     lookup[bar.element.group.attr('id')] = bar
 
-    ###
     # proceed to recursion over bar subs, if any
     if barData.subs?
       bar.children = []
       for barDataSub in barData.subs
         subBar = barCreate(svgHookPoint, barDataSub, bar, '#BBBBBB')
         bar.children.push(subBar)
-    ###
     
     #
     # attach mouse events to bar

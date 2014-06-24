@@ -3,7 +3,6 @@ data        = require './data'
 tokenize    = require './tokenize'
 textDraw    = require './textDraw'
 svgUtil     = require './svgUtil'
-navBars     = require './navBars'
 session     = require './session'
 
 # Global geometry 
@@ -11,6 +10,13 @@ globalDims   = require './globalDims'
 sceneObject  = globalDims.sceneObject
 layout       = globalDims.layout
 sceneHook    = globalDims.sceneHook
+
+subCategoriesNavigation = false
+
+if subCategoriesNavigation
+  navBars = require './navBarsSubMode'
+else
+  navBars = require './navBars'
 
 console.log 'read.js main started'
 
