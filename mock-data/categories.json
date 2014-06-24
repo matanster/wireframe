@@ -1,15 +1,5 @@
 { "root": 
   [
-    { 
-      "name": "Shortest summary",
-      "emphasis": "less",
-      "display": "segmented",
-      "segmentRole": "yes"
-    },
-    { 
-      "name":   "Introduction",
-      "emphasis": "less"
-    },
     {
       "name": "Article's goals",
       "subs": 
@@ -51,10 +41,6 @@
           "name": "recommendation"
         }
       ]
-    },
-    { 
-      "name": "Wrap-up",
-      "emphasis": "less"
     }
   ]
 }
