@@ -72,7 +72,7 @@ getCategoryText = function(catName) {
 };
 
 textportRefresh = function(fontSizeChange, scroll, mode) {
-  var categoryNode, rawSegment, rawTextArray, segment, segments, _i, _j, _len, _len1;
+  var categoryNode, downArrowNeeded, rawSegment, rawTextArray, segment, segments, _i, _j, _len, _len1;
   switch (session.display) {
     case 'segmented':
       for (_i = 0, _len = categorizedTextTree.length; _i < _len; _i++) {
@@ -92,7 +92,7 @@ textportRefresh = function(fontSizeChange, scroll, mode) {
       }
       return textportSegmented(segments, fontSizeChange, scroll, mode);
     case 'fluent':
-      return textportFluent(categorizedTextTree, fontSizeChange, scroll, mode);
+      return downArrowNeeded = textportFluent(categorizedTextTree, fontSizeChange, scroll, mode);
   }
 };
 

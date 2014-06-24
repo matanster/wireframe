@@ -92,7 +92,8 @@ textportRefresh = (fontSizeChange, scroll, mode) ->
 
     when 'fluent'
 
-      textportFluent(categorizedTextTree, fontSizeChange, scroll, mode)
+      downArrowNeeded = textportFluent(categorizedTextTree, fontSizeChange, scroll, mode)
+      #if downArrowNeeded
 
 exports.textportRefresh = textportRefresh
 

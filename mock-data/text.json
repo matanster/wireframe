@@ -15,7 +15,7 @@
       "subs": 
       [
         {
-          "name": "problem statement",
+          "name": "Problem Statement",
           "text": 
           [
             "<Theory> at both the micro and macro level <predicts> <that> investments in <superior> human capital <generate> <better> firm-level <performance.>",
@@ -23,7 +23,7 @@
           ]
         },
         {
-          "name": "purpose",
+          "name": "Purpose",
           "text": 
           [
             "Indeed, extant tests appear equivocal regarding its impact.",
@@ -31,7 +31,7 @@
           ]
         },
         {
-          "name": "hypotheses",
+          "name": "Hypotheses",
           "text": 
           [
             "Human capital is <positively> <related> to performance.",
@@ -47,14 +47,14 @@
       "subs": 
       [
         {
-          "name": "findings",
+          "name": "Findings",
           "text": 
           [
             "<We> <found> that human capital <relates> <strongly> to performance, <especially> when the human capital in question is <not> readily tradable in labor markets and when researchers use operational <performance> <measures> that are <not> subject to <profit> appropriation."
           ]
         },
         {
-          "name": "conclusions",
+          "name": "Conclusions",
           "text":
           [
             "<Our> <results> <suggest> that managers <should> <invest> in programs that <increase> and <retain> firm-specific human capital."
@@ -67,14 +67,14 @@
       "subs":       
       [
         {
-          "name": "contribution",
+          "name": "Contribution",
           "text":
           [
             "In our view, this finding takes a step toward clarifying the relationship between human capital and organizational performance and suggests that researchers should begin to take stock of performance both within organizations and at the organizational level."
           ]
         },
         {
-          "name": "implications",
+          "name": "Implications",
           "text":
           [
             "A final implication involves our finding that <operational> <performance> <mediates> <the> <relationship> between human capital and performance."   

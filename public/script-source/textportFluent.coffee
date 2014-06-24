@@ -80,6 +80,17 @@ module.exports = (categorizedTextTree, fontSizeChange, scroll, mode) ->
         for subCategory in categoryNode.subs
 
           # TBD - textport category title
+          tokenViewable = textDraw.tokenToViewable(subCategory.name, sceneObject.textPortInnerSVG.subElement)
+          tokenViewable.svg.attr('x', sceneObject.textPortInnerSVG.element.attr('width') / 2)
+                           .attr('y', y)
+                           .style("text-anchor", "middle")
+                           .attr("dominant-baseline", "central")
+                           .style("font-family", "Helvetica")
+                           .style("font-weight", "bold")
+                           .attr("font-size", "30px")
+                           .style('fill', '#999999')
+
+          y += 40
           
           # tokenize all subcategory sentences 
           sentences = []
@@ -132,9 +143,9 @@ module.exports = (categorizedTextTree, fontSizeChange, scroll, mode) ->
                 #console.log "x after space adding = " + x
             y += (tokenViewable.height)*2.3
             x = 0
+    return viewPortFull        
 
-
-  redraw()  
+  return redraw()  
 
   #
   # Scroll the text - to do:

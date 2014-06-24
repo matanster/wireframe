@@ -43,79 +43,69 @@ module.exports = function(categorizedTextTree, fontSizeChange, scroll, mode) {
   paddingY = 18;
   sceneObject.textPortInnerSVG.element.attr('x', parseFloat(sceneObject.textPort.element.attr('x')) + paddingX + 3).attr('width', parseFloat(sceneObject.textPort.element.attr('width') - (paddingX * 2) - 3)).attr('y', parseFloat(sceneObject.textPort.element.attr('y')) + paddingY).attr('height', parseFloat(sceneObject.textPort.element.attr('height') - (paddingY * 2) - 50));
   redraw = function() {
-    var categoryNode, rawSentence, sentence, sentences, subCategory, token, tokenViewable, viewPortFull, x, y, _i, _len, _results;
+    var categoryNode, rawSentence, sentence, sentences, subCategory, token, tokenViewable, viewPortFull, x, y, _i, _j, _k, _l, _len, _len1, _len2, _len3, _len4, _m, _ref, _ref1, _ref2;
     viewPortFull = false;
     x = 0;
     y = 0;
-    _results = [];
     for (_i = 0, _len = categorizedTextTree.length; _i < _len; _i++) {
       categoryNode = categorizedTextTree[_i];
       if (categoryNode.name === session.selected.name) {
         console.log("categroy " + session.selected.name + " found");
-        _results.push((function() {
-          var _j, _k, _len1, _len2, _ref, _ref1, _results1;
-          _ref = categoryNode.subs;
-          _results1 = [];
-          for (_j = 0, _len1 = _ref.length; _j < _len1; _j++) {
-            subCategory = _ref[_j];
-            sentences = [];
-            _ref1 = subCategory.text;
-            for (_k = 0, _len2 = _ref1.length; _k < _len2; _k++) {
-              rawSentence = _ref1[_k];
-              sentence = {
-                text: tokenize(rawSentence)
-              };
-              sentences.push(sentence);
-            }
-            console.log("subcategory " + subCategory.name + " being handled");
-            _results1.push((function() {
-              var _l, _len3, _len4, _m, _ref2, _results2;
-              _results2 = [];
-              for (_l = 0, _len3 = sentences.length; _l < _len3; _l++) {
-                sentence = sentences[_l];
-                _ref2 = sentence.text;
-                for (_m = 0, _len4 = _ref2.length; _m < _len4; _m++) {
-                  token = _ref2[_m];
-                  tokenViewable = textDraw.tokenToViewable(token.text, sceneObject.textPortInnerSVG.subElement);
-                  switch (token.mark) {
-                    case 1:
-                      tokenViewable.svg.style('fill', '#4488FE');
-                      break;
-                    case 2:
-                      tokenViewable.svg.style('fill', 'rgb(100,200,200)');
-                  }
-                  if (x + tokenViewable.width < sceneObject.textPortInnerSVG.element.attr('width')) {
-                    tokenViewable.svg.attr('x', x).attr('y', y);
-                    x += tokenViewable.width;
-                  } else {
-                    if (y + tokenViewable.height + lHeight < sceneObject.textPortInnerSVG.element.attr('height')) {
-                      x = 0;
-                      y += tokenViewable.height;
-                      tokenViewable.svg.attr('x', x).attr('y', y);
-                      x += tokenViewable.width;
-                    } else {
-                      console.log('text port full');
-                      viewPortFull = true;
-                      break;
-                    }
-                  }
-                  if (x + spaceWidth < sceneObject.textPortInnerSVG.element.attr('width')) {
-                    x += spaceWidth;
-                  }
-                }
-                y += tokenViewable.height * 2.3;
-                _results2.push(x = 0);
-              }
-              return _results2;
-            })());
+        _ref = categoryNode.subs;
+        for (_j = 0, _len1 = _ref.length; _j < _len1; _j++) {
+          subCategory = _ref[_j];
+          tokenViewable = textDraw.tokenToViewable(subCategory.name, sceneObject.textPortInnerSVG.subElement);
+          tokenViewable.svg.attr('x', sceneObject.textPortInnerSVG.element.attr('width') / 2).attr('y', y).style("text-anchor", "middle").attr("dominant-baseline", "central").style("font-family", "Helvetica").style("font-weight", "bold").attr("font-size", "30px").style('fill', '#999999');
+          y += 40;
+          sentences = [];
+          _ref1 = subCategory.text;
+          for (_k = 0, _len2 = _ref1.length; _k < _len2; _k++) {
+            rawSentence = _ref1[_k];
+            sentence = {
+              text: tokenize(rawSentence)
+            };
+            sentences.push(sentence);
           }
-          return _results1;
-        })());
-      } else {
-        _results.push(void 0);
+          console.log("subcategory " + subCategory.name + " being handled");
+          for (_l = 0, _len3 = sentences.length; _l < _len3; _l++) {
+            sentence = sentences[_l];
+            _ref2 = sentence.text;
+            for (_m = 0, _len4 = _ref2.length; _m < _len4; _m++) {
+              token = _ref2[_m];
+              tokenViewable = textDraw.tokenToViewable(token.text, sceneObject.textPortInnerSVG.subElement);
+              switch (token.mark) {
+                case 1:
+                  tokenViewable.svg.style('fill', '#4488FE');
+                  break;
+                case 2:
+                  tokenViewable.svg.style('fill', 'rgb(100,200,200)');
+              }
+              if (x + tokenViewable.width < sceneObject.textPortInnerSVG.element.attr('width')) {
+                tokenViewable.svg.attr('x', x).attr('y', y);
+                x += tokenViewable.width;
+              } else {
+                if (y + tokenViewable.height + lHeight < sceneObject.textPortInnerSVG.element.attr('height')) {
+                  x = 0;
+                  y += tokenViewable.height;
+                  tokenViewable.svg.attr('x', x).attr('y', y);
+                  x += tokenViewable.width;
+                } else {
+                  console.log('text port full');
+                  viewPortFull = true;
+                  break;
+                }
+              }
+              if (x + spaceWidth < sceneObject.textPortInnerSVG.element.attr('width')) {
+                x += spaceWidth;
+              }
+            }
+            y += tokenViewable.height * 2.3;
+            x = 0;
+          }
+        }
       }
     }
-    return _results;
+    return viewPortFull;
   };
   return redraw();
 };
