@@ -196,7 +196,7 @@ sceneDefine = function() {
     sceneObject.titlePort = sceneHook.svg.append('g');
     sceneObject.titlePortRect = sceneObject.titlePort.append('rect').style('fill', '#60CAFB');
     sceneObject.titleForeignContainer = sceneObject.titlePort.append('foreignObject').append('xhtml:body').html("<svg style='-webkit-transform: perspective(40px) rotateX(2deg)' id='titleSVG'></svg>");
-    return sceneObject.title = d3.select('#titleSVG').append('text').text("  The Relationship Between Human Capital and Firm Performance").attr("id", "title").attr("dominant-baseline", "central").style("text-anchor", "middle").style('fill', "#999999");
+    return sceneObject.title = d3.select('#titleSVG').append('text').text("  The Relationship Between Human Capital and Firm Performance").attr("id", "title").attr("dominant-baseline", "central").style("text-anchor", "middle").style('fill', "#EEEEEE");
   };
   rightPane = function() {
     var styles, textRect;
@@ -801,12 +801,12 @@ redraw = function(bars, borderColor) {
           bar.color = bar.baseColor;
         } else {
           bar.color = colors.selection;
-          bar.element.text.style('fill', '909092').attr("font-size", "20px").style("font-weight", "bold");
+          bar.element.text.style('fill', 'EEEEEE').attr("font-size", "20px").style("font-weight", "bold");
         }
         break;
       default:
         bar.color = bar.baseColor;
-        bar.element.text.style('fill', '909092').attr("font-size", "16px").style("font-weight", "bold");
+        bar.element.text.style('fill', 'EEEEEE').attr("font-size", "16px").style("font-weight", "bold");
     }
   }
   if (anySelected) {

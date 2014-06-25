@@ -205,7 +205,7 @@ sceneDefine = () ->
                                       .attr("id", "title")
                                       .attr("dominant-baseline", "central")
                                       .style("text-anchor", "middle")
-                                      .style('fill', "#999999") # "#EEEEEE"
+                                      .style('fill', "#EEEEEE")
 
 
   rightPane = ->

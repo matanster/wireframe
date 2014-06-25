@@ -248,12 +248,12 @@ redraw = function(bars, borderColor) {
           bar.color = bar.baseColor;
         } else {
           bar.color = colors.selection;
-          bar.element.text.style('fill', '909092').attr("font-size", "20px").style("font-weight", "bold");
+          bar.element.text.style('fill', 'EEEEEE').attr("font-size", "20px").style("font-weight", "bold");
         }
         break;
       default:
         bar.color = bar.baseColor;
-        bar.element.text.style('fill', '909092').attr("font-size", "16px").style("font-weight", "bold");
+        bar.element.text.style('fill', 'EEEEEE').attr("font-size", "16px").style("font-weight", "bold");
     }
   }
   if (anySelected) {

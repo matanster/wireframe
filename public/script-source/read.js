@@ -179,7 +179,7 @@ sceneDefine = function() {
     sceneObject.titlePort = sceneHook.svg.append('g');
     sceneObject.titlePortRect = sceneObject.titlePort.append('rect').style('fill', '#60CAFB');
     sceneObject.titleForeignContainer = sceneObject.titlePort.append('foreignObject').append('xhtml:body').html("<svg style='-webkit-transform: perspective(40px) rotateX(2deg)' id='titleSVG'></svg>");
-    return sceneObject.title = d3.select('#titleSVG').append('text').text("  The Relationship Between Human Capital and Firm Performance").attr("id", "title").attr("dominant-baseline", "central").style("text-anchor", "middle").style('fill', "#999999");
+    return sceneObject.title = d3.select('#titleSVG').append('text').text("  The Relationship Between Human Capital and Firm Performance").attr("id", "title").attr("dominant-baseline", "central").style("text-anchor", "middle").style('fill', "#EEEEEE");
   };
   rightPane = function() {
     var styles, textRect;
