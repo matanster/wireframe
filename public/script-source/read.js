@@ -144,7 +144,7 @@ sceneDefine = function() {
         event.target.style.cursor = "default";
         return element.transition().duration(500).style('stroke', '#999999');
       };
-      element.transition().duration(300).style('stroke', '#2F72FF');
+      element.transition().duration(300).style('stroke', '#aaaaaa');
     }).on('touchstart', function() {
       var element, widthInitialBoundary, widthInitialText, xInitial;
       element = d3.select(this);
@@ -488,6 +488,7 @@ syncInit = function() {
 start = function() {
   sceneDefine();
   syncInit();
+  console.dir(viewport);
   return document.body.style.cursor = "default";
 };
 

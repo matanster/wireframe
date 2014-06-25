@@ -149,7 +149,7 @@ sceneDefine = () ->
                                 element.transition().duration(500).style('stroke', '#999999')
                                 #console.log 'mouse up'
 
-                              element.transition().duration(300).style('stroke', '#2F72FF') #FFEEBB
+                              element.transition().duration(300).style('stroke', '#aaaaaa') #FFEEBB 2F72FF
                               return
                               ) 
                             # To be merged with the mouse interaction code for the same.
@@ -639,6 +639,7 @@ syncInit = () ->
 start = () ->
   sceneDefine()
   syncInit()
+  console.dir viewport
   #textportFluent(tokens)
   #textportSegmented(segments)
   document.body.style.cursor = "default" # needed because of https://code.google.com/p/chromium/issues/detail?id=3a69986&thanks=369986&ts=1399291013
