@@ -1448,7 +1448,7 @@ module.exports = function(categorizedTextTree, fontSizeChange, scroll, mode) {
             y += 30;
           }
           tokenViewable = textDraw.tokenToViewable(subCategory.name, sceneObject.textPortInnerSVG.subElement);
-          tokenViewable.svg.attr('x', sceneObject.textPortInnerSVG.element.attr('width') / 2).attr('y', y).style("text-anchor", "middle").attr("dominant-baseline", "central").style("font-family", "Helvetica").style("font-weight", "bold").attr("font-size", "30px").style('fill', '#999999');
+          tokenViewable.svg.attr('x', sceneObject.textPortInnerSVG.element.attr('width') / 2).attr('y', y).style("text-anchor", "middle").attr("dominant-baseline", "central").style("font-family", "Helvetica").style("font-weight", "bold").attr("font-size", "30px").style('fill', '#aaaaaa');
           y += 40;
           sentences = [];
           _ref1 = subCategory.text;
@@ -1471,7 +1471,7 @@ module.exports = function(categorizedTextTree, fontSizeChange, scroll, mode) {
                   tokenViewable.svg.style('fill', '#4488FE');
                   break;
                 case 2:
-                  tokenViewable.svg.style('fill', 'rgb(100,200,200)');
+                  tokenViewable.svg.style('fill', '#4488FE').style('font-style', 'italic');
               }
               if (x + tokenViewable.width < sceneObject.textPortInnerSVG.element.attr('width')) {
                 tokenViewable.svg.attr('x', x).attr('y', y);
@@ -1618,17 +1618,24 @@ module.exports = function(text) {
   tokens = [];
   for (t = _i = 0, _len = textArray.length; _i < _len; t = ++_i) {
     token = textArray[t];
+    if (token.charAt(0) === '<' && (token.charAt(1) != null) && token.charAt(1) === '<') {
+      tokens.push({
+        'text': token.substr(2, token.length - 4),
+        'mark': 2
+      });
+      continue;
+    }
     if (token.charAt(0) === '<' && token.charAt(token.length - 1) === '>') {
       tokens.push({
         'text': token.substr(1, token.length - 2),
         'mark': 1
       });
-    } else {
-      tokens.push({
-        'text': token,
-        'mark': 0
-      });
+      continue;
     }
+    tokens.push({
+      'text': token,
+      'mark': 0
+    });
   }
   return tokens;
 };

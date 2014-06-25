@@ -7,17 +7,24 @@ module.exports = function(text) {
   tokens = [];
   for (t = _i = 0, _len = textArray.length; _i < _len; t = ++_i) {
     token = textArray[t];
+    if (token.charAt(0) === '<' && (token.charAt(1) != null) && token.charAt(1) === '<') {
+      tokens.push({
+        'text': token.substr(2, token.length - 4),
+        'mark': 2
+      });
+      continue;
+    }
     if (token.charAt(0) === '<' && token.charAt(token.length - 1) === '>') {
       tokens.push({
         'text': token.substr(1, token.length - 2),
         'mark': 1
       });
-    } else {
-      tokens.push({
-        'text': token,
-        'mark': 0
-      });
+      continue;
     }
+    tokens.push({
+      'text': token,
+      'mark': 0
+    });
   }
   return tokens;
 };

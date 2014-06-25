@@ -80,7 +80,6 @@ module.exports = (categorizedTextTree, fontSizeChange, scroll, mode) ->
         for subCategory in categoryNode.subs
 
           # textport category title
-
           unless y is 0
             y += 30
 
@@ -92,7 +91,7 @@ module.exports = (categorizedTextTree, fontSizeChange, scroll, mode) ->
                            .style("font-family", "Helvetica")
                            .style("font-weight", "bold")
                            .attr("font-size", "30px")
-                           .style('fill', '#999999')
+                           .style('fill', '#aaaaaa')
 
           y += 40
           
@@ -116,10 +115,11 @@ module.exports = (categorizedTextTree, fontSizeChange, scroll, mode) ->
               #
               switch token.mark
                 when 1
-                  tokenViewable.svg.style('fill', '#4488FE')  # 'rgb(120,240,240)'
+                  tokenViewable.svg.style('fill', '#4488FE')  # #4488FE 'rgb(120,240,240)'
                 when 2
                   #tokenViewable.svg.style('fill', 'rgb(70,140,140)')
-                  tokenViewable.svg.style('fill', 'rgb(100,200,200)')
+                  tokenViewable.svg.style('fill', '#4488FE') # rgb(100,200,200)
+                                   .style('font-style', 'italic')
 
               if x + tokenViewable.width < sceneObject.textPortInnerSVG.element.attr('width')
                 #console.log 'adding to line'

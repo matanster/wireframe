@@ -58,7 +58,7 @@ module.exports = function(categorizedTextTree, fontSizeChange, scroll, mode) {
             y += 30;
           }
           tokenViewable = textDraw.tokenToViewable(subCategory.name, sceneObject.textPortInnerSVG.subElement);
-          tokenViewable.svg.attr('x', sceneObject.textPortInnerSVG.element.attr('width') / 2).attr('y', y).style("text-anchor", "middle").attr("dominant-baseline", "central").style("font-family", "Helvetica").style("font-weight", "bold").attr("font-size", "30px").style('fill', '#999999');
+          tokenViewable.svg.attr('x', sceneObject.textPortInnerSVG.element.attr('width') / 2).attr('y', y).style("text-anchor", "middle").attr("dominant-baseline", "central").style("font-family", "Helvetica").style("font-weight", "bold").attr("font-size", "30px").style('fill', '#aaaaaa');
           y += 40;
           sentences = [];
           _ref1 = subCategory.text;
@@ -81,7 +81,7 @@ module.exports = function(categorizedTextTree, fontSizeChange, scroll, mode) {
                   tokenViewable.svg.style('fill', '#4488FE');
                   break;
                 case 2:
-                  tokenViewable.svg.style('fill', 'rgb(100,200,200)');
+                  tokenViewable.svg.style('fill', '#4488FE').style('font-style', 'italic');
               }
               if (x + tokenViewable.width < sceneObject.textPortInnerSVG.element.attr('width')) {
                 tokenViewable.svg.attr('x', x).attr('y', y);

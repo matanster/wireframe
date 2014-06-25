@@ -10,16 +10,22 @@ module.exports = (text) ->
 
   tokens = []
   for token, t in textArray
+    if token.charAt(0) is '<' and token.charAt(1)? and token.charAt(1) is '<' 
+      tokens.push 
+        'text': token.substr(2, token.length-4)
+        'mark': 2
+      continue
     if token.charAt(0) is '<' and token.charAt(token.length-1) is '>'
       tokens.push 
         'text': token.substr(1, token.length-2)
         'mark': 1
-      #console.log 'highlighting word/s: ' + token.text        
-    else  
-      tokens.push 
-        'text': token,
-        'mark': 0
-    
+      continue
+        #console.log 'highlighting word/s: ' + token.text        
+
+    tokens.push 
+      'text': token,
+      'mark': 0
+      
   #console.dir tokens
   return tokens
 
