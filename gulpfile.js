@@ -15,6 +15,10 @@ gulp.task('default', function() {
         .pipe(browserify())
         .pipe(gulp.dest('public/script'))     /* output directory */
 
+  gulp.src('public/script-source/wait.js') /* source to build */
+        .pipe(browserify())
+        .pipe(gulp.dest('public/script'))     /* output directory */
+
   gulp.src('public/script-source/hive.js')    /* source to build */
         .pipe(browserify())
         .pipe(gulp.dest('public/script'))     /* output directory */

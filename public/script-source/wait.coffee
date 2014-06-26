@@ -47,22 +47,40 @@ sceneDefine = (callback) ->
              .on('mousedown', () -> 
                   console.log('click')
                   this.style.cursor = "progress"
-                  setTimeout((() -> window.location.href = '/wait.html'), 50)) # need this wait because of https://code.google.com/p/chromium/issues/detail?id=3a69986&thanks=369986&ts=1399291013
+                  setTimeout((() -> window.location.href = '/read.html'), 50)) # need this wait because of https://code.google.com/p/chromium/issues/detail?id=3a69986&thanks=369986&ts=1399291013
   
   text = () ->
-    svg.text = svg.main.append('text').text("let us know where's the article")
+
+    svg.text0 = svg.main.append('text').text("Well done!")
+                              .style("text-anchor", "middle")
+                              .attr("dominant-baseline", "central")
+                              .style("font-family", "Helvetica")
+                              .style("font-weight", "bold")
+                              .attr("font-size", "55px")
+                              .style('font-style', 'italic')                              
+
+    svg.text1 = svg.main.append('text').text("please wait while we're")
+                              .style("text-anchor", "middle")
+                              .attr("dominant-baseline", "central")
+                              .style("font-family", "Helvetica")
+                              .style("font-weight", "bold")
+                              .attr("font-size", "35px")
+    
+    svg.text2 = svg.main.append('text').text("re-packing and preparing your article for you")
+                              .style("text-anchor", "middle")
+                              .attr("dominant-baseline", "central")
+                              .style("font-family", "Helvetica")
+                              .style("font-weight", "bold")
+                              .attr("font-size", "35px")
+
+
+    svg.text3 = svg.main.append('text').text("so that you can efficiently dig through")
                               .style("text-anchor", "middle")
                               .attr("dominant-baseline", "central")
                               .style("font-family", "Helvetica")
                               .style("font-weight", "bold")
                               .attr("font-size", "25px")
 
-    svg.text1 = svg.main.append('text').text("Upload or Connect an Article")
-                              .style("text-anchor", "middle")
-                              .attr("dominant-baseline", "central")
-                              .style("font-family", "Helvetica")
-                              .style("font-weight", "bold")
-                              .attr("font-size", "45px")
 
 
 
@@ -97,40 +115,36 @@ sceneSync = () ->
   diameter = widthQuantum * 2           # width quantum sets the diameter
   heightQuantum = viewport.height / 6   # split vertically
 
-  # draw images
-  svg.upload.attr('width', diameter)
-            .attr('height', diameter)
-            .attr('x', widthQuantum * 1)
-            .attr('y', heightQuantum * 2)
-            .style('opacity', 0.01)            
-
-  svg.link.attr('width', diameter)
-            .attr('height', diameter)
-            .attr('x', widthQuantum * 4)
-            .attr('y', heightQuantum * 3)
-            .style('opacity', 0.01)
-
-  svg.dropbox.attr('width', diameter)
-            .attr('height', diameter)
-            .attr('x', widthQuantum * 7)
-            .attr('y', heightQuantum * 2)
-            .style('opacity', 0.01)
-
-  svg.text.attr('x', viewport.width / 2)
-          .attr('y', heightQuantum * 1.3)
+  svg.text0.attr('x', viewport.width / 2)
+          .attr('y', heightQuantum * 2)
           .style('fill', '#40bff1') 
           .style('opacity', 1)  
 
   svg.text1.attr('x', viewport.width / 2)
-          .attr('y', heightQuantum * 0.9)
+          .attr('y', heightQuantum * 3)
+          .style('fill', '#40bff1') 
+          .style('opacity', 1)  
+
+  svg.text2.attr('x', viewport.width / 2)
+          .attr('y', heightQuantum * 3.4)
+          .style('fill', '#40bff1') 
+          .style('opacity', 1)  
+
+  svg.text3.attr('x', viewport.width / 2)
+          .attr('y', heightQuantum * 4)
           .style('fill', '#EEEEEE') 
           .style('opacity', 1)  
-          .style('font-style', 'italic')
-   
+
+  for element in [svg.text0, svg.text1, svg.text2, svg.text3]
+    element.on('mousedown', () -> 
+                    console.log('click')
+                    this.style.cursor = "progress"
+                    setTimeout((() -> window.location.href = '/read.html'), 50)) # need this wait because of https://code.google.com/p/chromium/issues/detail?id=3a69986&thanks=369986&ts=1399291013
+     
   #svg.text.transition().style('opacity', 1)
-  svg.upload.transition().style('opacity', 1).duration(600).delay(500)
-  svg.link.transition().style('opacity', 1).duration(600).delay(1000)  
-  svg.dropbox.transition().style('opacity', 1).duration(650).delay(1200)  
+  #svg.upload.transition().style('opacity', 1).duration(1000).delay(600)
+  #svg.link.transition().style('opacity', 1).duration(1000).delay(1400)  
+  #svg.dropbox.transition().style('opacity', 1).duration(1000).delay(2000)  
 
   return  
 
@@ -144,4 +158,4 @@ syncInit = () ->
 #                #
 ##################
 sceneDefine(syncInit)
-#syncInit()
+

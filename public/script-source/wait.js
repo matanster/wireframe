@@ -43,15 +43,17 @@ sceneDefine = function(callback) {
         console.log('click');
         this.style.cursor = "progress";
         return setTimeout((function() {
-          return window.location.href = '/wait.html';
+          return window.location.href = '/read.html';
         }), 50);
       }));
     }
     return _results;
   };
   text = function() {
-    svg.text = svg.main.append('text').text("let us know where's the article").style("text-anchor", "middle").attr("dominant-baseline", "central").style("font-family", "Helvetica").style("font-weight", "bold").attr("font-size", "25px");
-    return svg.text1 = svg.main.append('text').text("Upload or Connect an Article").style("text-anchor", "middle").attr("dominant-baseline", "central").style("font-family", "Helvetica").style("font-weight", "bold").attr("font-size", "45px");
+    svg.text0 = svg.main.append('text').text("Well done!").style("text-anchor", "middle").attr("dominant-baseline", "central").style("font-family", "Helvetica").style("font-weight", "bold").attr("font-size", "55px").style('font-style', 'italic');
+    svg.text1 = svg.main.append('text').text("please wait while we're").style("text-anchor", "middle").attr("dominant-baseline", "central").style("font-family", "Helvetica").style("font-weight", "bold").attr("font-size", "35px");
+    svg.text2 = svg.main.append('text').text("re-packing and preparing your article for you").style("text-anchor", "middle").attr("dominant-baseline", "central").style("font-family", "Helvetica").style("font-weight", "bold").attr("font-size", "35px");
+    return svg.text3 = svg.main.append('text').text("so that you can efficiently dig through").style("text-anchor", "middle").attr("dominant-baseline", "central").style("font-family", "Helvetica").style("font-weight", "bold").attr("font-size", "25px");
   };
   main();
   text();
@@ -60,7 +62,7 @@ sceneDefine = function(callback) {
 };
 
 sceneSync = function() {
-  var diameter, end, heightQuantum, start, widthQuantum;
+  var diameter, element, end, heightQuantum, start, widthQuantum, _i, _len, _ref;
   viewport = util.getViewport();
   console.dir(viewport);
   console.log('starting scene sync');
@@ -70,14 +72,21 @@ sceneSync = function() {
   widthQuantum = viewport.width / 10;
   diameter = widthQuantum * 2;
   heightQuantum = viewport.height / 6;
-  svg.upload.attr('width', diameter).attr('height', diameter).attr('x', widthQuantum * 1).attr('y', heightQuantum * 2).style('opacity', 0.01);
-  svg.link.attr('width', diameter).attr('height', diameter).attr('x', widthQuantum * 4).attr('y', heightQuantum * 3).style('opacity', 0.01);
-  svg.dropbox.attr('width', diameter).attr('height', diameter).attr('x', widthQuantum * 7).attr('y', heightQuantum * 2).style('opacity', 0.01);
-  svg.text.attr('x', viewport.width / 2).attr('y', heightQuantum * 1.3).style('fill', '#40bff1').style('opacity', 1);
-  svg.text1.attr('x', viewport.width / 2).attr('y', heightQuantum * 0.9).style('fill', '#EEEEEE').style('opacity', 1).style('font-style', 'italic');
-  svg.upload.transition().style('opacity', 1).duration(600).delay(500);
-  svg.link.transition().style('opacity', 1).duration(600).delay(1000);
-  svg.dropbox.transition().style('opacity', 1).duration(650).delay(1200);
+  svg.text0.attr('x', viewport.width / 2).attr('y', heightQuantum * 2).style('fill', '#40bff1').style('opacity', 1);
+  svg.text1.attr('x', viewport.width / 2).attr('y', heightQuantum * 3).style('fill', '#40bff1').style('opacity', 1);
+  svg.text2.attr('x', viewport.width / 2).attr('y', heightQuantum * 3.4).style('fill', '#40bff1').style('opacity', 1);
+  svg.text3.attr('x', viewport.width / 2).attr('y', heightQuantum * 4).style('fill', '#EEEEEE').style('opacity', 1);
+  _ref = [svg.text0, svg.text1, svg.text2, svg.text3];
+  for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+    element = _ref[_i];
+    element.on('mousedown', function() {
+      console.log('click');
+      this.style.cursor = "progress";
+      return setTimeout((function() {
+        return window.location.href = '/read.html';
+      }), 50);
+    });
+  }
 };
 
 syncInit = function() {
