@@ -64,7 +64,7 @@ sceneDefine = function(callback) {
       });
     }
     return svg.upload.on('dragover', function() {
-      console.log('click');
+      console.log('dragover');
       this.style.cursor = "progress";
       return setTimeout((function() {
         return window.location.href = '/wait.html';
