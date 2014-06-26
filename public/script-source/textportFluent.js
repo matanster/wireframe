@@ -75,6 +75,7 @@ module.exports = function(categorizedTextTree, fontSizeChange, scroll, mode) {
             _ref2 = sentence.text;
             for (_m = 0, _len4 = _ref2.length; _m < _len4; _m++) {
               token = _ref2[_m];
+              console.log(token.text);
               tokenViewable = textDraw.tokenToViewable(token.text, sceneObject.textPortInnerSVG.subElement);
               switch (token.mark) {
                 case 1:

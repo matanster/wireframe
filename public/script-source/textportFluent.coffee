@@ -106,7 +106,10 @@ module.exports = (categorizedTextTree, fontSizeChange, scroll, mode) ->
 
           # textport all sentences
           for sentence in sentences
+
             for token in sentence.text
+
+              console.log token.text
 
               tokenViewable = textDraw.tokenToViewable(token.text, sceneObject.textPortInnerSVG.subElement)
               
@@ -147,6 +150,7 @@ module.exports = (categorizedTextTree, fontSizeChange, scroll, mode) ->
                 #console.log "x after space adding = " + x
             y += (tokenViewable.height)*2
             x = 0
+    
     return viewPortFull        
 
   return redraw()  
