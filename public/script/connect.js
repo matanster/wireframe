@@ -42,15 +42,14 @@ sceneDefine = function(callback) {
     return svg.main = d3.select('body').append('svg').style('background-color', '#222288');
   };
   images = function() {
-    var element, _i, _len, _ref, _results;
+    var element, _i, _len, _ref;
     svg.upload = svg.main.append("svg:image").attr("xlink:href", "images/upload.svg");
     svg.link = svg.main.append("svg:image").attr("xlink:href", "images/link.svg");
     svg.dropbox = svg.main.append("svg:image").attr("xlink:href", "images/dropbox.svg");
     _ref = [svg.upload, svg.link, svg.dropbox];
-    _results = [];
     for (_i = 0, _len = _ref.length; _i < _len; _i++) {
       element = _ref[_i];
-      _results.push(element.on('mouseover', function() {
+      element.on('mouseover', function() {
         console.log('hover');
         return this.style.cursor = "pointer";
       }).on('mouseout', function() {
@@ -62,9 +61,15 @@ sceneDefine = function(callback) {
         return setTimeout((function() {
           return window.location.href = '/wait.html';
         }), 50);
-      }));
+      });
     }
-    return _results;
+    return svg.upload.on('dragover', function() {
+      console.log('click');
+      this.style.cursor = "progress";
+      return setTimeout((function() {
+        return window.location.href = '/wait.html';
+      }), 1700);
+    });
   };
   text = function() {
     svg.text = svg.main.append('text').text("let us know where's the article").style("text-anchor", "middle").attr("dominant-baseline", "central").style("font-family", "Helvetica").style("font-weight", "bold").attr("font-size", "25px");

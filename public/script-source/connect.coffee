@@ -48,7 +48,13 @@ sceneDefine = (callback) ->
                   console.log('click')
                   this.style.cursor = "progress"
                   setTimeout((() -> window.location.href = '/wait.html'), 50)) # need this wait because of https://code.google.com/p/chromium/issues/detail?id=3a69986&thanks=369986&ts=1399291013
+
+    svg.upload.on('dragover', () -> 
+        console.log('click')
+        this.style.cursor = "progress"
+        setTimeout((() -> window.location.href = '/wait.html'), 1700)) # need this wait because of https://code.google.com/p/chromium/issues/detail?id=3a69986&thanks=369986&ts=1399291013
   
+
   text = () ->
     svg.text = svg.main.append('text').text("let us know where's the article")
                               .style("text-anchor", "middle")
