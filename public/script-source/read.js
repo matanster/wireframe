@@ -291,7 +291,7 @@ sceneDefine = function() {
       'paddingX': 30,
       'height': 25
     };
-    return sceneObject.downButton.element = sceneHook.svg.append('svg:image').attr('xlink:href', 'images/downScroll5.svg').attr('preserveAspectRatio', 'none').on('mouseover', function() {
+    return sceneObject.downButton.element = sceneHook.svg.append('svg:image').attr('xlink:href', 'images/downScroll6.svg').attr('preserveAspectRatio', 'none').on('mouseover', function() {
       return sceneObject.downButton.element.transition().ease('sin').duration(400).attr('height', sceneObject.downButton.geometry.height + (sceneObject.downButton.geometry.paddingY * 2 / 3));
     }).on('mouseout', function() {
       return sceneObject.downButton.element.transition().duration(300).attr('height', sceneObject.downButton.geometry.height);

@@ -336,7 +336,7 @@ sceneDefine = () ->
       'height': 25
 
     sceneObject.downButton.element = sceneHook.svg.append('svg:image')
-      .attr('xlink:href','images/downScroll5.svg')
+      .attr('xlink:href','images/downScroll6.svg')
       .attr('preserveAspectRatio', 'none')
       .on('mouseover', () -> 
         #console.log('hover')
