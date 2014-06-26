@@ -35,7 +35,7 @@ module.exports = function(categorizedTextTree, fontSizeChange, scroll, mode) {
   }
   sceneObject.textPortInnerSVG = {};
   sceneObject.textPortInnerSVG.element = sceneHook.svg.append('svg');
-  sceneObject.textPortInnerSVG.subElement = sceneObject.textPortInnerSVG.element.append('g').style('text-anchor', 'start').style('fill', 'rgb(255,255,220)').style('font-family', fontFamily).style('font-size', fontSize);
+  sceneObject.textPortInnerSVG.subElement = sceneObject.textPortInnerSVG.element.append('g').style('text-anchor', 'start').style('fill', 'rgb(220,220,220)').style('font-family', fontFamily).style('font-size', fontSize);
   spaceWidth = textDraw.tokenToViewable('a a', sceneObject.textPortInnerSVG.subElement).width - textDraw.tokenToViewable('aa', sceneObject.textPortInnerSVG.subElement).width;
   spaceWidth *= 1.4;
   lHeight = textDraw.tokenToViewable('l', sceneObject.textPortInnerSVG.subElement).height;

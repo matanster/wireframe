@@ -46,7 +46,7 @@ module.exports = (categorizedTextTree, fontSizeChange, scroll, mode) ->
 
   sceneObject.textPortInnerSVG.subElement = sceneObject.textPortInnerSVG.element.append('g')
                                  .style('text-anchor', 'start')
-                                 .style('fill', 'rgb(255,255,220)')                                                                                                                                            
+                                 .style('fill', 'rgb(220,220,220)')                                                                                                                                            
                                  .style('font-family',fontFamily)
                                  .style('font-size',fontSize)
 
