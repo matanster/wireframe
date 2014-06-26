@@ -55,7 +55,16 @@ sceneDefine = (callback) ->
                               .attr("dominant-baseline", "central")
                               .style("font-family", "Helvetica")
                               .style("font-weight", "bold")
-                              .attr("font-size", "35px")
+                              .attr("font-size", "25px")
+
+    svg.text1 = svg.main.append('text').text("Upload or Connect an Article")
+                              .style("text-anchor", "middle")
+                              .attr("dominant-baseline", "central")
+                              .style("font-family", "Helvetica")
+                              .style("font-weight", "bold")
+                              .attr("font-size", "45px")
+
+
 
   main()
   text()
@@ -108,9 +117,15 @@ sceneSync = () ->
             .style('opacity', 0.01)
 
   svg.text.attr('x', viewport.width / 2)
-          .attr('y', heightQuantum * 1.5)
+          .attr('y', heightQuantum * 1.35)
+          .style('fill', '#40bff1') 
+          .style('opacity', 1)  
+
+  svg.text1.attr('x', viewport.width / 2)
+          .attr('y', heightQuantum * 1)
           .style('fill', '#EEEEEE') 
           .style('opacity', 1)  
+          .style('font-style', 'italic')
    
   #svg.text.transition().style('opacity', 1)
   svg.upload.transition().style('opacity', 1).duration(1000).delay(600)

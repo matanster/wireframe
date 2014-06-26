@@ -67,7 +67,8 @@ sceneDefine = function(callback) {
     return _results;
   };
   text = function() {
-    return svg.text = svg.main.append('text').text("let us know where's the article").style("text-anchor", "middle").attr("dominant-baseline", "central").style("font-family", "Helvetica").style("font-weight", "bold").attr("font-size", "35px");
+    svg.text = svg.main.append('text').text("let us know where's the article").style("text-anchor", "middle").attr("dominant-baseline", "central").style("font-family", "Helvetica").style("font-weight", "bold").attr("font-size", "25px");
+    return svg.text1 = svg.main.append('text').text("Upload or Connect an Article").style("text-anchor", "middle").attr("dominant-baseline", "central").style("font-family", "Helvetica").style("font-weight", "bold").attr("font-size", "45px");
   };
   main();
   text();
@@ -89,7 +90,8 @@ sceneSync = function() {
   svg.upload.attr('width', diameter).attr('height', diameter).attr('x', widthQuantum * 1).attr('y', heightQuantum * 2).style('opacity', 0.01);
   svg.link.attr('width', diameter).attr('height', diameter).attr('x', widthQuantum * 4).attr('y', heightQuantum * 3).style('opacity', 0.01);
   svg.dropbox.attr('width', diameter).attr('height', diameter).attr('x', widthQuantum * 7).attr('y', heightQuantum * 2).style('opacity', 0.01);
-  svg.text.attr('x', viewport.width / 2).attr('y', heightQuantum * 1.5).style('fill', '#EEEEEE').style('opacity', 1);
+  svg.text.attr('x', viewport.width / 2).attr('y', heightQuantum * 1.35).style('fill', '#40bff1').style('opacity', 1);
+  svg.text1.attr('x', viewport.width / 2).attr('y', heightQuantum * 1).style('fill', '#EEEEEE').style('opacity', 1).style('font-style', 'italic');
   svg.upload.transition().style('opacity', 1).duration(1000).delay(600);
   svg.link.transition().style('opacity', 1).duration(1000).delay(1400);
   svg.dropbox.transition().style('opacity', 1).duration(1000).delay(2000);
