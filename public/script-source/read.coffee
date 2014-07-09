@@ -55,6 +55,32 @@ coreH = null
 boxH   = null
 end    = null
 
+articles = ["The Relationship Between Human Capital and Firm Performance",
+            "Article 2",
+            "Article 3"
+           ]
+currentArticle = 0           
+
+articleSelectorPaneHeight = calcStart() - 5 - 5
+
+TitleChooser = () ->
+
+
+  height =
+    'selectorMode' : articles.length * articleSelectorPaneHeight,
+    'selectedMode' : articleSelectorPaneHeight,
+
+  chooserClose = () ->
+    sceneObject.titlePort.pane.transition().duration(400).ease('sin').attr('height', height.selectedMode)
+
+  console.log 'title chooser on'
+    #sceneObject.titlePort.text.transition().duration(300).ease('sin').attr('y', layout.separator.top.y / 2)
+  sceneObject.titlePort.pane.transition().duration(450).ease('linear').attr('height', height.selectorMode)
+  sceneObject.titlePort.pane.on('mouseout', () ->
+    chooserClose()
+  )
+
+
 #####################################################################
 #
 # Define the objects making the scene, plus any of their properties 
@@ -190,22 +216,38 @@ sceneDefine = () ->
                            .style('fill', '#222222')   
 
   titlePort = () ->
-    sceneObject.titlePort = sceneHook.svg.append('g') # for now this grouping isn't used for anything, but a best practice anyway
+    sceneObject.titlePort = 
+      'element': sceneHook.svg.append('g') # for now this grouping isn't used for anything, but a best practice anyway
 
-    sceneObject.titlePortRect = sceneObject.titlePort.append('rect')
+    sceneObject.titlePort.pane = sceneObject.titlePort.element.append('rect')
                                      .style('fill', '#60CAFB')   
 
     # nest an html element containing an svg, inside the topmost svg hook, so we can use a non-svg transform on it
-    sceneObject.titleForeignContainer = sceneObject.titlePort.append('foreignObject')
+    sceneObject.titlePort.textwrapper = sceneObject.titlePort.element.append('foreignObject')
                            .append('xhtml:body')
-                           .html("<svg style='-webkit-transform: perspective(40px) rotateX(2deg)' id='titleSVG'></svg>")
+                           .html("<svg id='titleSVG' style='-webkit-transform: perspective(40px) rotateX(2deg)'></svg>")
+
+    sceneObject.titlePort.textwrapper.style('pointer-events', 'none') # disable mouse events and let them drip through
     
     # modify the svg nested inside the html just created
-    sceneObject.title = d3.select('#titleSVG').append('text').text("  The Relationship Between Human Capital and Firm Performance")  # "Something Something Something Title"
+    sceneObject.titlePort.text = d3.select('#titleSVG').append('text')
                                       .attr("id", "title")
                                       .attr("dominant-baseline", "central")
                                       .style("text-anchor", "middle")
                                       .style('fill', "#EEEEEE")
+
+    sceneObject.titlePort.text.text(articles[currentArticle])  # "Something Something Something Title"
+
+    sceneObject.titlePort.pane.on('mouseover', () ->
+      console.log 'mouseover titleport'
+      TitleChooser()
+#      sceneObject.rightPane.element.on('mousemove', () -> # to do: replace with a more circular area of tolerance
+#        if event.x > layout.separator.right.x + sceneObject.rightPane.geometry.hoverIgnoreAreaX
+#          if event.y > layout.separator.top.y + sceneObject.rightPane.geometry.hoverIgnoreAreaY and
+#             event.y < viewport.height - sceneObject.rightPane.geometry.hoverIgnoreAreaY 
+      )
+
+
 
 
   rightPane = ->
@@ -400,28 +442,6 @@ sceneSync = (mode) ->
   #console.log sceneObject.textPort.element.attr('width')
   #console.log sceneObject.textPort.geometry.width
 
-  # draw title port 
-  sceneObject.titlePortRect.attr('width', viewport.width - 5 - 5)
-               .attr('height', layout.separator.top.y - 5 - 5)
-               .attr('x', 5)
-               .attr('y', -50)
-               .style('stroke-width', '7px')
-               .attr('rx', 10)
-               .attr('rx', 10)              
-
-  #sceneObject.titleForeignContainer.style('stroke-width', '7px')
-  d3.select('#titleSVG')
-           .attr('width', viewport.width - 5 - 5 - 100) # -100 is intended to keep the buttons on the right above the nested svg, otherwise they don't click
-                                                        # this spoils the center alignemnt of the title and is a temporary hack 
-                                                        # (for some reason, the 'x' attr won't affect the position of the inline html)
-           .attr('height', layout.separator.top.y - 5 - 5)           
-
-  sceneObject.title.attr('x', viewport.width / 2)
-           .attr('y', 0)
-           .style('font-family', 'Helvetica')
-           .style("font-weight", "bold")
-           .attr("font-size", "30px")
-
   sceneObject.fontSize.redraw = () ->
 
     console.log 'redrawing font size buttons'
@@ -449,19 +469,45 @@ sceneSync = (mode) ->
 
   sceneObject.fontSize.redraw()      
 
-  if firstEntry
-    sceneObject.title.transition().duration(300).ease('sin')
-                                         .attr('y', layout.separator.top.y / 2)
-    sceneObject.titlePortRect.transition().duration(300).ease('sin')
-                                         .attr('y', 5)
-    #setTimeout(sceneObject.fontSize.redraw, 2000)                                         
-    firstEntry = false
+  drawTitle = () ->
 
-  else 
-    sceneObject.title
-       .attr('y', layout.separator.top.y / 2)
-    sceneObject.titlePortRect
-       .attr('y', 5) 
+ # draw title port 
+    sceneObject.titlePort.pane.attr('width', viewport.width - 5 - 5)
+                 .attr('height', layout.separator.top.y - 5 - 5)
+                 .attr('x', 5)
+                 .attr('y', -50) # pre-animation location
+                 .style('stroke-width', '7px')
+                 .attr('rx', 10)
+                 .attr('rx', 10)              
+
+    #sceneObject.titlePort.textwrapper.style('stroke-width', '7px')
+    d3.select('#titleSVG')
+             .attr('width', viewport.width - 5 - 5 - 100) # -100 is intended to keep the buttons on the right above the nested svg, otherwise they don't click
+                                                          # this spoils the center alignemnt of the title and is a temporary hack 
+                                                          # (for some reason, the 'x' attr won't affect the position of the inline html)
+             .attr('height', articleSelectorPaneHeight)           
+
+    sceneObject.titlePort.text.attr('x', viewport.width / 2)
+             .attr('y', 0)
+             .style('font-family', 'Helvetica')
+             .style("font-weight", "bold")
+             .attr("font-size", "30px")    
+
+    if firstEntry
+      sceneObject.titlePort.text.transition().duration(300).ease('sin')
+                                    .attr('y', layout.separator.top.y / 2)
+      sceneObject.titlePort.pane.transition().duration(300).ease('sin')
+                                            .attr('y', 5)
+      #setTimeout(sceneObject.fontSize.redraw, 2000)                                         
+      firstEntry = false
+
+    else 
+      sceneObject.titlePort.text
+                 .attr('y', layout.separator.top.y / 2)
+      sceneObject.titlePort.pane
+                 .attr('y', 5) 
+
+  drawTitle()
 
   # show text if source tokens already loaded
   #console.log 'before textportFluent from scenesync'
