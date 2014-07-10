@@ -27,6 +27,7 @@ viewport  = null
 
 states = 
   rightPane: 'toc-invitation'
+  articleSwitcher: false
     
 colors =
   scaleStart : '#87CEFA'
@@ -67,65 +68,53 @@ articleSelectorPaneHeight = calcStart() - 5 - 5
 //
 TitleChooser = () ->
 
+  states.articleSwitcher = true
+
   height =
     'selectorMode' : articles.length * articleSelectorPaneHeight,
     'selectedMode' : articleSelectorPaneHeight,
 
   chooserClose = () ->
     sceneObject.titlePort.pane.transition().duration(400).ease('sin').attr('height', height.selectedMode)
-
-  console.log 'title chooser on'
+    states.articleSwitcher = false
 
   console.log 'opening title chooser'
 
   util.makeSvgTopLayer(sceneObject.titlePort.element.node()) # move to svg top "layer"
     #sceneObject.titlePort.text.transition().duration(300).ease('sin').attr('y', layout.separator.top.y / 2)
   sceneObject.titlePort.pane.transition().duration(450).ease('linear').attr('height', height.selectorMode)
+                                         .each("end", () ->
 
-  titlePanes = []
-  for article, i in articles
-    pane = util.titlePaneCreate(sceneHook.svg)
-    pane.textContent = article
-    
-    # draw title port 
-    pane.element.attr('width', viewport.width - 5 - 5)
-                 .attr('height', layout.separator.top.y - 5 - 5)
-                 .attr('x', 5)
-                 .attr('y', -50) # pre-animation location
-                 .style('stroke-width', '7px')
-                 .attr('rx', 10)
-                 .attr('rx', 10)              
+    titlePanes = []
+    for article, i in articles
 
-    #sceneObject.titlePort.textwrapper.style('stroke-width', '7px')
-    d3.select('#pane0')
-             .attr('width', viewport.width - 5 - 5) # -100 is intended to keep the buttons on the right above the nested svg, otherwise they don't click
-                                                          # this spoils the center alignemnt of the title and is a temporary hack 
-                                                          # (for some reason, the 'x' attr won't affect the position of the inline html)
-             .attr('height', articleSelectorPaneHeight)           
+      if i is currentArticle then continue
 
-    pane.text.attr('x', viewport.width / 2)
-             .attr('y', 0)
-             .style('font-family', 'Helvetica')
-             .style("font-weight", "bold")
-             .attr("font-size", "30px")    
+      pane = util.titlePaneCreate(sceneHook.svg, '#50BFEF')
+      pane.text.text(article)
+      
+      # draw title port 
+      console.log (i * articleSelectorPaneHeight)
+      pane.pane.attr('width', viewport.width - 5 - 5)
+                   .attr('height', layout.separator.top.y - 5 - 5)
+                   .attr('x', 5)
+                   .attr('y', 5 + (i * articleSelectorPaneHeight))
+                   .style('stroke-width', '7px')
+                   .attr('rx', 10)
+                   .attr('rx', 10)              
 
-    ###
-    if firstEntry
-      sceneObject.pane.text.transition().duration(300).ease('sin')
-                                    .attr('y', layout.separator.top.y / 2)
-      sceneObject.titlePort.pane.transition().duration(300).ease('sin')
-                                            .attr('y', 5)
-      #setTimeout(sceneObject.fontSize.redraw, 2000)                                         
-      firstEntry = false
+      pane.text.attr('x', viewport.width / 2)
+               .attr('y', (5 + (i + 0.5) * articleSelectorPaneHeight))
+               .style('font-family', 'Helvetica')
+               .style("font-weight", "bold")
+               .attr("font-size", "30px")    
 
-    else 
-      sceneObject.titlePort.text
-                 .attr('y', layout.separator.top.y / 2)
-      sceneObject.titlePort.pane
-                 .attr('y', 5) 
-    ###
+      pane.pane.on('mouseover', () ->
+        pane.pane.style('fill', '#60CBFE')
+      )
 
-    titlePanes.push(pane)
+      titlePanes.push(pane)
+  )
 
   sceneObject.titlePort.pane.on('mouseout', () ->
     chooserClose()
@@ -268,13 +257,15 @@ sceneDefine = () ->
 
   titlePort = () ->
 
-    sceneObject.titlePort = util.titlePaneCreate(sceneHook.svg)
+    sceneObject.titlePort = util.titlePaneCreate(sceneHook.svg, '#60CAFB', true)
 
     sceneObject.titlePort.text.text(articles[currentArticle])  # "Something Something Something Title"
 
     sceneObject.titlePort.pane.on('mouseover', () ->
       console.log 'mouseover titleport'
-      TitleChooser()
+      console.log states.articleSwitcher
+      unless states.articleSwitcher
+        TitleChooser()
 #      sceneObject.rightPane.element.on('mousemove', () -> # to do: replace with a more circular area of tolerance
 #        if event.x > layout.separator.right.x + sceneObject.rightPane.geometry.hoverIgnoreAreaX
 #          if event.y > layout.separator.top.y + sceneObject.rightPane.geometry.hoverIgnoreAreaY and
@@ -515,8 +506,7 @@ sceneSync = (mode) ->
                  .attr('rx', 10)              
 
     #sceneObject.titlePort.textwrapper.style('stroke-width', '7px')
-    d3.select('#pane0')
-             .attr('width', viewport.width - 5 - 5) 
+    sceneObject.titlePort.textwrapper.attr('width', viewport.width - 5 - 5) 
              .attr('height', articleSelectorPaneHeight)           
 
     sceneObject.titlePort.text.attr('x', viewport.width / 2)

@@ -36,7 +36,8 @@ firstEntry = true;
 viewport = null;
 
 states = {
-  rightPane: 'toc-invitation'
+  rightPane: 'toc-invitation',
+  articleSwitcher: false
 };
 
 colors = {
@@ -95,44 +96,39 @@ articleSelectorPaneHeight = calcStart() - 5 - 5;
 /(?:)/;
 
 TitleChooser = function() {
-  var article, chooserClose, height, i, pane, titlePanes, _i, _len;
+  var chooserClose, height;
+  states.articleSwitcher = true;
   height = {
     'selectorMode': articles.length * articleSelectorPaneHeight,
     'selectedMode': articleSelectorPaneHeight
   };
   chooserClose = function() {
-    return sceneObject.titlePort.pane.transition().duration(400).ease('sin').attr('height', height.selectedMode);
+    sceneObject.titlePort.pane.transition().duration(400).ease('sin').attr('height', height.selectedMode);
+    return states.articleSwitcher = false;
   };
-  console.log('title chooser on');
   console.log('opening title chooser');
   util.makeSvgTopLayer(sceneObject.titlePort.element.node());
-  sceneObject.titlePort.pane.transition().duration(450).ease('linear').attr('height', height.selectorMode);
-  titlePanes = [];
-  for (i = _i = 0, _len = articles.length; _i < _len; i = ++_i) {
-    article = articles[i];
-    pane = util.titlePaneCreate(sceneHook.svg);
-    pane.textContent = article;
-    pane.element.attr('width', viewport.width - 5 - 5).attr('height', layout.separator.top.y - 5 - 5).attr('x', 5).attr('y', -50).style('stroke-width', '7px').attr('rx', 10).attr('rx', 10);
-    d3.select('#pane0').attr('width', viewport.width - 5 - 5).attr('height', articleSelectorPaneHeight);
-    pane.text.attr('x', viewport.width / 2).attr('y', 0).style('font-family', 'Helvetica').style("font-weight", "bold").attr("font-size", "30px");
-    /*
-    if firstEntry
-      sceneObject.pane.text.transition().duration(300).ease('sin')
-                                    .attr('y', layout.separator.top.y / 2)
-      sceneObject.titlePort.pane.transition().duration(300).ease('sin')
-                                            .attr('y', 5)
-      #setTimeout(sceneObject.fontSize.redraw, 2000)                                         
-      firstEntry = false
-    
-    else 
-      sceneObject.titlePort.text
-                 .attr('y', layout.separator.top.y / 2)
-      sceneObject.titlePort.pane
-                 .attr('y', 5)
-    */
-
-    titlePanes.push(pane);
-  }
+  sceneObject.titlePort.pane.transition().duration(450).ease('linear').attr('height', height.selectorMode).each("end", function() {
+    var article, i, pane, titlePanes, _i, _len, _results;
+    titlePanes = [];
+    _results = [];
+    for (i = _i = 0, _len = articles.length; _i < _len; i = ++_i) {
+      article = articles[i];
+      if (i === currentArticle) {
+        continue;
+      }
+      pane = util.titlePaneCreate(sceneHook.svg, '#50BFEF');
+      pane.text.text(article);
+      console.log(i * articleSelectorPaneHeight);
+      pane.pane.attr('width', viewport.width - 5 - 5).attr('height', layout.separator.top.y - 5 - 5).attr('x', 5).attr('y', 5 + (i * articleSelectorPaneHeight)).style('stroke-width', '7px').attr('rx', 10).attr('rx', 10);
+      pane.text.attr('x', viewport.width / 2).attr('y', 5 + (i + 0.5) * articleSelectorPaneHeight).style('font-family', 'Helvetica').style("font-weight", "bold").attr("font-size", "30px");
+      pane.pane.on('mouseover', function() {
+        return pane.pane.style('fill', '#60CBFE');
+      });
+      _results.push(titlePanes.push(pane));
+    }
+    return _results;
+  });
   return sceneObject.titlePort.pane.on('mouseout', function() {
     return chooserClose();
   });
@@ -232,11 +228,14 @@ sceneDefine = function() {
     return sceneObject.textPort.element = sceneHook.svg.append('rect').style('stroke', '#222222').style('fill', '#222222');
   };
   titlePort = function() {
-    sceneObject.titlePort = util.titlePaneCreate(sceneHook.svg);
+    sceneObject.titlePort = util.titlePaneCreate(sceneHook.svg, '#60CAFB', true);
     sceneObject.titlePort.text.text(articles[currentArticle]);
     return sceneObject.titlePort.pane.on('mouseover', function() {
       console.log('mouseover titleport');
-      return TitleChooser();
+      console.log(states.articleSwitcher);
+      if (!states.articleSwitcher) {
+        return TitleChooser();
+      }
     });
   };
   rightPane = function() {
@@ -410,7 +409,7 @@ sceneSync = function(mode) {
   sceneObject.fontSize.redraw();
   drawTitle = function() {
     sceneObject.titlePort.pane.attr('width', viewport.width - 5 - 5).attr('height', layout.separator.top.y - 5 - 5).attr('x', 5).attr('y', -50).style('stroke-width', '7px').attr('rx', 10).attr('rx', 10);
-    d3.select('#pane0').attr('width', viewport.width - 5 - 5).attr('height', articleSelectorPaneHeight);
+    sceneObject.titlePort.textwrapper.attr('width', viewport.width - 5 - 5).attr('height', articleSelectorPaneHeight);
     sceneObject.titlePort.text.attr('x', viewport.width / 2).attr('y', 0).style('font-family', 'Helvetica').style("font-weight", "bold").attr("font-size", "30px");
     if (firstEntry) {
       sceneObject.titlePort.text.transition().duration(300).ease('sin').attr('y', layout.separator.top.y / 2);
