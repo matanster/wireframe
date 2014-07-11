@@ -130,7 +130,8 @@ TitleChooser = function() {
       newSelected.pane.transition().duration(450).attr('y', yOldPane);
       newSelected.text.transition().duration(450).attr('y', yOldText);
       oldSelected.pane.node().style.fill = '#50BFEF';
-      return newSelected.pane.node().style.fill = '#60CBFE';
+      newSelected.pane.node().style.fill = '#60CBFE';
+      return oldSelected.textWrapper.transition().duration(2000).style('-webkit-transform', 'perspective(40px) rotateX(0deg)');
     };
     hoverHandler = function(eventPane, i) {
       eventPane.pane.node().style.fill = '#55C4F5';
@@ -140,8 +141,7 @@ TitleChooser = function() {
       return eventPane.pane.node().onclick = function() {
         console.log("article " + articles[currentArticle] + " selected");
         switchPanes(titlePanes[currentArticle], titlePanes[i]);
-        currentArticle = i;
-        return panes.titlePaneCreate = eventPane;
+        return currentArticle = i;
       };
     };
     sceneObject.titlePort.element.remove();

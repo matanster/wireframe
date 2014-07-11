@@ -106,6 +106,8 @@ TitleChooser = () ->
       oldSelected.pane.node().style.fill = '#50BFEF'
       newSelected.pane.node().style.fill = '#60CBFE'
 
+      oldSelected.textWrapper.transition().duration(2000).style('-webkit-transform', 'perspective(40px) rotateX(0deg)')
+
     hoverHandler = (eventPane, i) ->
       eventPane.pane.node().style.fill = '#55C4F5'
       eventPane.pane.node().onmouseout = () -> eventPane.pane.node().style.fill = '#50BFEF'
@@ -113,7 +115,7 @@ TitleChooser = () ->
         console.log """article #{articles[currentArticle]} selected"""
         switchPanes(titlePanes[currentArticle], titlePanes[i])
         currentArticle = i
-        panes.titlePaneCreate = eventPane
+        #panes.titlePaneCreate = eventPane
 
     sceneObject.titlePort.element.remove()
 
