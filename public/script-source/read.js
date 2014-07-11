@@ -98,37 +98,58 @@ articleSelectorPaneHeight = calcStart() - 5 - 5;
 /(?:)/;
 
 TitleChooser = function() {
-  var chooserClose, height;
+  var chooserClose, height, titlePanes;
   states.articleSwitcher = true;
+  titlePanes = [];
   height = {
     'selectorMode': articles.length * articleSelectorPaneHeight,
     'selectedMode': articleSelectorPaneHeight
   };
   chooserClose = function() {
+    var article, i, _i, _len;
     console.log('closing article chooser');
-    sceneObject.titlePort.pane.transition().duration(400).ease('sin').attr('height', height.selectedMode);
+    sceneObject.topPane.transition().duration(400).ease('sin').attr('height', height.selectedMode);
+    for (i = _i = 0, _len = articles.length; _i < _len; i = ++_i) {
+      article = articles[i];
+      titlePanes[i].element.remove();
+    }
     return states.articleSwitcher = false;
   };
   console.log('opening article chooser');
-  util.makeSvgTopLayer(sceneObject.titlePort.element.node());
-  sceneObject.titlePort.pane.transition().duration(450).ease('linear').attr('height', height.selectorMode).each("end", function() {
-    var a, action, article, i, pane, titlePanes, _i, _len, _results;
-    titlePanes = [];
-    action = function(eventPane, i) {
-      eventPane.pane.node().style.fill = '#60CBFE';
+  util.makeSvgTopLayer(sceneObject.topPaneGroup.node());
+  sceneObject.topPane.transition().duration(450).ease('linear').attr('height', height.selectorMode).each("end", function() {
+    var a, article, hoverHandler, i, pane, switchPanes, _i, _len, _results;
+    switchPanes = function(oldSelected, newSelected) {
+      var yNewPane, yNewText, yOldPane, yOldText;
+      yOldPane = oldSelected.pane.attr('y');
+      yNewPane = newSelected.pane.attr('y');
+      yOldText = oldSelected.text.attr('y');
+      yNewText = newSelected.text.attr('y');
+      oldSelected.pane.transition().duration(450).delay(250).attr('y', yNewPane);
+      oldSelected.text.transition().duration(450).delay(250).attr('y', yNewText);
+      newSelected.pane.transition().duration(450).attr('y', yOldPane);
+      newSelected.text.transition().duration(450).attr('y', yOldText);
+      oldSelected.pane.node().style.fill = '#50BFEF';
+      return newSelected.pane.node().style.fill = '#60CBFE';
+    };
+    hoverHandler = function(eventPane, i) {
+      eventPane.pane.node().style.fill = '#55C4F5';
       eventPane.pane.node().onmouseout = function() {
         return eventPane.pane.node().style.fill = '#50BFEF';
       };
       return eventPane.pane.node().onclick = function() {
+        console.log("article " + articles[currentArticle] + " selected");
+        switchPanes(titlePanes[currentArticle], titlePanes[i]);
         currentArticle = i;
-        return console.log("article " + articles[currentArticle] + " selected");
+        return panes.titlePaneCreate = eventPane;
       };
     };
+    sceneObject.titlePort.element.remove();
     _results = [];
     for (i = _i = 0, _len = articles.length; _i < _len; i = ++_i) {
       article = articles[i];
       if (i === currentArticle) {
-        titlePanes.push(panes.titlePaneCreate(sceneObject.topPaneGroup, '#60CAFB', true));
+        titlePanes.push(panes.titlePaneCreate(sceneObject.topPaneGroup, '#60CBFE'));
       } else {
         titlePanes.push(panes.titlePaneCreate(sceneObject.topPaneGroup, '#50BFEF'));
       }
@@ -136,8 +157,12 @@ TitleChooser = function() {
       pane.text.text(article);
       pane.pane.attr('width', viewport.width - 5 - 5).attr('height', layout.separator.top.y - 5 - 5).attr('x', 5).attr('y', 5 + (i * articleSelectorPaneHeight)).style('stroke-width', '7px').attr('rx', 10).attr('rx', 10);
       pane.text.attr('x', viewport.width / 2).attr('y', 5 + (i + 0.5) * articleSelectorPaneHeight).style('font-family', 'Helvetica').style("font-weight", "bold").attr("font-size", "30px");
-      a = action.bind(void 0, pane, i);
-      _results.push(pane.pane.node().onmouseover = a);
+      if (i !== currentArticle) {
+        a = hoverHandler.bind(void 0, pane, i);
+        _results.push(pane.pane.node().onmouseover = a);
+      } else {
+        _results.push(void 0);
+      }
     }
     return _results;
   });
@@ -428,11 +453,12 @@ sceneSync = function(mode) {
     if (firstEntry) {
       sceneObject.titlePort.text.transition().duration(300).ease('sin').attr('y', layout.separator.top.y / 2);
       sceneObject.titlePort.pane.transition().duration(300).ease('sin').attr('y', 5);
-      return firstEntry = false;
+      firstEntry = false;
     } else {
       sceneObject.titlePort.text.attr('y', layout.separator.top.y / 2);
-      return sceneObject.titlePort.pane.attr('y', 5);
+      sceneObject.titlePort.pane.attr('y', 5);
     }
+    return sceneObject.topPane.attr('width', viewport.width - 5 - 5).attr('height', layout.separator.top.y - 5 - 5).attr('x', 5).attr('y', 5).style('stroke-width', '7px').attr('rx', 10).attr('rx', 10);
   };
   drawTitle();
   if (tokens != null) {

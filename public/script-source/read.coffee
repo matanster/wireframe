@@ -71,34 +71,56 @@ TitleChooser = () ->
 
   states.articleSwitcher = true
 
+  titlePanes = []
+
   height =
     'selectorMode' : articles.length * articleSelectorPaneHeight,
     'selectedMode' : articleSelectorPaneHeight,
 
   chooserClose = () ->
     console.log 'closing article chooser'
-    sceneObject.titlePort.pane.transition().duration(400).ease('sin').attr('height', height.selectedMode)
+    sceneObject.topPane.transition().duration(400).ease('sin').attr('height', height.selectedMode)
+    for article, i in articles
+      titlePanes[i].element.remove()
     states.articleSwitcher = false
 
   console.log 'opening article chooser'
 
-  util.makeSvgTopLayer(sceneObject.titlePort.element.node()) # move to svg top "layer"
+  util.makeSvgTopLayer(sceneObject.topPaneGroup.node()) # move to svg top "layer"
     #sceneObject.titlePort.text.transition().duration(300).ease('sin').attr('y', layout.separator.top.y / 2)
-  sceneObject.titlePort.pane.transition().duration(450).ease('linear').attr('height', height.selectorMode)
+  sceneObject.topPane.transition().duration(450).ease('linear').attr('height', height.selectorMode)
                                          .each("end", () ->
 
-    titlePanes = []
-    action = (eventPane, i) ->
-      eventPane.pane.node().style.fill = '#60CBFE'   
+    switchPanes = (oldSelected, newSelected) ->
+
+      yOldPane = oldSelected.pane.attr('y')
+      yNewPane = newSelected.pane.attr('y')
+      yOldText = oldSelected.text.attr('y')
+      yNewText = newSelected.text.attr('y')
+
+      oldSelected.pane.transition().duration(450).delay(250).attr('y', yNewPane)
+      oldSelected.text.transition().duration(450).delay(250).attr('y', yNewText)
+      newSelected.pane.transition().duration(450).attr('y', yOldPane)
+      newSelected.text.transition().duration(450).attr('y', yOldText)
+
+      oldSelected.pane.node().style.fill = '#50BFEF'
+      newSelected.pane.node().style.fill = '#60CBFE'
+
+    hoverHandler = (eventPane, i) ->
+      eventPane.pane.node().style.fill = '#55C4F5'
       eventPane.pane.node().onmouseout = () -> eventPane.pane.node().style.fill = '#50BFEF'
       eventPane.pane.node().onclick = () -> 
-        currentArticle = i
         console.log """article #{articles[currentArticle]} selected"""
+        switchPanes(titlePanes[currentArticle], titlePanes[i])
+        currentArticle = i
+        panes.titlePaneCreate = eventPane
+
+    sceneObject.titlePort.element.remove()
 
     for article, i in articles
 
-      if i is currentArticle 
-        titlePanes.push(panes.titlePaneCreate(sceneObject.topPaneGroup, '#60CAFB', true))
+      if i is currentArticle
+        titlePanes.push(panes.titlePaneCreate(sceneObject.topPaneGroup, '#60CBFE'))
       else
         titlePanes.push(panes.titlePaneCreate(sceneObject.topPaneGroup, '#50BFEF'))
 
@@ -120,9 +142,10 @@ TitleChooser = () ->
                .style('font-family', 'Helvetica')
                .style("font-weight", "bold")
                .attr("font-size", "30px")    
-
-      a = action.bind(undefined, pane, i)
-      pane.pane.node().onmouseover = a
+      
+      if i isnt currentArticle
+        a = hoverHandler.bind(undefined, pane, i)
+        pane.pane.node().onmouseover = a
   )
 
   sceneObject.topPaneGroup.on('mouseleave', () ->
@@ -513,6 +536,7 @@ sceneSync = (mode) ->
   drawTitle = () ->
 
  # draw title port 
+
     sceneObject.titlePort.pane.attr('width', viewport.width - 5 - 5)
                  .attr('height', layout.separator.top.y - 5 - 5)
                  .attr('x', 5)
@@ -544,6 +568,14 @@ sceneSync = (mode) ->
                  .attr('y', layout.separator.top.y / 2)
       sceneObject.titlePort.pane
                  .attr('y', 5) 
+
+    sceneObject.topPane.attr('width', viewport.width - 5 - 5)
+                 .attr('height', layout.separator.top.y - 5 - 5)
+                 .attr('x', 5)
+                 .attr('y', 5) # pre-animation location
+                 .style('stroke-width', '7px')
+                 .attr('rx', 10)
+                 .attr('rx', 10)              
 
   drawTitle()
 
