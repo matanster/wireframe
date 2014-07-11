@@ -1,4 +1,5 @@
 util        = require './util'
+panes        = require './panes'
 data        = require './data'
 tokenize    = require './tokenize'
 textDraw    = require './textDraw'
@@ -86,15 +87,19 @@ TitleChooser = () ->
                                          .each("end", () ->
 
     titlePanes = []
+    action = (eventPane) ->
+      eventPane.pane.node().style.fill = '#ffCBFE'          
+
     for article, i in articles
 
-      if i is currentArticle then continue
+      #if i is currentArticle then continue
 
-      pane = util.titlePaneCreate(sceneHook.svg, '#50BFEF')
+      titlePanes.push(panes.titlePaneCreate(sceneHook.svg, '#50BFEF'))
+      pane = titlePanes[i]
+
       pane.text.text(article)
       
       # draw title port 
-      console.log (i * articleSelectorPaneHeight)
       pane.pane.attr('width', viewport.width - 5 - 5)
                    .attr('height', layout.separator.top.y - 5 - 5)
                    .attr('x', 5)
@@ -109,11 +114,20 @@ TitleChooser = () ->
                .style("font-weight", "bold")
                .attr("font-size", "30px")    
 
+      a = action.bind(undefined, pane)
+      pane.pane.node().onmouseover = a
+      
+      ###
       pane.pane.on('mouseover', () ->
+        console.log """hovering #{this.getAttribute('id')}"""
+        pane = panes.lookup[this.getAttribute('id')] # get pane moused over
+        #console.dir(pane)
+        console.dir(pane.pane)
         pane.pane.style('fill', '#60CBFE')
       )
+      ###
 
-      titlePanes.push(pane)
+    #console.log "panes lookup table"
   )
 
   sceneObject.titlePort.pane.on('mouseout', () ->
@@ -257,7 +271,7 @@ sceneDefine = () ->
 
   titlePort = () ->
 
-    sceneObject.titlePort = util.titlePaneCreate(sceneHook.svg, '#60CAFB', true)
+    sceneObject.titlePort = panes.titlePaneCreate(sceneHook.svg, '#60CAFB', true)
 
     sceneObject.titlePort.text.text(articles[currentArticle])  # "Something Something Something Title"
 
@@ -506,7 +520,7 @@ sceneSync = (mode) ->
                  .attr('rx', 10)              
 
     #sceneObject.titlePort.textwrapper.style('stroke-width', '7px')
-    sceneObject.titlePort.textwrapper.attr('width', viewport.width - 5 - 5) 
+    sceneObject.titlePort.textWrapper.attr('width', viewport.width - 5 - 5) 
              .attr('height', articleSelectorPaneHeight)           
 
     sceneObject.titlePort.text.attr('x', viewport.width / 2)
