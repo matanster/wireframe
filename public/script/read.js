@@ -122,41 +122,44 @@ TitleChooser = function() {
     'selectedMode': articleSelectorPaneHeight
   };
   chooserClose = function() {
+    console.log('closing article chooser');
     sceneObject.titlePort.pane.transition().duration(400).ease('sin').attr('height', height.selectedMode);
     return states.articleSwitcher = false;
   };
-  console.log('opening title chooser');
+  console.log('opening article chooser');
   util.makeSvgTopLayer(sceneObject.titlePort.element.node());
   sceneObject.titlePort.pane.transition().duration(450).ease('linear').attr('height', height.selectorMode).each("end", function() {
     var a, action, article, i, pane, titlePanes, _i, _len, _results;
     titlePanes = [];
-    action = function(eventPane) {
-      return eventPane.pane.node().style.fill = '#ffCBFE';
+    action = function(eventPane, i) {
+      eventPane.pane.node().style.fill = '#60CBFE';
+      eventPane.pane.node().onmouseout = function() {
+        return eventPane.pane.node().style.fill = '#50BFEF';
+      };
+      return eventPane.pane.node().onclick = function() {
+        currentArticle = i;
+        return console.log("article " + articles[currentArticle] + " selected");
+      };
     };
     _results = [];
     for (i = _i = 0, _len = articles.length; _i < _len; i = ++_i) {
       article = articles[i];
-      titlePanes.push(panes.titlePaneCreate(sceneHook.svg, '#50BFEF'));
+      if (i === currentArticle) {
+        titlePanes.push(panes.titlePaneCreate(sceneObject.topPaneGroup, '#60CAFB', true));
+      } else {
+        titlePanes.push(panes.titlePaneCreate(sceneObject.topPaneGroup, '#50BFEF'));
+      }
       pane = titlePanes[i];
       pane.text.text(article);
       pane.pane.attr('width', viewport.width - 5 - 5).attr('height', layout.separator.top.y - 5 - 5).attr('x', 5).attr('y', 5 + (i * articleSelectorPaneHeight)).style('stroke-width', '7px').attr('rx', 10).attr('rx', 10);
       pane.text.attr('x', viewport.width / 2).attr('y', 5 + (i + 0.5) * articleSelectorPaneHeight).style('font-family', 'Helvetica').style("font-weight", "bold").attr("font-size", "30px");
-      a = action.bind(void 0, pane);
+      a = action.bind(void 0, pane, i);
       _results.push(pane.pane.node().onmouseover = a);
-      /*
-      pane.pane.on('mouseover', () ->
-        console.log """hovering #{this.getAttribute('id')}"""
-        pane = panes.lookup[this.getAttribute('id')] # get pane moused over
-        #console.dir(pane)
-        console.dir(pane.pane)
-        pane.pane.style('fill', '#60CBFE')
-      )
-      */
-
     }
     return _results;
   });
-  return sceneObject.titlePort.pane.on('mouseout', function() {
+  return sceneObject.topPaneGroup.on('mouseleave', function() {
+    console.log('mouse outside title port');
     return chooserClose();
   });
 };
@@ -255,11 +258,12 @@ sceneDefine = function() {
     return sceneObject.textPort.element = sceneHook.svg.append('rect').style('stroke', '#222222').style('fill', '#222222');
   };
   titlePort = function() {
-    sceneObject.titlePort = panes.titlePaneCreate(sceneHook.svg, '#60CAFB', true);
+    sceneObject.topPaneGroup = sceneHook.svg.append('g');
+    sceneObject.topPane = sceneObject.topPaneGroup.append('rect').style('fill', '#60CAFB');
+    sceneObject.titlePort = panes.titlePaneCreate(sceneObject.topPaneGroup, '#60CAFB', true);
     sceneObject.titlePort.text.text(articles[currentArticle]);
-    return sceneObject.titlePort.pane.on('mouseover', function() {
+    return sceneObject.topPaneGroup.on('mouseover', function() {
       console.log('mouseover titleport');
-      console.log(states.articleSwitcher);
       if (!states.articleSwitcher) {
         return TitleChooser();
       }

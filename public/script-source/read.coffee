@@ -76,10 +76,11 @@ TitleChooser = () ->
     'selectedMode' : articleSelectorPaneHeight,
 
   chooserClose = () ->
+    console.log 'closing article chooser'
     sceneObject.titlePort.pane.transition().duration(400).ease('sin').attr('height', height.selectedMode)
     states.articleSwitcher = false
 
-  console.log 'opening title chooser'
+  console.log 'opening article chooser'
 
   util.makeSvgTopLayer(sceneObject.titlePort.element.node()) # move to svg top "layer"
     #sceneObject.titlePort.text.transition().duration(300).ease('sin').attr('y', layout.separator.top.y / 2)
@@ -87,14 +88,20 @@ TitleChooser = () ->
                                          .each("end", () ->
 
     titlePanes = []
-    action = (eventPane) ->
-      eventPane.pane.node().style.fill = '#ffCBFE'          
+    action = (eventPane, i) ->
+      eventPane.pane.node().style.fill = '#60CBFE'   
+      eventPane.pane.node().onmouseout = () -> eventPane.pane.node().style.fill = '#50BFEF'
+      eventPane.pane.node().onclick = () -> 
+        currentArticle = i
+        console.log """article #{articles[currentArticle]} selected"""
 
     for article, i in articles
 
-      #if i is currentArticle then continue
+      if i is currentArticle 
+        titlePanes.push(panes.titlePaneCreate(sceneObject.topPaneGroup, '#60CAFB', true))
+      else
+        titlePanes.push(panes.titlePaneCreate(sceneObject.topPaneGroup, '#50BFEF'))
 
-      titlePanes.push(panes.titlePaneCreate(sceneHook.svg, '#50BFEF'))
       pane = titlePanes[i]
 
       pane.text.text(article)
@@ -114,23 +121,12 @@ TitleChooser = () ->
                .style("font-weight", "bold")
                .attr("font-size", "30px")    
 
-      a = action.bind(undefined, pane)
+      a = action.bind(undefined, pane, i)
       pane.pane.node().onmouseover = a
-      
-      ###
-      pane.pane.on('mouseover', () ->
-        console.log """hovering #{this.getAttribute('id')}"""
-        pane = panes.lookup[this.getAttribute('id')] # get pane moused over
-        #console.dir(pane)
-        console.dir(pane.pane)
-        pane.pane.style('fill', '#60CBFE')
-      )
-      ###
-
-    #console.log "panes lookup table"
   )
 
-  sceneObject.titlePort.pane.on('mouseout', () ->
+  sceneObject.topPaneGroup.on('mouseleave', () ->
+    console.log 'mouse outside title port'
     chooserClose()
   )
 
@@ -271,13 +267,19 @@ sceneDefine = () ->
 
   titlePort = () ->
 
-    sceneObject.titlePort = panes.titlePaneCreate(sceneHook.svg, '#60CAFB', true)
+    sceneObject.topPaneGroup = sceneHook.svg.append('g')
+
+    sceneObject.topPane = sceneObject.topPaneGroup.append('rect')
+                                                  .style('fill', '#60CAFB')  
+
+    sceneObject.titlePort = panes.titlePaneCreate(sceneObject.topPaneGroup, '#60CAFB', true)
+
+    #sceneObject.titlePort.pane.style('pointer-events', 'all') # disable mouse events and let them drip through
 
     sceneObject.titlePort.text.text(articles[currentArticle])  # "Something Something Something Title"
 
-    sceneObject.titlePort.pane.on('mouseover', () ->
+    sceneObject.topPaneGroup.on('mouseover', () ->
       console.log 'mouseover titleport'
-      console.log states.articleSwitcher
       unless states.articleSwitcher
         TitleChooser()
 #      sceneObject.rightPane.element.on('mousemove', () -> # to do: replace with a more circular area of tolerance
