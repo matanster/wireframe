@@ -92,6 +92,7 @@ TitleChooser = () ->
 
   sceneObject.titlePort.textWrapper.transition().duration(450)
       .styleTween('-webkit-transform', () -> d3.interpolateString('perspective(40px) rotate3d(1, 0, 0, 2deg)', 'perspective(40px) rotate3d(1, 0, 0, 0deg)'))
+      .each("end", () -> sceneObject.titlePort.element.remove())
 
   sceneObject.topPane.transition().duration(450).ease('linear').attr('height', height.selectorMode)
                                          .each("end", () ->
@@ -99,9 +100,11 @@ TitleChooser = () ->
     switchPanes = (oldSelected, newSelected) ->
 
       yOldPane = oldSelected.pane.attr('y')
-      yNewPane = newSelected.pane.attr('y')
       yOldText = oldSelected.text.attr('y')
+      yNewPane = newSelected.pane.attr('y')
       yNewText = newSelected.text.attr('y')
+
+      util.makeSvgTopLayer(newSelected.element.node()) # swish on top other bars, by moving to svg top "layer"
 
       oldSelected.pane.transition().duration(450).delay(250).attr('y', yNewPane)
       oldSelected.text.transition().duration(450).delay(250).attr('y', yNewText)
@@ -111,27 +114,31 @@ TitleChooser = () ->
       oldSelected.pane.node().style.fill = '#50BFEF'
       newSelected.pane.node().style.fill = '#60CBFE'
 
-      #sceneObject.titlePort.textWrapper.transition().duration(2000).style('-webkit-transform', 'perspective(40px) rotate3d(1, 0, 0, 0)')
-
     hoverHandler = (eventPane, i) ->
-      eventPane.pane.node().style.fill = '#55C4F5'
-      eventPane.pane.node().onmouseout = () -> eventPane.pane.node().style.fill = '#50BFEF'
-      eventPane.pane.node().onclick = () -> 
-        console.log """article #{articles[currentArticle]} selected"""
-        switchPanes(titlePanes[currentArticle], titlePanes[i])
-        currentArticle = i
-        #panes.titlePaneCreate = eventPane
+      unless i is currentArticle
+        eventPane.pane.node().style.fill = '#55C4F5'
+        eventPane.pane.node().onmouseout = () -> 
+          unless i = currentArticle
+            eventPane.pane.node().style.fill = '#50BFEF'
+        eventPane.pane.node().onclick = () -> 
+          console.log """article #{articles[i]} selected"""
+          console.log i
+          switchPanes(titlePanes[currentArticle], titlePanes[i])
+          currentArticle = i
+          #panes.titlePaneCreate = eventPane
 
     #sceneObject.titlePort.element.remove()
 
     for article, i in articles
 
       if i is currentArticle
-        titlePanes.push(panes.titlePaneCreate(sceneObject.topPaneGroup, '#60CBFE', true))
+        titlePanes.push(panes.titlePaneCreate(sceneObject.topPaneGroup, '#60CBFE'))
+
       else
         titlePanes.push(panes.titlePaneCreate(sceneObject.topPaneGroup, '#50BFEF'))
 
       pane = titlePanes[i]
+      console.log article
 
       pane.text.text(article)
       
@@ -150,9 +157,8 @@ TitleChooser = () ->
                .style("font-weight", "bold")
                .attr("font-size", "30px")    
       
-      if i isnt currentArticle
-        a = hoverHandler.bind(undefined, pane, i)
-        pane.pane.node().onmouseover = a
+      boundHandler = hoverHandler.bind(undefined, pane, i)
+      pane.pane.node().onmouseover = boundHandler
   )
 
   sceneObject.topPaneGroup.on('mouseleave', () ->
@@ -318,7 +324,7 @@ sceneDefine = () ->
 
     sceneObject.titlePort.text.text(articles[currentArticle])  # "Something Something Something Title"
 
-    sceneObject.topPaneGroup.on('mouseover', () ->
+    sceneObject.topPaneGroup.on('mouseenter', () ->
       console.log 'mouseover titleport'
       unless states.articleSwitcher
         TitleChooser()
@@ -565,8 +571,9 @@ sceneSync = (mode) ->
     #sceneObject.titlePort.textwrapper.style('stroke-width', '7px')
     sceneObject.titlePort.textWrapper.attr('width', viewport.width - 5 - 5) 
              .attr('height', articleSelectorPaneHeight)           
+             #.style("background-color", 'red')
 
-    sceneObject.titlePort.text.attr('x', viewport.width / 2)
+    sceneObject.titlePort.text.attr('x', viewport.width / 2 - 5)
              .attr('y', 0)
              .style('font-family', 'Helvetica')
              .style("font-weight", "bold")

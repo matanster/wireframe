@@ -136,15 +136,18 @@ TitleChooser = function() {
   util.makeSvgTopLayer(sceneObject.topPaneGroup.node());
   sceneObject.titlePort.textWrapper.transition().duration(450).styleTween('-webkit-transform', function() {
     return d3.interpolateString('perspective(40px) rotate3d(1, 0, 0, 2deg)', 'perspective(40px) rotate3d(1, 0, 0, 0deg)');
+  }).each("end", function() {
+    return sceneObject.titlePort.element.remove();
   });
   sceneObject.topPane.transition().duration(450).ease('linear').attr('height', height.selectorMode).each("end", function() {
-    var a, article, hoverHandler, i, pane, switchPanes, _i, _len, _results;
+    var article, boundHandler, hoverHandler, i, pane, switchPanes, _i, _len, _results;
     switchPanes = function(oldSelected, newSelected) {
       var yNewPane, yNewText, yOldPane, yOldText;
       yOldPane = oldSelected.pane.attr('y');
-      yNewPane = newSelected.pane.attr('y');
       yOldText = oldSelected.text.attr('y');
+      yNewPane = newSelected.pane.attr('y');
       yNewText = newSelected.text.attr('y');
+      util.makeSvgTopLayer(newSelected.element.node());
       oldSelected.pane.transition().duration(450).delay(250).attr('y', yNewPane);
       oldSelected.text.transition().duration(450).delay(250).attr('y', yNewText);
       newSelected.pane.transition().duration(450).attr('y', yOldPane);
@@ -153,34 +156,36 @@ TitleChooser = function() {
       return newSelected.pane.node().style.fill = '#60CBFE';
     };
     hoverHandler = function(eventPane, i) {
-      eventPane.pane.node().style.fill = '#55C4F5';
-      eventPane.pane.node().onmouseout = function() {
-        return eventPane.pane.node().style.fill = '#50BFEF';
-      };
-      return eventPane.pane.node().onclick = function() {
-        console.log("article " + articles[currentArticle] + " selected");
-        switchPanes(titlePanes[currentArticle], titlePanes[i]);
-        return currentArticle = i;
-      };
+      if (i !== currentArticle) {
+        eventPane.pane.node().style.fill = '#55C4F5';
+        eventPane.pane.node().onmouseout = function() {
+          if (!(i = currentArticle)) {
+            return eventPane.pane.node().style.fill = '#50BFEF';
+          }
+        };
+        return eventPane.pane.node().onclick = function() {
+          console.log("article " + articles[i] + " selected");
+          console.log(i);
+          switchPanes(titlePanes[currentArticle], titlePanes[i]);
+          return currentArticle = i;
+        };
+      }
     };
     _results = [];
     for (i = _i = 0, _len = articles.length; _i < _len; i = ++_i) {
       article = articles[i];
       if (i === currentArticle) {
-        titlePanes.push(panes.titlePaneCreate(sceneObject.topPaneGroup, '#60CBFE', true));
+        titlePanes.push(panes.titlePaneCreate(sceneObject.topPaneGroup, '#60CBFE'));
       } else {
         titlePanes.push(panes.titlePaneCreate(sceneObject.topPaneGroup, '#50BFEF'));
       }
       pane = titlePanes[i];
+      console.log(article);
       pane.text.text(article);
       pane.pane.attr('width', viewport.width - 5 - 5).attr('height', layout.separator.top.y - 5 - 5).attr('x', 5).attr('y', 5 + (i * articleSelectorPaneHeight)).style('stroke-width', '7px').attr('rx', 10).attr('rx', 10);
       pane.text.attr('x', viewport.width / 2).attr('y', 5 + (i + 0.5) * articleSelectorPaneHeight).style('font-family', 'Helvetica').style("font-weight", "bold").attr("font-size", "30px");
-      if (i !== currentArticle) {
-        a = hoverHandler.bind(void 0, pane, i);
-        _results.push(pane.pane.node().onmouseover = a);
-      } else {
-        _results.push(void 0);
-      }
+      boundHandler = hoverHandler.bind(void 0, pane, i);
+      _results.push(pane.pane.node().onmouseover = boundHandler);
     }
     return _results;
   });
@@ -288,7 +293,7 @@ sceneDefine = function() {
     sceneObject.topPane = sceneObject.topPaneGroup.append('rect').style('fill', '#60CAFB');
     sceneObject.titlePort = panes.titlePaneCreate(sceneObject.topPaneGroup, '#60CAFB', true);
     sceneObject.titlePort.text.text(articles[currentArticle]);
-    return sceneObject.topPaneGroup.on('mouseover', function() {
+    return sceneObject.topPaneGroup.on('mouseenter', function() {
       console.log('mouseover titleport');
       if (!states.articleSwitcher) {
         return TitleChooser();
@@ -467,7 +472,7 @@ sceneSync = function(mode) {
   drawTitle = function() {
     sceneObject.titlePort.pane.attr('width', viewport.width - 5 - 5).attr('height', layout.separator.top.y - 5 - 5).attr('x', 5).attr('y', -50).style('stroke-width', '7px').attr('rx', 10).attr('rx', 10);
     sceneObject.titlePort.textWrapper.attr('width', viewport.width - 5 - 5).attr('height', articleSelectorPaneHeight);
-    sceneObject.titlePort.text.attr('x', viewport.width / 2).attr('y', 0).style('font-family', 'Helvetica').style("font-weight", "bold").attr("font-size", "30px");
+    sceneObject.titlePort.text.attr('x', viewport.width / 2 - 5).attr('y', 0).style('font-family', 'Helvetica').style("font-weight", "bold").attr("font-size", "30px");
     if (firstEntry) {
       sceneObject.titlePort.text.transition().duration(300).ease('sin').attr('y', layout.separator.top.y / 2);
       sceneObject.titlePort.pane.transition().duration(300).ease('sin').attr('y', 5);
@@ -1410,7 +1415,9 @@ exports.titlePaneCreate = function(svgAnchor, initialColor, rotated) {
   paneObject.pane = paneObject.element.append('rect').style('fill', initialColor);
   if (rotated) {
     textWrapperId = "panetextWrapper" + getPaneID();
-    paneObject.element.append('foreignObject').append('xhtml:body').html("<svg id=" + textWrapperId + " style='-webkit-transform: perspective(40px) rotate3d(1, 0, 0, 2deg)'></svg>").style('pointer-events', 'none');
+    paneObject.element.append('foreignObject').append('xhtml:body').style({
+      "margin": "5px"
+    }).html("<svg id=" + textWrapperId + " style='-webkit-transform: perspective(40px) rotate3d(1, 0, 0, 2deg)'></svg>").style('pointer-events', 'none');
     paneObject.textWrapper = d3.select('#' + textWrapperId);
     paneObject.text = paneObject.textWrapper.append('text').attr("dominant-baseline", "central").style("text-anchor", "middle").style('fill', "#EEEEEE");
   } else {
