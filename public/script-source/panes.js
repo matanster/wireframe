@@ -15,12 +15,11 @@ exports.titlePaneCreate = function(svgAnchor, initialColor, rotated) {
   paneObject.pane = paneObject.element.append('rect').style('fill', initialColor);
   if (rotated) {
     textWrapperId = "panetextWrapper" + getPaneID();
-    paneObject.element.append('foreignObject').append('xhtml:body').html("<svg id=" + textWrapperId + " style='-webkit-transform: perspective(40px) rotateX(2deg)'></svg>").style('pointer-events', 'none');
+    paneObject.element.append('foreignObject').append('xhtml:body').html("<svg id=" + textWrapperId + " style='-webkit-transform: perspective(40px) rotate3d(1, 0, 0, 2deg)'></svg>").style('pointer-events', 'none');
     paneObject.textWrapper = d3.select('#' + textWrapperId);
     paneObject.text = paneObject.textWrapper.append('text').attr("dominant-baseline", "central").style("text-anchor", "middle").style('fill', "#EEEEEE");
   } else {
     paneObject.text = paneObject.element.append('text').attr("dominant-baseline", "central").style("text-anchor", "middle").style('fill', "#EEEEEE");
   }
-  paneObject.textWrapperId = textWrapperId;
   return paneObject;
 };

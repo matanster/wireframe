@@ -19,9 +19,14 @@ exports.titlePaneCreate = (svgAnchor, initialColor, rotated) ->
     textWrapperId = "panetextWrapper" + getPaneID() # unique DOM id for being able to access the html embedded svg for modifying it
     paneObject.element.append('foreignObject')
                       .append('xhtml:body')
-                      .html("""<svg id=#{textWrapperId} style='-webkit-transform: perspective(40px) rotateX(2deg)'></svg>""")
+                      #.html("""<svg id=#{textWrapperId} style='-webkit-transform: perspective(40px) rotateX(2deg)'></svg>""")
+                      .html("""<svg id=#{textWrapperId} style='-webkit-transform: perspective(40px) rotate3d(1, 0, 0, 2deg)'></svg>""")
+                      #.html("""<svg id=#{textWrapperId}'></svg>""")
                       .style('pointer-events', 'none') # disable mouse events and let them drip through
+
     paneObject.textWrapper = d3.select('#' + textWrapperId)
+
+    #paneObject.textWrapper.transition().duration(4000).style('-webkit-transform', 'perspective(40px) rotate3d(1, 0, 0, 2deg)')
 
     # modify the svg nested inside the html just created
     paneObject.text = paneObject.textWrapper.append('text')
@@ -37,6 +42,6 @@ exports.titlePaneCreate = (svgAnchor, initialColor, rotated) ->
                                       .style("text-anchor", "middle")
                                       .style('fill', "#EEEEEE")
 
-  paneObject.textWrapperId = textWrapperId
+  #paneObject.textWrapperId = textWrapperId
   
   return paneObject

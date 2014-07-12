@@ -134,6 +134,9 @@ TitleChooser = function() {
   };
   console.log('opening article chooser');
   util.makeSvgTopLayer(sceneObject.topPaneGroup.node());
+  sceneObject.titlePort.textWrapper.transition().duration(450).styleTween('-webkit-transform', function() {
+    return d3.interpolateString('perspective(40px) rotate3d(1, 0, 0, 2deg)', 'perspective(40px) rotate3d(1, 0, 0, 0deg)');
+  });
   sceneObject.topPane.transition().duration(450).ease('linear').attr('height', height.selectorMode).each("end", function() {
     var a, article, hoverHandler, i, pane, switchPanes, _i, _len, _results;
     switchPanes = function(oldSelected, newSelected) {
@@ -147,8 +150,7 @@ TitleChooser = function() {
       newSelected.pane.transition().duration(450).attr('y', yOldPane);
       newSelected.text.transition().duration(450).attr('y', yOldText);
       oldSelected.pane.node().style.fill = '#50BFEF';
-      newSelected.pane.node().style.fill = '#60CBFE';
-      return oldSelected.textWrapper.transition().duration(2000).style('-webkit-transform', 'perspective(40px) rotateX(0deg)');
+      return newSelected.pane.node().style.fill = '#60CBFE';
     };
     hoverHandler = function(eventPane, i) {
       eventPane.pane.node().style.fill = '#55C4F5';
@@ -161,12 +163,11 @@ TitleChooser = function() {
         return currentArticle = i;
       };
     };
-    sceneObject.titlePort.element.remove();
     _results = [];
     for (i = _i = 0, _len = articles.length; _i < _len; i = ++_i) {
       article = articles[i];
       if (i === currentArticle) {
-        titlePanes.push(panes.titlePaneCreate(sceneObject.topPaneGroup, '#60CBFE'));
+        titlePanes.push(panes.titlePaneCreate(sceneObject.topPaneGroup, '#60CBFE', true));
       } else {
         titlePanes.push(panes.titlePaneCreate(sceneObject.topPaneGroup, '#50BFEF'));
       }
@@ -1409,13 +1410,12 @@ exports.titlePaneCreate = function(svgAnchor, initialColor, rotated) {
   paneObject.pane = paneObject.element.append('rect').style('fill', initialColor);
   if (rotated) {
     textWrapperId = "panetextWrapper" + getPaneID();
-    paneObject.element.append('foreignObject').append('xhtml:body').html("<svg id=" + textWrapperId + " style='-webkit-transform: perspective(40px) rotateX(2deg)'></svg>").style('pointer-events', 'none');
+    paneObject.element.append('foreignObject').append('xhtml:body').html("<svg id=" + textWrapperId + " style='-webkit-transform: perspective(40px) rotate3d(1, 0, 0, 2deg)'></svg>").style('pointer-events', 'none');
     paneObject.textWrapper = d3.select('#' + textWrapperId);
     paneObject.text = paneObject.textWrapper.append('text').attr("dominant-baseline", "central").style("text-anchor", "middle").style('fill', "#EEEEEE");
   } else {
     paneObject.text = paneObject.element.append('text').attr("dominant-baseline", "central").style("text-anchor", "middle").style('fill', "#EEEEEE");
   }
-  paneObject.textWrapperId = textWrapperId;
   return paneObject;
 };
 

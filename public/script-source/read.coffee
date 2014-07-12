@@ -88,6 +88,11 @@ TitleChooser = () ->
 
   util.makeSvgTopLayer(sceneObject.topPaneGroup.node()) # move to svg top "layer"
     #sceneObject.titlePort.text.transition().duration(300).ease('sin').attr('y', layout.separator.top.y / 2)
+
+
+  sceneObject.titlePort.textWrapper.transition().duration(450)
+      .styleTween('-webkit-transform', () -> d3.interpolateString('perspective(40px) rotate3d(1, 0, 0, 2deg)', 'perspective(40px) rotate3d(1, 0, 0, 0deg)'))
+
   sceneObject.topPane.transition().duration(450).ease('linear').attr('height', height.selectorMode)
                                          .each("end", () ->
 
@@ -106,7 +111,7 @@ TitleChooser = () ->
       oldSelected.pane.node().style.fill = '#50BFEF'
       newSelected.pane.node().style.fill = '#60CBFE'
 
-      oldSelected.textWrapper.transition().duration(2000).style('-webkit-transform', 'perspective(40px) rotateX(0deg)')
+      #sceneObject.titlePort.textWrapper.transition().duration(2000).style('-webkit-transform', 'perspective(40px) rotate3d(1, 0, 0, 0)')
 
     hoverHandler = (eventPane, i) ->
       eventPane.pane.node().style.fill = '#55C4F5'
@@ -117,12 +122,12 @@ TitleChooser = () ->
         currentArticle = i
         #panes.titlePaneCreate = eventPane
 
-    sceneObject.titlePort.element.remove()
+    #sceneObject.titlePort.element.remove()
 
     for article, i in articles
 
       if i is currentArticle
-        titlePanes.push(panes.titlePaneCreate(sceneObject.topPaneGroup, '#60CBFE'))
+        titlePanes.push(panes.titlePaneCreate(sceneObject.topPaneGroup, '#60CBFE', true))
       else
         titlePanes.push(panes.titlePaneCreate(sceneObject.topPaneGroup, '#50BFEF'))
 
@@ -298,6 +303,16 @@ sceneDefine = () ->
                                                   .style('fill', '#60CAFB')  
 
     sceneObject.titlePort = panes.titlePaneCreate(sceneObject.topPaneGroup, '#60CAFB', true)
+
+    #sceneObject.titlePort.textWrapper.node().style.transitions = 'all 6s'
+    #sceneObject.titlePort.textWrapper.node().style.backgroundColor = '#993333'
+    #sceneObject.titlePort.textWrapper.node().style.transform = 'perspective(40px) rotate3d(1, 0, 0, 2deg)'
+    #sceneObject.titlePort.textWrapper.style('background-color', '#FF4444')
+    #sceneObject.titlePort.textWrapper.transition().duration(5000).style('-webkit-transform', 'perspective(40px) rotate3d(1, 0, 0, 0deg)')
+    #sceneObject.titlePort.textWrapper.style('-webkit-transform', 'perspective(40px) rotate3d(1, 0, 0, 0deg)')
+    #sceneObject.titlePort.textWrapper.transition().duration(5000).style('background-color', '#FF4444')
+    #sceneObject.titlePort.textWrapper.transition().duration(5000)
+    #                                 .styleTween('transform', 'perspective(40px) rotate3d(1, 0, 0, 0deg)')
 
     #sceneObject.titlePort.pane.style('pointer-events', 'all') # disable mouse events and let them drip through
 
