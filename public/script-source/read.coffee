@@ -24,7 +24,7 @@ console.log 'read.js main started'
 firstEntry = true
 
 # Globals
-viewport  = null
+viewport = util.getViewport()
 
 states = 
   rightPane: 'toc-invitation'
@@ -49,25 +49,85 @@ layout =
     'left':
       'x':
         'current': 300
+    'top': 
+      'y': null
 
 layout.separator.left.x.revertsTo = layout.separator.left.x.current
-layout.separator.top = {}
 
 coreH = null
 boxH   = null
 end    = null
 
+
+articleSelectorPaneHeight = calcStart() - 5 - 5
+
 articles = ["The Relationship Between Human Capital and Firm Performance",
             "Article 2",
             "Article 3"
            ]
-currentArticle = 0           
-articleSelectorPaneHeight = calcStart() - 5 - 5
+articlesDisplayOrder = [0, 1, 2]
+
+selectedArticle = articles[0] 
+
+
+# draw title port 
+drawTitle = () ->
+
+  sceneObject.titlePort.pane.attr('width', viewport.width - 5 - 5)
+               .attr('height', layout.separator.top.y - 5 - 5)
+               .attr('x', 5)
+               .attr('y', -50) # pre-animation location
+               .style('stroke-width', '7px')
+               .attr('rx', 10)
+               .attr('rx', 10)              
+
+  #sceneObject.titlePort.textwrapper.style('stroke-width', '7px')
+  sceneObject.titlePort.textWrapper.attr('width', viewport.width - 5 - 5) 
+           .attr('height', articleSelectorPaneHeight)           
+           #.style("background-color", 'red')
+
+  sceneObject.titlePort.text.attr('x', viewport.width / 2 - 5)
+           .attr('y', 0)
+           .style('font-family', 'Helvetica')
+           .style("font-weight", "bold")
+           .attr("font-size", "30px")    
+
+  if firstEntry
+    sceneObject.titlePort.text.transition().duration(300).ease('sin')
+                                  .attr('y', layout.separator.top.y / 2)
+    sceneObject.titlePort.pane.transition().duration(300).ease('sin')
+                                          .attr('y', 5)
+    #setTimeout(sceneObject.fontSize.redraw, 2000)                                         
+    firstEntry = false
+
+  else 
+    sceneObject.titlePort.text
+               .attr('y', layout.separator.top.y / 2)
+    sceneObject.titlePort.pane
+               .attr('y', 5) 
+
+
+titleShow = () ->
+
+  sceneObject.titlePort = panes.titlePaneCreate(sceneObject.topPaneGroup, '#60CAFB', true)
+
+  #sceneObject.titlePort.pane.style('pointer-events', 'all') # disable mouse events and let them drip through
+
+  sceneObject.titlePort.text.text(selectedArticle)  
+
+#      sceneObject.rightPane.element.on('mousemove', () -> # to do: replace with a more circular area of tolerance
+#        if event.x > layout.separator.right.x + sceneObject.rightPane.geometry.hoverIgnoreAreaX
+#          if event.y > layout.separator.top.y + sceneObject.rightPane.geometry.hoverIgnoreAreaY and
+#             event.y < viewport.height - sceneObject.rightPane.geometry.hoverIgnoreAreaY 
+
+  drawTitle()
 
 //
 //
 //
 TitleChooser = () ->
+
+  activePane = null
 
   states.articleSwitcher = true
 
@@ -75,20 +135,28 @@ TitleChooser = () ->
 
   height =
     'selectorMode' : articles.length * articleSelectorPaneHeight,
-    'selectedMode' : articleSelectorPaneHeight,
+    'selectedMode' : articleSelectorPaneHeight
 
   chooserClose = () ->
     console.log 'closing article chooser'
-    sceneObject.topPane.transition().duration(400).ease('sin').attr('height', height.selectedMode)
+
+    titleShow()
+
+    sceneObject.titlePort.textWrapper.transition().duration(300)
+          .styleTween('-webkit-transform', () -> d3.interpolateString('perspective(40px) rotate3d(1, 0, 0, 0deg)', 'perspective(40px) rotate3d(1, 0, 0, 2deg)'))
+          #.each("end", () -> sceneObject.titlePort.element.remove())
+
+    sceneObject.topPane.transition().duration(400).ease('linear').attr('height', height.selectedMode)
+
     for article, i in articles
       titlePanes[i].element.remove()
+
     states.articleSwitcher = false
+
 
   console.log 'opening article chooser'
 
   util.makeSvgTopLayer(sceneObject.topPaneGroup.node()) # move to svg top "layer"
-    #sceneObject.titlePort.text.transition().duration(300).ease('sin').attr('y', layout.separator.top.y / 2)
-
 
   sceneObject.titlePort.textWrapper.transition().duration(450)
       .styleTween('-webkit-transform', () -> d3.interpolateString('perspective(40px) rotate3d(1, 0, 0, 2deg)', 'perspective(40px) rotate3d(1, 0, 0, 0deg)'))
@@ -96,6 +164,8 @@ TitleChooser = () ->
 
   sceneObject.topPane.transition().duration(450).ease('linear').attr('height', height.selectorMode)
                                          .each("end", () ->
+
+    sceneObject.titlePort.element.remove()
 
     switchPanes = (oldSelected, newSelected) ->
 
@@ -114,50 +184,69 @@ TitleChooser = () ->
       oldSelected.pane.node().style.fill = '#50BFEF'
       newSelected.pane.node().style.fill = '#60CBFE'
 
-    hoverHandler = (eventPane, i) ->
-      unless i is currentArticle
-        eventPane.pane.node().style.fill = '#55C4F5'
-        eventPane.pane.node().onmouseout = () -> 
-          unless i = currentArticle
-            eventPane.pane.node().style.fill = '#50BFEF'
-        eventPane.pane.node().onclick = () -> 
-          console.log """article #{articles[i]} selected"""
-          console.log i
-          switchPanes(titlePanes[currentArticle], titlePanes[i])
-          currentArticle = i
-          #panes.titlePaneCreate = eventPane
+    hoverHandler = (hoveredPane) ->
+      console.log hoveredPane.order
+      console.log activePane.order
+      unless hoveredPane is activePane
+        hoveredPane.pane.node().style.fill = '#55C4F5'
 
-    #sceneObject.titlePort.element.remove()
+        hoveredPane.pane.node().onmouseout = () -> 
+          unless hoveredPane is activePane
+            hoveredPane.pane.node().style.fill = '#50BFEF'
 
-    for article, i in articles
+        hoveredPane.pane.node().onclick = () -> 
+          selectedArticle = articles[hoveredPane.articleId]
+          console.log """article #{selectedArticle} selected"""
+          switchPanes(activePane, hoveredPane)
 
-      if i is currentArticle
-        titlePanes.push(panes.titlePaneCreate(sceneObject.topPaneGroup, '#60CBFE'))
+          console.log articlesDisplayOrder
+          articlesDisplayOrder[activePane.order] = hoveredPane.articleId
+          articlesDisplayOrder[hoveredPane.order]  = activePane.articleId
+          console.log articlesDisplayOrder
 
+          activePane.order = hoveredPane.order
+          hoveredPane.order = 0
+          activePane = hoveredPane
+
+    for articleId, displayOrder in articlesDisplayOrder
+
+      articleName = articles[articleId]
+      console.log articleName
+
+      if displayOrder is 0
+        pane = panes.titlePaneCreate(sceneObject.topPaneGroup, '#60CBFE')
       else
-        titlePanes.push(panes.titlePaneCreate(sceneObject.topPaneGroup, '#50BFEF'))
+        pane = panes.titlePaneCreate(sceneObject.topPaneGroup, '#50BFEF')
 
-      pane = titlePanes[i]
-      console.log article
+      titlePanes.push(pane)
 
-      pane.text.text(article)
+      pane.text.text(articleName)
       
       # draw title port 
       pane.pane.attr('width', viewport.width - 5 - 5)
                    .attr('height', layout.separator.top.y - 5 - 5)
                    .attr('x', 5)
-                   .attr('y', 5 + (i * articleSelectorPaneHeight))
+                   .attr('y', 5 + (displayOrder * articleSelectorPaneHeight))
                    .style('stroke-width', '7px')
                    .attr('rx', 10)
                    .attr('rx', 10)              
 
       pane.text.attr('x', viewport.width / 2)
-               .attr('y', (5 + (i + 0.5) * articleSelectorPaneHeight))
+               .attr('y', (5 + (displayOrder + 0.5) * articleSelectorPaneHeight))
                .style('font-family', 'Helvetica')
                .style("font-weight", "bold")
                .attr("font-size", "30px")    
-      
-      boundHandler = hoverHandler.bind(undefined, pane, i)
+
+      # the active article should be the one first in the display order
+      if displayOrder is 0
+        activePane = pane
+
+      # each pane knows its display order
+      pane.order     = displayOrder
+      pane.articleId = articleId
+
+      # each pane has its hover handler (requiring early binding)
+      boundHandler = hoverHandler.bind(undefined, pane) # early binding
       pane.pane.node().onmouseover = boundHandler
   )
 
@@ -301,14 +390,17 @@ sceneDefine = () ->
                            .style('stroke', '#222222')
                            .style('fill', '#222222')   
 
-  titlePort = () ->
-
+  topPane = () ->
     sceneObject.topPaneGroup = sceneHook.svg.append('g')
 
     sceneObject.topPane = sceneObject.topPaneGroup.append('rect')
                                                   .style('fill', '#60CAFB')  
 
-    sceneObject.titlePort = panes.titlePaneCreate(sceneObject.topPaneGroup, '#60CAFB', true)
+    sceneObject.topPaneGroup.on('mouseenter', () ->
+      console.log 'mouseover titleport'
+      unless states.articleSwitcher
+        TitleChooser()
+      )
 
     #sceneObject.titlePort.textWrapper.node().style.transitions = 'all 6s'
     #sceneObject.titlePort.textWrapper.node().style.backgroundColor = '#993333'
@@ -319,22 +411,6 @@ sceneDefine = () ->
     #sceneObject.titlePort.textWrapper.transition().duration(5000).style('background-color', '#FF4444')
     #sceneObject.titlePort.textWrapper.transition().duration(5000)
     #                                 .styleTween('transform', 'perspective(40px) rotate3d(1, 0, 0, 0deg)')
-
-    #sceneObject.titlePort.pane.style('pointer-events', 'all') # disable mouse events and let them drip through
-
-    sceneObject.titlePort.text.text(articles[currentArticle])  # "Something Something Something Title"
-
-    sceneObject.topPaneGroup.on('mouseenter', () ->
-      console.log 'mouseover titleport'
-      unless states.articleSwitcher
-        TitleChooser()
-#      sceneObject.rightPane.element.on('mousemove', () -> # to do: replace with a more circular area of tolerance
-#        if event.x > layout.separator.right.x + sceneObject.rightPane.geometry.hoverIgnoreAreaX
-#          if event.y > layout.separator.top.y + sceneObject.rightPane.geometry.hoverIgnoreAreaY and
-#             event.y < viewport.height - sceneObject.rightPane.geometry.hoverIgnoreAreaY 
-      )
-
-
 
 
   rightPane = ->
@@ -429,7 +505,7 @@ sceneDefine = () ->
   rightPane()
   textPort()
   navBars.init(navBarsTree, navBarHook, categorizedTextTree)  
-  titlePort()
+  topPane()
   TOC()
 
   # font buttons
@@ -494,6 +570,16 @@ sceneSync = (mode) ->
 
   coreH = viewport.height - layout.separator.top.y - end
 
+  sceneObject.topPane.attr('width', viewport.width - 5 - 5)
+             .attr('height', layout.separator.top.y - 5 - 5)
+             .attr('x', 5)
+             .attr('y', 5) # pre-animation location
+             .style('stroke-width', '7px')
+             .attr('rx', 10)
+             .attr('rx', 10)  
+
+  titleShow()
+
   # draw main svg
   sceneHook.svg.attr('width', viewport.width)
           .attr('height', viewport.height)
@@ -555,51 +641,6 @@ sceneSync = (mode) ->
       .attr('height', fontButtonGeometry.height)
 
   sceneObject.fontSize.redraw()      
-
-  drawTitle = () ->
-
- # draw title port 
-
-    sceneObject.titlePort.pane.attr('width', viewport.width - 5 - 5)
-                 .attr('height', layout.separator.top.y - 5 - 5)
-                 .attr('x', 5)
-                 .attr('y', -50) # pre-animation location
-                 .style('stroke-width', '7px')
-                 .attr('rx', 10)
-                 .attr('rx', 10)              
-
-    #sceneObject.titlePort.textwrapper.style('stroke-width', '7px')
-    sceneObject.titlePort.textWrapper.attr('width', viewport.width - 5 - 5) 
-             .attr('height', articleSelectorPaneHeight)           
-             #.style("background-color", 'red')
-
-    sceneObject.titlePort.text.attr('x', viewport.width / 2 - 5)
-             .attr('y', 0)
-             .style('font-family', 'Helvetica')
-             .style("font-weight", "bold")
-             .attr("font-size", "30px")    
-
-    if firstEntry
-      sceneObject.titlePort.text.transition().duration(300).ease('sin')
-                                    .attr('y', layout.separator.top.y / 2)
-      sceneObject.titlePort.pane.transition().duration(300).ease('sin')
-                                            .attr('y', 5)
-      #setTimeout(sceneObject.fontSize.redraw, 2000)                                         
-      firstEntry = false
-
-    else 
-      sceneObject.titlePort.text
-                 .attr('y', layout.separator.top.y / 2)
-      sceneObject.titlePort.pane
-                 .attr('y', 5) 
-
-    sceneObject.topPane.attr('width', viewport.width - 5 - 5)
-                 .attr('height', layout.separator.top.y - 5 - 5)
-                 .attr('x', 5)
-                 .attr('y', 5) # pre-animation location
-                 .style('stroke-width', '7px')
-                 .attr('rx', 10)
-                 .attr('rx', 10)              
 
   drawTitle()
 
