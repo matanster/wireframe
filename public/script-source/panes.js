@@ -21,7 +21,7 @@ exports.titlePaneCreate = function(svgAnchor, initialColor, rotated) {
     paneObject.textWrapper = d3.select('#' + textWrapperId);
     paneObject.text = paneObject.textWrapper.append('text').attr("dominant-baseline", "central").style("text-anchor", "middle").style('fill', "#EEEEEE");
   } else {
-    paneObject.text = paneObject.element.append('text').attr("dominant-baseline", "central").style("text-anchor", "middle").style('fill', "#EEEEEE");
+    paneObject.text = paneObject.element.append('text').attr("dominant-baseline", "central").style("text-anchor", "middle").style('fill', "#EEEEEE").style('pointer-events', 'none');
   }
   return paneObject;
 };

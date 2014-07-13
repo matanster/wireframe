@@ -40,5 +40,6 @@ exports.titlePaneCreate = (svgAnchor, initialColor, rotated) ->
                                       .attr("dominant-baseline", "central")
                                       .style("text-anchor", "middle")
                                       .style('fill', "#EEEEEE")
+                                      .style('pointer-events', 'none') # disable mouse events and let them drip through
 
   return paneObject
