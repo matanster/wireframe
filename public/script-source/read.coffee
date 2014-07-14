@@ -64,8 +64,11 @@ articleSelectorPaneHeight = calcStart() - 5 - 5
 articles = ["The Relationship Between Human Capital and Firm Performance",
             "Article 2",
             "Article 3"
+            "Article 4"
+            "Article 5"
+            "Article 6"
            ]
-articlesDisplayOrder = [0, 1, 2]
+articlesDisplayOrder = [0, 1, 2, 3, 4, 5]
 
 selectedArticle = articles[0] 
 
@@ -396,7 +399,7 @@ sceneDefine = () ->
     sceneObject.topPane = sceneObject.topPaneGroup.append('rect')
                                                   .style('fill', '#60CAFB')  
 
-    sceneObject.topPaneGroup.on('mouseenter', () ->
+    sceneObject.topPaneGroup.on('click', () -> #mouseenter
       console.log 'mouseover titleport'
       unless states.articleSwitcher
         TitleChooser()

@@ -88,9 +88,9 @@ end = null;
 
 articleSelectorPaneHeight = calcStart() - 5 - 5;
 
-articles = ["The Relationship Between Human Capital and Firm Performance", "Article 2", "Article 3"];
+articles = ["The Relationship Between Human Capital and Firm Performance", "Article 2", "Article 3", "Article 4", "Article 5", "Article 6"];
 
-articlesDisplayOrder = [0, 1, 2];
+articlesDisplayOrder = [0, 1, 2, 3, 4, 5];
 
 selectedArticle = articles[0];
 
@@ -317,7 +317,7 @@ sceneDefine = function() {
   topPane = function() {
     sceneObject.topPaneGroup = sceneHook.svg.append('g');
     sceneObject.topPane = sceneObject.topPaneGroup.append('rect').style('fill', '#60CAFB');
-    return sceneObject.topPaneGroup.on('mouseenter', function() {
+    return sceneObject.topPaneGroup.on('click', function() {
       console.log('mouseover titleport');
       if (!states.articleSwitcher) {
         return TitleChooser();
