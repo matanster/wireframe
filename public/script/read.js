@@ -74,10 +74,7 @@ categorizedTextTree = void 0;
 
 segments = void 0;
 
-scrollButtonsRedraw = function() {
-  sceneObject.downButton.redraw();
-  return sceneObject.upButton.redraw();
-};
+scrollButtonsRedraw = function() {};
 
 calcStart = function() {
   return 90;

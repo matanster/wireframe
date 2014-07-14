@@ -42,8 +42,8 @@ categorizedTextTree = undefined
 segments = undefined
 
 scrollButtonsRedraw = () ->
-  sceneObject.downButton.redraw()  
-  sceneObject.upButton.redraw()
+  #sceneObject.downButton.redraw()  
+  #sceneObject.upButton.redraw()
 
 
 calcStart = () -> 90
