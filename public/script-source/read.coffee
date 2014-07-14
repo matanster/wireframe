@@ -1,5 +1,5 @@
 util        = require './util'
-panes        = require './panes'
+panes       = require './panes'
 data        = require './data'
 tokenize    = require './tokenize'
 textDraw    = require './textDraw'
@@ -40,6 +40,11 @@ TOCTokens = []
 navBarsTree = undefined
 categorizedTextTree = undefined
 segments = undefined
+
+scrollButtonsRedraw = () ->
+  sceneObject.downButton.redraw()  
+  sceneObject.upButton.redraw()
+
 
 calcStart = () -> 90
 calcEnd   = () -> 90
@@ -156,12 +161,12 @@ TitleChooser = () ->
           #.each("end", () -> sceneObject.titlePort.element.remove())
 
     sceneObject.topPane.transition().duration(400).ease('linear').attr('height', height.selectedMode)
+                       .each('end', sceneObject.fontSize.redraw)
 
     for article, i in articles
       titlePanes[i].element.remove()
 
     states.articleSwitcher = false
-
 
   console.log 'opening article chooser'
 
@@ -173,6 +178,11 @@ TitleChooser = () ->
 
   sceneObject.topPane.transition().duration(450).ease('linear').attr('height', height.selectorMode)
                                          .each("end", () ->
+
+    sceneObject.topPaneGroup.on('mouseleave', () ->
+      console.log 'mouse outside title port'
+      chooserClose()
+    )
 
     sceneObject.titlePort.element.remove()
 
@@ -263,11 +273,6 @@ TitleChooser = () ->
       pane.pane.node().onmouseover = boundHandler
   )
 
-  sceneObject.topPaneGroup.on('mouseleave', () ->
-    console.log 'mouse outside title port'
-    chooserClose()
-  )
-
 
 #####################################################################
 #
@@ -356,7 +361,7 @@ sceneDefine = () ->
 
                                 navBars.textportRefresh()
                                 sceneObject.rightPane.redraw()
-                                sceneObject.downButton.redraw()
+                                scrollButtonsRedraw()
                               window.onmouseup = (event) ->
                                 window.onmousemove = null
                                 event.target.style.cursor = "default"
@@ -539,6 +544,27 @@ sceneDefine = () ->
   fontSizeButton()
 
   # viewport down button 
+  upButton = () ->
+    sceneObject.upButton = {}
+
+    sceneObject.upButton.geometry = 
+      'paddingY': 15,
+      'paddingX': 30, 
+      'height': 25
+
+    sceneObject.upButton.element = sceneHook.svg.append('svg:image')
+      .attr('xlink:href','images/downScroll6.svg')
+      .attr('preserveAspectRatio', 'none')
+      .on('mouseover', () -> 
+        #console.log('hover')
+        sceneObject.upButton.element.transition().ease('sin').duration(400).attr('height', sceneObject.upButton.geometry.height + (sceneObject.upButton.geometry.paddingY *2/3)))
+      .on('mouseout', () -> 
+        #console.log('hover')
+        sceneObject.upButton.element.transition().duration(300).attr('height', sceneObject.upButton.geometry.height))
+      .on('mousedown', () -> 
+        console.log('scroll')
+        navBars.textportRefresh(0, true)) 
+
   downButton = () ->
     sceneObject.downButton = {}
 
@@ -552,16 +578,20 @@ sceneDefine = () ->
       .attr('preserveAspectRatio', 'none')
       .on('mouseover', () -> 
         #console.log('hover')
-        sceneObject.downButton.element.transition().ease('sin').duration(400).attr('height', sceneObject.downButton.geometry.height + (sceneObject.downButton.geometry.paddingY *2/3)))
+        sceneObject.downButton.element.transition().ease('sin').duration(400)
+                                      .attr('height', sceneObject.downButton.geometry.height + (sceneObject.downButton.geometry.paddingY *2/3)))
       .on('mouseout', () -> 
         #console.log('hover')
-        sceneObject.downButton.element.transition().duration(300).attr('height', sceneObject.downButton.geometry.height))
+        sceneObject.downButton.element.transition().duration(300)
+                                      .attr('height', sceneObject.downButton.geometry.height))
       .on('mousedown', () -> 
         console.log('scroll')
         navBars.textportRefresh(0, true)) 
 
   downButton()
+  upButton()
 
+  
 ######################################################
 #
 # Keep everything harmonized with the viewport size
@@ -647,6 +677,9 @@ sceneSync = (mode) ->
       .attr('width', fontButtonGeometry.width)
       .attr('height', fontButtonGeometry.height)
 
+    util.makeSvgTopLayer(sceneObject.fontSize.element.node()) # move to svg top "layer"
+   
+
   sceneObject.fontSize.redraw()      
 
   drawTitle()
@@ -670,9 +703,26 @@ sceneSync = (mode) ->
         navBars.textportRefresh()
 
   # draw down button
+  sceneObject.upButton.redraw = () ->
+    sceneObject.upButton.geometry.width = (layout.separator.right.x - layout.separator.left.x.current) / 5
+    sceneObject.upButton.geometry.x = layout.separator.left.x.current + 
+                                        (((layout.separator.right.x - layout.separator.left.x.current) - sceneObject.upButton.geometry.width) / 2)
+      
+
+    sceneObject.upButton.geometry.y = sceneObject.textPort.geometry.y + sceneObject.upButton.geometry.paddingY # stick near bottom
+
+    buttonCenter =
+      'x' : sceneObject.upButton.geometry.x + (sceneObject.upButton.geometry.width / 2)
+      'y' : sceneObject.upButton.geometry.y + (sceneObject.upButton.geometry.height / 2)
+
+    sceneObject.upButton.element
+      .attr('x', sceneObject.upButton.geometry.x) # center 
+      .attr('width', sceneObject.upButton.geometry.width) 
+      .attr('y', sceneObject.upButton.geometry.y)
+      .attr('height', sceneObject.upButton.geometry.height)
+      .attr('transform', """rotate(180,#{buttonCenter.x},#{buttonCenter.y})""") # flip upwards
+    
   sceneObject.downButton.redraw = () ->
-    #sceneObject.downButton.geometry.x = layout.separator.left.x.current + sceneObject.downButton.geometry.paddingX
-    #sceneObject.downButton.geometry.width = layout.separator.right.x - layout.separator.left.x.current - (2 * sceneObject.downButton.geometry.paddingX)
     sceneObject.downButton.geometry.width = (layout.separator.right.x - layout.separator.left.x.current) / 5
     sceneObject.downButton.geometry.x = layout.separator.left.x.current + 
                                         (((layout.separator.right.x - layout.separator.left.x.current) - sceneObject.downButton.geometry.width) / 2)
@@ -680,13 +730,19 @@ sceneSync = (mode) ->
 
     sceneObject.downButton.geometry.y = sceneHook.svg.attr('height') - sceneObject.downButton.geometry.height - sceneObject.downButton.geometry.paddingY # stick near bottom
 
+    buttonCenter =
+      'x' : sceneObject.downButton.geometry.x + (sceneObject.downButton.geometry.width / 2)
+      'y' : sceneObject.downButton.geometry.y + (sceneObject.downButton.geometry.height / 2)
+
     sceneObject.downButton.element
       .attr('x', sceneObject.downButton.geometry.x) # center 
       .attr('width', sceneObject.downButton.geometry.width) 
       .attr('y', sceneObject.downButton.geometry.y)
       .attr('height', sceneObject.downButton.geometry.height)
+      #.attr('transform', """rotate(180,#{buttonCenter.x},#{buttonCenter.y})""")
     
-  sceneObject.downButton.redraw()
+  scrollButtonsRedraw()
+
 
   sceneObject.rightPane.redraw()
 
