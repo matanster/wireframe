@@ -128,6 +128,11 @@ drawTitle = function() {
 titleShow = function() {
   sceneObject.titlePort = panes.titlePaneCreate(sceneObject.topPaneGroup, '#60CAFB', true);
   sceneObject.titlePort.text.text(selectedArticle);
+  sceneObject.titlePort.element.on('click', function() {
+    if (!states.articleSwitcher) {
+      return TitleChooser();
+    }
+  });
   return drawTitle();
 };
 
@@ -149,6 +154,7 @@ TitleChooser = function() {
   chooserClose = function() {
     var article, i, _i, _len;
     console.log('closing article chooser');
+    sceneObject.topPaneGroup.on('mouseleave', null);
     titleShow();
     sceneObject.titlePort.textWrapper.transition().duration(300).styleTween('-webkit-transform', function() {
       return d3.interpolateString('perspective(40px) rotate3d(1, 0, 0, 0deg)', 'perspective(40px) rotate3d(1, 0, 0, 2deg)');
@@ -185,8 +191,6 @@ TitleChooser = function() {
       return newSelected.pane.node().style.fill = '#60CBFE';
     };
     hoverHandler = function(hoveredPane) {
-      console.log(hoveredPane.order);
-      console.log(activePane.order);
       if (hoveredPane !== activePane) {
         hoveredPane.pane.node().style.fill = '#55C4F5';
         hoveredPane.pane.node().onmouseout = function() {
@@ -197,6 +201,8 @@ TitleChooser = function() {
         return hoveredPane.pane.node().onclick = function() {
           selectedArticle = articles[hoveredPane.articleId];
           console.log("article " + selectedArticle + " selected");
+          hoveredPane.element.on('click', null);
+          activePane.element.on('click', chooserClose);
           switchPanes(activePane, hoveredPane);
           console.log(articlesDisplayOrder);
           articlesDisplayOrder[activePane.order] = hoveredPane.articleId;
@@ -224,6 +230,7 @@ TitleChooser = function() {
       pane.text.attr('x', viewport.width / 2).attr('y', 5 + (displayOrder + 0.5) * articleSelectorPaneHeight).style('font-family', 'Helvetica').style("font-weight", "bold").attr("font-size", "30px");
       if (displayOrder === 0) {
         activePane = pane;
+        pane.element.on('click', chooserClose);
       }
       pane.order = displayOrder;
       pane.articleId = articleId;
@@ -333,13 +340,7 @@ sceneDefine = function() {
   };
   topPane = function() {
     sceneObject.topPaneGroup = sceneHook.svg.append('g');
-    sceneObject.topPane = sceneObject.topPaneGroup.append('rect').style('fill', '#60CAFB');
-    return sceneObject.topPaneGroup.on('click', function() {
-      console.log('mouseover titleport');
-      if (!states.articleSwitcher) {
-        return TitleChooser();
-      }
-    });
+    return sceneObject.topPane = sceneObject.topPaneGroup.append('rect').style('fill', '#60CAFB');
   };
   rightPane = function() {
     var styles, textRect;

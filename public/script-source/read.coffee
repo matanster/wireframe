@@ -118,6 +118,11 @@ titleShow = () ->
 
   sceneObject.titlePort.text.text(selectedArticle)  
 
+  sceneObject.titlePort.element.on('click', () -> #mouseenter
+      unless states.articleSwitcher
+        TitleChooser()
+      )
+
 #      sceneObject.rightPane.element.on('mousemove', () -> # to do: replace with a more circular area of tolerance
 #        if event.x > layout.separator.right.x + sceneObject.rightPane.geometry.hoverIgnoreAreaX
 #          if event.y > layout.separator.top.y + sceneObject.rightPane.geometry.hoverIgnoreAreaY and
@@ -143,6 +148,7 @@ TitleChooser = () ->
   chooserClose = () ->
     console.log 'closing article chooser'
 
+    sceneObject.topPaneGroup.on('mouseleave', null)
     titleShow()
 
     sceneObject.titlePort.textWrapper.transition().duration(300)
@@ -188,8 +194,6 @@ TitleChooser = () ->
       newSelected.pane.node().style.fill = '#60CBFE'
 
     hoverHandler = (hoveredPane) ->
-      console.log hoveredPane.order
-      console.log activePane.order
       unless hoveredPane is activePane
         hoveredPane.pane.node().style.fill = '#55C4F5'
 
@@ -198,8 +202,13 @@ TitleChooser = () ->
             hoveredPane.pane.node().style.fill = '#50BFEF'
 
         hoveredPane.pane.node().onclick = () -> 
+
           selectedArticle = articles[hoveredPane.articleId]
           console.log """article #{selectedArticle} selected"""
+
+          hoveredPane.element.on('click', null) 
+          activePane.element.on('click', chooserClose) 
+
           switchPanes(activePane, hoveredPane)
 
           console.log articlesDisplayOrder
@@ -243,6 +252,7 @@ TitleChooser = () ->
       # the active article should be the one first in the display order
       if displayOrder is 0
         activePane = pane
+        pane.element.on('click', chooserClose) # and clicking it again should collapse the view
 
       # each pane knows its display order
       pane.order     = displayOrder
@@ -398,13 +408,7 @@ sceneDefine = () ->
 
     sceneObject.topPane = sceneObject.topPaneGroup.append('rect')
                                                   .style('fill', '#60CAFB')  
-
-    sceneObject.topPaneGroup.on('click', () -> #mouseenter
-      console.log 'mouseover titleport'
-      unless states.articleSwitcher
-        TitleChooser()
-      )
-
+ 
     #sceneObject.titlePort.textWrapper.node().style.transitions = 'all 6s'
     #sceneObject.titlePort.textWrapper.node().style.backgroundColor = '#993333'
     #sceneObject.titlePort.textWrapper.node().style.transform = 'perspective(40px) rotate3d(1, 0, 0, 2deg)'
