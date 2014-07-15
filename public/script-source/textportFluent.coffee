@@ -42,13 +42,27 @@ module.exports = (categorizedTextTree, fontSizeChange, scroll, mode) ->
   #console.dir sceneObject
   #console.dir sceneHook.svg
 
-  sceneObject.textPortInnerSVG.element = sceneHook.svg.append('svg')
+    
+  sceneObject.textPortInnerSVG.element = d3.select('#' + 'textPortInnerSVG')
+  console.log "textportInnerSVG"
+  console.dir sceneObject.textPortInnerSVG.element 
 
+  
+  # separate svg element to contain the actual text
+  #sceneObject.textPortInnerSVG.element = sceneHook.svg.append('svg')
+  #                                                    .style('overflow-y', 'auto')
+
+  # inside it, an svg group for the actual words
   sceneObject.textPortInnerSVG.subElement = sceneObject.textPortInnerSVG.element.append('g')
                                  .style('text-anchor', 'start')
                                  .style('fill', 'rgb(220,220,220)')                                                                                                                                            
                                  .style('font-family',fontFamily)
                                  .style('font-size',fontSize)
+
+
+  sceneHook.div.style('top', '100px')
+               .style('left', '315px')
+               .style('height', '200px')
 
   # get the width of a space character
   spaceWidth = textDraw.tokenToViewable('a a', sceneObject.textPortInnerSVG.subElement).width - 
@@ -64,7 +78,7 @@ module.exports = (categorizedTextTree, fontSizeChange, scroll, mode) ->
     .attr('x',      parseFloat(sceneObject.textPort.element.attr('x')) + paddingX + 3)
     .attr('width',  parseFloat sceneObject.textPort.element.attr('width')  - (paddingX * 2) - 3)
     .attr('y',      parseFloat(sceneObject.textPort.element.attr('y')) + paddingY)
-    .attr('height', parseFloat sceneObject.textPort.element.attr('height') - (paddingY * 2) - 50)
+    .attr('height', 1000) #parseFloat sceneObject.textPort.element.attr('height') - (paddingY * 2) - 50
 
   redraw = () ->
     #

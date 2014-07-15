@@ -510,7 +510,14 @@ sceneDefine = () ->
         else
           svgUtil.sync(sceneObject.rightPane)
 
-  sceneHook.svg = d3.select('body').append('svg').style('background-color', '#999999')   
+
+  sceneHook.svg = d3.select('body').append('svg').style('background-color', '#999999')
+
+  sceneHook.div = d3.select('body').append('xhtml:div')
+                                   .style('overflow-y', 'scroll')
+                                   .style('position', 'absolute')
+                                   .html("""<div><svg id='textPortInnerSVG' style='overflow-y: scroll;'></svg></div>""")
+
   sceneObject.categories = {} # can move this elsewhere
   navBarHook = sceneHook.svg.append('g')
 

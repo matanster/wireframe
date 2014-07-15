@@ -420,6 +420,7 @@ sceneDefine = function() {
     };
   };
   sceneHook.svg = d3.select('body').append('svg').style('background-color', '#999999');
+  sceneHook.div = d3.select('body').append('xhtml:div').style('overflow-y', 'scroll').style('position', 'absolute').html("<div><svg id='textPortInnerSVG' style='overflow-y: scroll;'></svg></div>");
   sceneObject.categories = {};
   navBarHook = sceneHook.svg.append('g');
   rightPane();
@@ -1626,14 +1627,17 @@ module.exports = function(categorizedTextTree, fontSizeChange, scroll, mode) {
     sceneObject.textPortInnerSVG.element.remove();
   }
   sceneObject.textPortInnerSVG = {};
-  sceneObject.textPortInnerSVG.element = sceneHook.svg.append('svg');
+  sceneObject.textPortInnerSVG.element = d3.select('#' + 'textPortInnerSVG');
+  console.log("textportInnerSVG");
+  console.dir(sceneObject.textPortInnerSVG.element);
   sceneObject.textPortInnerSVG.subElement = sceneObject.textPortInnerSVG.element.append('g').style('text-anchor', 'start').style('fill', 'rgb(220,220,220)').style('font-family', fontFamily).style('font-size', fontSize);
+  sceneHook.div.style('top', '100px').style('left', '315px').style('height', '200px');
   spaceWidth = textDraw.tokenToViewable('a a', sceneObject.textPortInnerSVG.subElement).width - textDraw.tokenToViewable('aa', sceneObject.textPortInnerSVG.subElement).width;
   spaceWidth *= 1.4;
   lHeight = textDraw.tokenToViewable('l', sceneObject.textPortInnerSVG.subElement).height;
   paddingX = 20;
   paddingY = 18;
-  sceneObject.textPortInnerSVG.element.attr('x', parseFloat(sceneObject.textPort.element.attr('x')) + paddingX + 3).attr('width', parseFloat(sceneObject.textPort.element.attr('width') - (paddingX * 2) - 3)).attr('y', parseFloat(sceneObject.textPort.element.attr('y')) + paddingY).attr('height', parseFloat(sceneObject.textPort.element.attr('height') - (paddingY * 2) - 50));
+  sceneObject.textPortInnerSVG.element.attr('x', parseFloat(sceneObject.textPort.element.attr('x')) + paddingX + 3).attr('width', parseFloat(sceneObject.textPort.element.attr('width') - (paddingX * 2) - 3)).attr('y', parseFloat(sceneObject.textPort.element.attr('y')) + paddingY).attr('height', 1000);
   redraw = function() {
     var categoryNode, rawSentence, sentence, sentences, subCategory, token, tokenViewable, viewPortFull, x, y, _i, _j, _k, _l, _len, _len1, _len2, _len3, _len4, _m, _ref, _ref1, _ref2;
     viewPortFull = false;

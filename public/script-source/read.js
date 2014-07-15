@@ -403,6 +403,7 @@ sceneDefine = function() {
     };
   };
   sceneHook.svg = d3.select('body').append('svg').style('background-color', '#999999');
+  sceneHook.div = d3.select('body').append('xhtml:div').style('overflow-y', 'scroll').style('position', 'absolute').html("<div><svg id='textPortInnerSVG' style='overflow-y: scroll;'></svg></div>");
   sceneObject.categories = {};
   navBarHook = sceneHook.svg.append('g');
   rightPane();
