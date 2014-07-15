@@ -403,7 +403,7 @@ sceneDefine = function() {
     };
   };
   sceneHook.svg = d3.select('body').append('svg').style('background-color', '#999999');
-  sceneHook.div = d3.select('body').append('xhtml:div').style('overflow-y', 'scroll').style('position', 'absolute').html("<div><svg id='textPortInnerSVG' style='overflow-y: scroll;'></svg></div>");
+  sceneHook.textPortDiv = d3.select('body').append('xhtml:div').style('overflow-y', 'auto').style('position', 'absolute').attr('class', 'scroll').html("<svg id='textPortInnerSVG' style='overflow-y: auto;'></svg>");
   sceneObject.categories = {};
   navBarHook = sceneHook.svg.append('g');
   rightPane();

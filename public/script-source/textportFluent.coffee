@@ -1,4 +1,5 @@
 # import global geometry
+util         = require './util'
 globalDims   = require './globalDims'
 sceneObject  = globalDims.sceneObject
 sceneHook    = globalDims.sceneHook
@@ -60,9 +61,12 @@ module.exports = (categorizedTextTree, fontSizeChange, scroll, mode) ->
                                  .style('font-size',fontSize)
 
 
-  sceneHook.div.style('top', '100px')
+  sceneHook.textPortDiv.style('top', '100px')
                .style('left', '315px')
                .style('height', '200px')
+               .style('width', '682px')
+
+  util.makeSvgTopLayer(sceneHook.textPortDiv.node())
 
   # get the width of a space character
   spaceWidth = textDraw.tokenToViewable('a a', sceneObject.textPortInnerSVG.subElement).width - 
