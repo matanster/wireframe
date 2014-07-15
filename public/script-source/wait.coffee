@@ -51,7 +51,7 @@ sceneDefine = (callback) ->
   
   text = () ->
 
-    svg.text0 = svg.main.append('text').text("Well done!")
+    svg.text0 = svg.main.append('text').text("Almost there...")
                               .style("text-anchor", "middle")
                               .attr("dominant-baseline", "central")
                               .style("font-family", "Helvetica")

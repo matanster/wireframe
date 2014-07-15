@@ -67,7 +67,7 @@ sceneDefine = function(callback) {
     return _results;
   };
   text = function() {
-    svg.text0 = svg.main.append('text').text("Well done!").style("text-anchor", "middle").attr("dominant-baseline", "central").style("font-family", "Helvetica").style("font-weight", "bold").attr("font-size", "55px").style('font-style', 'italic');
+    svg.text0 = svg.main.append('text').text("Almost there...").style("text-anchor", "middle").attr("dominant-baseline", "central").style("font-family", "Helvetica").style("font-weight", "bold").attr("font-size", "55px").style('font-style', 'italic');
     svg.text1 = svg.main.append('text').text("please wait while we're").style("text-anchor", "middle").attr("dominant-baseline", "central").style("font-family", "Helvetica").style("font-weight", "bold").attr("font-size", "35px");
     svg.text2 = svg.main.append('text').text("re-packing and preparing your article for you").style("text-anchor", "middle").attr("dominant-baseline", "central").style("font-family", "Helvetica").style("font-weight", "bold").attr("font-size", "35px");
     return svg.text3 = svg.main.append('text').text("so that you can efficiently dig through").style("text-anchor", "middle").attr("dominant-baseline", "central").style("font-family", "Helvetica").style("font-weight", "bold").attr("font-size", "25px");
