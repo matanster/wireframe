@@ -22,7 +22,7 @@ fontSize = '22px';
 fontFamily = 'Helvetica';
 
 module.exports = function(categorizedTextTree, fontSizeChange, scroll, mode) {
-  var lHeight, paddingX, paddingY, redraw, spaceWidth;
+  var lHeight, paddingX, paddingY, redraw, spaceWidth, width;
   if (scroll != null) {
     console.log(scroll);
     sceneObject.textPortInnerSVG.element.transition().ease('sin').duration(2000).attr('y', 0);
@@ -36,18 +36,19 @@ module.exports = function(categorizedTextTree, fontSizeChange, scroll, mode) {
     sceneObject.textPortInnerSVG.element.remove();
   }
   sceneObject.textPortInnerSVG = {};
+  paddingX = 20;
+  paddingY = 18;
   sceneObject.textPortInnerSVG.element = d3.select('#' + 'textPortInnerSVG');
   console.log("textportInnerSVG");
   console.dir(sceneObject.textPortInnerSVG.element);
   sceneObject.textPortInnerSVG.subElement = sceneObject.textPortInnerSVG.element.append('g').style('text-anchor', 'start').style('fill', 'rgb(220,220,220)').style('font-family', fontFamily).style('font-size', fontSize);
-  sceneHook.textPortDiv.style('top', '100px').style('left', '315px').style('height', '200px').style('width', '682px');
+  width = parseFloat(sceneObject.textPort.element.attr('width')) - (paddingX * 2) - 3 + 20;
+  sceneHook.textPortDiv.style('top', '100px').style('left', '315px').style('height', 250).style('width', width + 16);
   util.makeSvgTopLayer(sceneHook.textPortDiv.node());
   spaceWidth = textDraw.tokenToViewable('a a', sceneObject.textPortInnerSVG.subElement).width - textDraw.tokenToViewable('aa', sceneObject.textPortInnerSVG.subElement).width;
   spaceWidth *= 1.4;
   lHeight = textDraw.tokenToViewable('l', sceneObject.textPortInnerSVG.subElement).height;
-  paddingX = 20;
-  paddingY = 18;
-  sceneObject.textPortInnerSVG.element.attr('x', parseFloat(sceneObject.textPort.element.attr('x')) + paddingX + 3).attr('width', parseFloat(sceneObject.textPort.element.attr('width') - (paddingX * 2) - 3)).attr('y', parseFloat(sceneObject.textPort.element.attr('y')) + paddingY).attr('height', 1000);
+  sceneObject.textPortInnerSVG.element.attr('width', parseFloat(sceneObject.textPort.element.attr('width') - (paddingX * 2) - 3)).attr('height', 2000);
   redraw = function() {
     var categoryNode, rawSentence, sentence, sentences, subCategory, token, tokenViewable, viewPortFull, x, y, _i, _j, _k, _l, _len, _len1, _len2, _len3, _len4, _m, _ref, _ref1, _ref2;
     viewPortFull = false;
@@ -81,7 +82,6 @@ module.exports = function(categorizedTextTree, fontSizeChange, scroll, mode) {
             _ref2 = sentence.text;
             for (_m = 0, _len4 = _ref2.length; _m < _len4; _m++) {
               token = _ref2[_m];
-              console.log(token.text);
               tokenViewable = textDraw.tokenToViewable(token.text, sceneObject.textPortInnerSVG.subElement);
               switch (token.mark) {
                 case 1:
@@ -94,16 +94,10 @@ module.exports = function(categorizedTextTree, fontSizeChange, scroll, mode) {
                 tokenViewable.svg.attr('x', x).attr('y', y);
                 x += tokenViewable.width;
               } else {
-                if (y + tokenViewable.height + lHeight < sceneObject.textPortInnerSVG.element.attr('height')) {
-                  x = 0;
-                  y += tokenViewable.height;
-                  tokenViewable.svg.attr('x', x).attr('y', y);
-                  x += tokenViewable.width;
-                } else {
-                  console.log('text port full');
-                  viewPortFull = true;
-                  break;
-                }
+                x = 0;
+                y += tokenViewable.height;
+                tokenViewable.svg.attr('x', x).attr('y', y);
+                x += tokenViewable.width;
               }
               if (x + spaceWidth < sceneObject.textPortInnerSVG.element.attr('width')) {
                 x += spaceWidth;

@@ -517,7 +517,7 @@ sceneDefine = () ->
                                    .style('overflow-y', 'auto')
                                    .style('position', 'absolute')
                                    .attr('class', 'scroll')
-                                   .html("""<svg id='textPortInnerSVG' style='overflow-y: auto;'></svg>""")
+                                   .html("""<svg id='textPortInnerSVG' style='overflow-y: scroll;'></svg>""")
 
   sceneObject.categories = {} # can move this elsewhere
   navBarHook = sceneHook.svg.append('g')

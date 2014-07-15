@@ -40,14 +40,12 @@ module.exports = (categorizedTextTree, fontSizeChange, scroll, mode) ->
   # and a 'g' element to afford treating the whole bunch as one group
   #
 
-  #console.dir sceneObject
-  #console.dir sceneHook.svg
-
+  paddingX = 20
+  paddingY = 18
     
   sceneObject.textPortInnerSVG.element = d3.select('#' + 'textPortInnerSVG')
   console.log "textportInnerSVG"
   console.dir sceneObject.textPortInnerSVG.element 
-
   
   # separate svg element to contain the actual text
   #sceneObject.textPortInnerSVG.element = sceneHook.svg.append('svg')
@@ -60,11 +58,12 @@ module.exports = (categorizedTextTree, fontSizeChange, scroll, mode) ->
                                  .style('font-family',fontFamily)
                                  .style('font-size',fontSize)
 
+  width = parseFloat(sceneObject.textPort.element.attr('width')) - (paddingX * 2) - 3 + 20
 
   sceneHook.textPortDiv.style('top', '100px')
                .style('left', '315px')
-               .style('height', '200px')
-               .style('width', '682px')
+               .style('height', 250)
+               .style('width', width + 16)
 
   util.makeSvgTopLayer(sceneHook.textPortDiv.node())
 
@@ -75,14 +74,13 @@ module.exports = (categorizedTextTree, fontSizeChange, scroll, mode) ->
   # get the maximum character height in the font
   lHeight    = textDraw.tokenToViewable('l', sceneObject.textPortInnerSVG.subElement).height
 
-  paddingX = 20
-  paddingY = 18
+
 
   sceneObject.textPortInnerSVG.element
-    .attr('x',      parseFloat(sceneObject.textPort.element.attr('x')) + paddingX + 3)
+    #.attr('x',      parseFloat(sceneObject.textPort.element.attr('x')) + paddingX + 3)
     .attr('width',  parseFloat sceneObject.textPort.element.attr('width')  - (paddingX * 2) - 3)
-    .attr('y',      parseFloat(sceneObject.textPort.element.attr('y')) + paddingY)
-    .attr('height', 1000) #parseFloat sceneObject.textPort.element.attr('height') - (paddingY * 2) - 50
+    #.attr('y',      parseFloat(sceneObject.textPort.element.attr('y')) + paddingY)
+    .attr('height', 2000) #parseFloat sceneObject.textPort.element.attr('height') - (paddingY * 2) - 50 # must be large enough to contain all text content! otherwise no scroll of the text!
 
   redraw = () ->
     #
@@ -127,8 +125,6 @@ module.exports = (categorizedTextTree, fontSizeChange, scroll, mode) ->
 
             for token in sentence.text
 
-              console.log token.text
-
               tokenViewable = textDraw.tokenToViewable(token.text, sceneObject.textPortInnerSVG.subElement)
               
               #
@@ -148,19 +144,17 @@ module.exports = (categorizedTextTree, fontSizeChange, scroll, mode) ->
                                  .attr('y', y)
                 x += tokenViewable.width
               else  
-                if y + tokenViewable.height + lHeight < sceneObject.textPortInnerSVG.element.attr('height')
+                #if y + tokenViewable.height + lHeight < sceneObject.textPortInnerSVG.element.attr('height')
                   #console.log 'adding to new line'
-                  x = 0
-                  y += tokenViewable.height
-                  tokenViewable.svg.attr('x', x)
-                                   .attr('y', y)
-                  x += tokenViewable.width  
-                  #console.log y  
-                  #console.dir textPort  
-                else
-                  console.log 'text port full'
-                  viewPortFull = true
-                  break
+                x = 0
+                y += tokenViewable.height
+                tokenViewable.svg.attr('x', x)
+                                 .attr('y', y)
+                x += tokenViewable.width  
+                #else
+                #  console.log 'text port full'
+                #  viewPortFull = true
+                #  break
               
               # add word space unless end of line
               if x + spaceWidth < sceneObject.textPortInnerSVG.element.attr('width')

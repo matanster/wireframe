@@ -31,10 +31,9 @@ gulp.task('default', function() {
 gulp.task("watch", function() {
     watch({glob: "public/script-source/**/*.js"}, function() {
         gulp.start("default");
-        clientRefresh.broadcast()
     });
 
-    watch({glob: "public/*"}, function() {
+    watch({glob: "public/**/*"}, function() {
         clientRefresh.broadcast()
     });
 
