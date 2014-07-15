@@ -64,6 +64,7 @@ module.exports = (categorizedTextTree, fontSizeChange, scroll, mode) ->
                .style('left', '315px')
                .style('height', 250)
                .style('width', width + 16)
+               .style('webkit-overflow-scrolling', 'touch')
 
   util.makeSvgTopLayer(sceneHook.textPortDiv.node())
 

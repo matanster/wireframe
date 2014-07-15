@@ -1636,7 +1636,7 @@ module.exports = function(categorizedTextTree, fontSizeChange, scroll, mode) {
   console.dir(sceneObject.textPortInnerSVG.element);
   sceneObject.textPortInnerSVG.subElement = sceneObject.textPortInnerSVG.element.append('g').style('text-anchor', 'start').style('fill', 'rgb(220,220,220)').style('font-family', fontFamily).style('font-size', fontSize);
   width = parseFloat(sceneObject.textPort.element.attr('width')) - (paddingX * 2) - 3 + 20;
-  sceneHook.textPortDiv.style('top', '100px').style('left', '315px').style('height', 250).style('width', width + 16);
+  sceneHook.textPortDiv.style('top', '100px').style('left', '315px').style('height', 250).style('width', width + 16).style('webkit-overflow-scrolling', 'touch');
   util.makeSvgTopLayer(sceneHook.textPortDiv.node());
   spaceWidth = textDraw.tokenToViewable('a a', sceneObject.textPortInnerSVG.subElement).width - textDraw.tokenToViewable('aa', sceneObject.textPortInnerSVG.subElement).width;
   spaceWidth *= 1.4;
