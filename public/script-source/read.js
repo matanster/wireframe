@@ -403,7 +403,6 @@ sceneDefine = function() {
     };
   };
   sceneHook.svg = d3.select('body').append('svg').style('background-color', '#999999');
-  sceneHook.textPortDiv = d3.select('body').append('xhtml:div').style('overflow-y', 'auto').style('position', 'absolute').style('-overflow-scrolling', 'touch').attr('class', 'scroll').html("<svg id='textPortInnerSVG' style='overflow-y: scroll;'></svg>");
   sceneObject.categories = {};
   navBarHook = sceneHook.svg.append('g');
   rightPane();

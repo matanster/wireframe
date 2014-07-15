@@ -14,6 +14,7 @@ fontFamily = 'Helvetica' # for now
 
 module.exports = (categorizedTextTree, fontSizeChange, scroll, mode) ->
 
+  # old button-based scroll, maybe will be reverted to
   if scroll?
     console.log scroll
     sceneObject.textPortInnerSVG.element.transition().ease('sin').duration(2000).attr('y', 0)
@@ -32,6 +33,7 @@ module.exports = (categorizedTextTree, fontSizeChange, scroll, mode) ->
 
   if sceneObject.textPortInnerSVG? # discard existing text if already drawn
     sceneObject.textPortInnerSVG.element.remove()
+    sceneHook.textPortDiv.remove()  
 
   sceneObject.textPortInnerSVG = {}
 
@@ -43,10 +45,17 @@ module.exports = (categorizedTextTree, fontSizeChange, scroll, mode) ->
   paddingX = 20
   paddingY = 18
     
+  sceneHook.textPortDiv = d3.select('body').append('xhtml:div')
+                                   .style('overflow-y', 'auto')
+                                   .style('position', 'absolute')
+                                   .style('-overflow-scrolling', 'touch') # check out http://iscrolljs.com/ for finer experience
+                                   .attr('class', 'scroll')
+                                   .html("""<svg id='textPortInnerSVG' style='overflow-y: scroll;'></svg>""")
   sceneObject.textPortInnerSVG.element = d3.select('#' + 'textPortInnerSVG')
-  console.log "textportInnerSVG"
-  console.dir sceneObject.textPortInnerSVG.element 
-  
+
+  #util.makeSvgTopLayer(sceneHook.svg.node()) # doesn't work in this case
+
+
   # separate svg element to contain the actual text
   #sceneObject.textPortInnerSVG.element = sceneHook.svg.append('svg')
   #                                                    .style('overflow-y', 'auto')
@@ -58,15 +67,17 @@ module.exports = (categorizedTextTree, fontSizeChange, scroll, mode) ->
                                  .style('font-family',fontFamily)
                                  .style('font-size',fontSize)
 
-  width = parseFloat(sceneObject.textPort.element.attr('width')) - (paddingX * 2) - 3 + 20
+  width  = parseFloat(sceneObject.textPort.element.attr('width')) - (paddingX * 2) - 3 + 20
+  height = parseFloat(sceneObject.textPort.element.attr('height')) - (paddingY * 2) 
 
-  sceneHook.textPortDiv.style('top', '100px')
-               .style('left', '315px')
-               .style('height', 250)
-               .style('width', width + 16)
+  sceneHook.textPortDiv
+               .style('left', parseFloat(sceneObject.textPort.element.attr('x')) + paddingX + 3)
+               .style('top', parseFloat(sceneObject.textPort.element.attr('y')) + paddingY)
+               .style('height', height)
+               .style('width', width + 18)
                .style('webkit-overflow-scrolling', 'touch')
 
-  util.makeSvgTopLayer(sceneHook.textPortDiv.node())
+  #util.makeSvgTopLayer(sceneHook.textPortDiv.node()) # this really necessary?
 
   # get the width of a space character
   spaceWidth = textDraw.tokenToViewable('a a', sceneObject.textPortInnerSVG.subElement).width - 
@@ -75,13 +86,11 @@ module.exports = (categorizedTextTree, fontSizeChange, scroll, mode) ->
   # get the maximum character height in the font
   lHeight    = textDraw.tokenToViewable('l', sceneObject.textPortInnerSVG.subElement).height
 
-
-
   sceneObject.textPortInnerSVG.element
     #.attr('x',      parseFloat(sceneObject.textPort.element.attr('x')) + paddingX + 3)
     .attr('width',  parseFloat sceneObject.textPort.element.attr('width')  - (paddingX * 2) - 3)
     #.attr('y',      parseFloat(sceneObject.textPort.element.attr('y')) + paddingY)
-    .attr('height', 2000) #parseFloat sceneObject.textPort.element.attr('height') - (paddingY * 2) - 50 # must be large enough to contain all text content! otherwise no scroll of the text!
+    #.attr('height', 2000) # temporary maximum, until actual size is set after all text was drawn to svg
 
   redraw = () ->
     #
@@ -107,8 +116,9 @@ module.exports = (categorizedTextTree, fontSizeChange, scroll, mode) ->
                            .attr("dominant-baseline", "central")
                            .style("font-family", "Helvetica")
                            .style("font-weight", "bold")
+                           .style("font-style", "italic")
                            .attr("font-size", "30px")
-                           .style('fill', '#aaaaaa')
+                           .style('fill', '#2dc4fd') #aaaaaa
 
           y += 40
           
@@ -164,16 +174,11 @@ module.exports = (categorizedTextTree, fontSizeChange, scroll, mode) ->
             y += (tokenViewable.height)*2
             x = 0
     
+    # adjust container svg to length of text (to enable smooth scrolability)
+    sceneObject.textPortInnerSVG.element.attr('height', y + 30)
+
     return viewPortFull        
 
   return redraw()  
 
-  #
-  # Scroll the text - to do:
-  # 
-  # Take care drawing beyond the visible
-  # Tween the text on scroll
-  # Remove Down Button when reached bottom
-  # Add Up button after initial scroll
-  #
  

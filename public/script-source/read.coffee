@@ -125,6 +125,7 @@ titleShow = () ->
 
   sceneObject.titlePort.element.on('click', () -> #mouseenter
       unless states.articleSwitcher
+        #sceneHook.svg.node().style
         TitleChooser()
       )
 
@@ -511,14 +512,9 @@ sceneDefine = () ->
           svgUtil.sync(sceneObject.rightPane)
 
 
-  sceneHook.svg = d3.select('body').append('svg').style('background-color', '#999999')
-
-  sceneHook.textPortDiv = d3.select('body').append('xhtml:div')
-                                   .style('overflow-y', 'auto')
-                                   .style('position', 'absolute')
-                                   .style('-overflow-scrolling', 'touch')
-                                   .attr('class', 'scroll')
-                                   .html("""<svg id='textPortInnerSVG' style='overflow-y: scroll;'></svg>""")
+  sceneHook.svg = d3.select('body').append('svg')
+      .style('background-color', '#999999')
+      #.style('background-image', '-webkit-linear-gradient(45deg, #888888, #999999)')
 
   sceneObject.categories = {} # can move this elsewhere
   navBarHook = sceneHook.svg.append('g')

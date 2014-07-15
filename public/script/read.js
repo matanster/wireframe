@@ -420,7 +420,6 @@ sceneDefine = function() {
     };
   };
   sceneHook.svg = d3.select('body').append('svg').style('background-color', '#999999');
-  sceneHook.textPortDiv = d3.select('body').append('xhtml:div').style('overflow-y', 'auto').style('position', 'absolute').attr('class', 'scroll').html("<svg id='textPortInnerSVG' style='overflow-y: scroll;'></svg>");
   sceneObject.categories = {};
   navBarHook = sceneHook.svg.append('g');
   rightPane();
@@ -1615,7 +1614,7 @@ fontSize = '22px';
 fontFamily = 'Helvetica';
 
 module.exports = function(categorizedTextTree, fontSizeChange, scroll, mode) {
-  var lHeight, paddingX, paddingY, redraw, spaceWidth, width;
+  var height, lHeight, paddingX, paddingY, redraw, spaceWidth, width;
   if (scroll != null) {
     console.log(scroll);
     sceneObject.textPortInnerSVG.element.transition().ease('sin').duration(2000).attr('y', 0);
@@ -1627,21 +1626,21 @@ module.exports = function(categorizedTextTree, fontSizeChange, scroll, mode) {
   }
   if (sceneObject.textPortInnerSVG != null) {
     sceneObject.textPortInnerSVG.element.remove();
+    sceneHook.textPortDiv.remove();
   }
   sceneObject.textPortInnerSVG = {};
   paddingX = 20;
   paddingY = 18;
+  sceneHook.textPortDiv = d3.select('body').append('xhtml:div').style('overflow-y', 'auto').style('position', 'absolute').style('-overflow-scrolling', 'touch').attr('class', 'scroll').html("<svg id='textPortInnerSVG' style='overflow-y: scroll;'></svg>");
   sceneObject.textPortInnerSVG.element = d3.select('#' + 'textPortInnerSVG');
-  console.log("textportInnerSVG");
-  console.dir(sceneObject.textPortInnerSVG.element);
   sceneObject.textPortInnerSVG.subElement = sceneObject.textPortInnerSVG.element.append('g').style('text-anchor', 'start').style('fill', 'rgb(220,220,220)').style('font-family', fontFamily).style('font-size', fontSize);
   width = parseFloat(sceneObject.textPort.element.attr('width')) - (paddingX * 2) - 3 + 20;
-  sceneHook.textPortDiv.style('top', '100px').style('left', '315px').style('height', 250).style('width', width + 16).style('webkit-overflow-scrolling', 'touch');
-  util.makeSvgTopLayer(sceneHook.textPortDiv.node());
+  height = parseFloat(sceneObject.textPort.element.attr('height')) - (paddingY * 2);
+  sceneHook.textPortDiv.style('left', parseFloat(sceneObject.textPort.element.attr('x')) + paddingX + 3).style('top', parseFloat(sceneObject.textPort.element.attr('y')) + paddingY).style('height', height).style('width', width + 18).style('webkit-overflow-scrolling', 'touch');
   spaceWidth = textDraw.tokenToViewable('a a', sceneObject.textPortInnerSVG.subElement).width - textDraw.tokenToViewable('aa', sceneObject.textPortInnerSVG.subElement).width;
   spaceWidth *= 1.4;
   lHeight = textDraw.tokenToViewable('l', sceneObject.textPortInnerSVG.subElement).height;
-  sceneObject.textPortInnerSVG.element.attr('width', parseFloat(sceneObject.textPort.element.attr('width') - (paddingX * 2) - 3)).attr('height', 2000);
+  sceneObject.textPortInnerSVG.element.attr('width', parseFloat(sceneObject.textPort.element.attr('width') - (paddingX * 2) - 3));
   redraw = function() {
     var categoryNode, rawSentence, sentence, sentences, subCategory, token, tokenViewable, viewPortFull, x, y, _i, _j, _k, _l, _len, _len1, _len2, _len3, _len4, _m, _ref, _ref1, _ref2;
     viewPortFull = false;
@@ -1658,7 +1657,7 @@ module.exports = function(categorizedTextTree, fontSizeChange, scroll, mode) {
             y += 30;
           }
           tokenViewable = textDraw.tokenToViewable(subCategory.name, sceneObject.textPortInnerSVG.subElement);
-          tokenViewable.svg.attr('x', sceneObject.textPortInnerSVG.element.attr('width') / 2).attr('y', y).style("text-anchor", "middle").attr("dominant-baseline", "central").style("font-family", "Helvetica").style("font-weight", "bold").attr("font-size", "30px").style('fill', '#aaaaaa');
+          tokenViewable.svg.attr('x', sceneObject.textPortInnerSVG.element.attr('width') / 2).attr('y', y).style("text-anchor", "middle").attr("dominant-baseline", "central").style("font-family", "Helvetica").style("font-weight", "bold").style("font-style", "italic").attr("font-size", "30px").style('fill', '#2dc4fd');
           y += 40;
           sentences = [];
           _ref1 = subCategory.text;
@@ -1702,6 +1701,7 @@ module.exports = function(categorizedTextTree, fontSizeChange, scroll, mode) {
         }
       }
     }
+    sceneObject.textPortInnerSVG.element.attr('height', y + 30);
     return viewPortFull;
   };
   return redraw();
