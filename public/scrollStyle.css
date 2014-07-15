@@ -14,10 +14,6 @@ Gradients:
 
 */
 
-.scroll {
-  -overflow-scrolling: touch;
-}
-
 .scroll::-webkit-scrollbar-track
 {
   /* background-color: #222222 !important; */
