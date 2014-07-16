@@ -53,8 +53,12 @@ module.exports = (categorizedTextTree, fontSizeChange, scroll, mode) ->
                                    .html("""<svg id='textPortInnerSVG' style='overflow-y: scroll;'></svg>""")
   sceneObject.textPortInnerSVG.element = d3.select('#' + 'textPortInnerSVG')
 
-  #util.makeSvgTopLayer(sceneHook.svg.node()) # doesn't work in this case
+  sceneHook.textPortDiv.on('scroll', () -> 
+    console.log("""scroll #{sceneHook.textPortDiv.node().scrollTop}""")
 
+  )
+
+  #util.makeSvgTopLayer(sceneHook.svg.node()) # doesn't work in this case
 
   # separate svg element to contain the actual text
   #sceneObject.textPortInnerSVG.element = sceneHook.svg.append('svg')
@@ -176,6 +180,8 @@ module.exports = (categorizedTextTree, fontSizeChange, scroll, mode) ->
     
     # adjust container svg to length of text (to enable smooth scrolability)
     sceneObject.textPortInnerSVG.element.attr('height', y + 30)
+
+    sceneHook.textPortDiv.node().scrollTop = 300
 
     return viewPortFull        
 

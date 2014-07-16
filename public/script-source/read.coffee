@@ -888,7 +888,7 @@ syncInit = () ->
 start = () ->
   sceneDefine()
   syncInit()
-  console.dir viewport
+  console.log """detected viewport dimensions: height=#{viewport.height} width=#{viewport.width}"""
   #textportFluent(tokens)
   #textportSegmented(segments)
   document.body.style.cursor = "default" # needed because of https://code.google.com/p/chromium/issues/detail?id=3a69986&thanks=369986&ts=1399291013

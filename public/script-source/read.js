@@ -660,7 +660,7 @@ syncInit = function() {
 start = function() {
   sceneDefine();
   syncInit();
-  console.dir(viewport);
+  console.log("detected viewport dimensions: height=" + viewport.height + " width=" + viewport.width);
   return document.body.style.cursor = "default";
 };
 

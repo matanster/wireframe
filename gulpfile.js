@@ -25,7 +25,7 @@ gulp.task('default', function() {
 });
 
 //
-// task for automatic building upon javascript change - 
+// task for automatic building, and reloading the browser, upon javascript change - 
 // invoked via 'gulp watch'
 // 
 gulp.task("watch", function() {
@@ -33,10 +33,12 @@ gulp.task("watch", function() {
         gulp.start("default");
     });
 
+    // reload any listening browser window when the build targets are created
     watch({glob: "public/**/*"}, function() {
         clientRefresh.broadcast()
     });
 
+    // now already probably superfluous 
     watch({glob: "public/landing/*"}, function() {
         clientRefresh.broadcast()
     });
