@@ -8,7 +8,7 @@
 
 util              = require './util'
 svgUtil           = require './svgUtil'
-textportFluent    = require './textportFluent'
+textportFluent    = require './navBars'
 textportSegmented = require './textportSegmented'
 session           = require './session'
 tokenize          = require './tokenize'
