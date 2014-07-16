@@ -53,11 +53,6 @@ module.exports = (categorizedTextTree, fontSizeChange, scroll, mode) ->
                                    .html("""<svg id='textPortInnerSVG' style='overflow-y: scroll;'></svg>""")
   sceneObject.textPortInnerSVG.element = d3.select('#' + 'textPortInnerSVG')
 
-  sceneHook.textPortDiv.on('scroll', () -> 
-    console.log("""scroll #{sceneHook.textPortDiv.node().scrollTop}""")
-
-  )
-
   #util.makeSvgTopLayer(sceneHook.svg.node()) # doesn't work in this case
 
   # separate svg element to contain the actual text
@@ -95,6 +90,9 @@ module.exports = (categorizedTextTree, fontSizeChange, scroll, mode) ->
     .attr('width',  parseFloat sceneObject.textPort.element.attr('width')  - (paddingX * 2) - 3)
     #.attr('y',      parseFloat(sceneObject.textPort.element.attr('y')) + paddingY)
     #.attr('height', 2000) # temporary maximum, until actual size is set after all text was drawn to svg
+    
+  categories = []
+  currentCategory = 0
 
   redraw = () ->
     #
@@ -104,87 +102,109 @@ module.exports = (categorizedTextTree, fontSizeChange, scroll, mode) ->
     x = 0
     y = 0
 
-    for categoryNode in categorizedTextTree
-      if categoryNode.name is session.selected.name
-        console.log """categroy #{session.selected.name} found"""
-        for subCategory in categoryNode.subs
+    for categoryNode, c in categorizedTextTree
+      #if categoryNode.name is session.selected.name
 
-          # textport category title
-          unless y is 0
-            y += 30
+      # mark y location of renderred category beginning
+      categories.push( { name: categoryNode.name, beginning: y })
 
-          tokenViewable = textDraw.tokenToViewable(subCategory.name, sceneObject.textPortInnerSVG.subElement)
-          tokenViewable.svg.attr('x', sceneObject.textPortInnerSVG.element.attr('width') / 2)
-                           .attr('y', y)
-                           .style("text-anchor", "middle")
-                           .attr("dominant-baseline", "central")
-                           .style("font-family", "Helvetica")
-                           .style("font-weight", "bold")
-                           .style("font-style", "italic")
-                           .attr("font-size", "30px")
-                           .style('fill', '#2dc4fd') #aaaaaa
+      for subCategory in categoryNode.subs
 
-          y += 40
-          
-          # tokenize all subcategory sentences 
-          sentences = []
-          for rawSentence in subCategory.text
-            sentence = 
-              text: tokenize(rawSentence)        
-            sentences.push(sentence)
+        # textport category title
+        unless y is 0
+          y += 30
 
-          console.log """subcategory #{subCategory.name} being handled"""
+        tokenViewable = textDraw.tokenToViewable(subCategory.name, sceneObject.textPortInnerSVG.subElement)
+        tokenViewable.svg.attr('x', sceneObject.textPortInnerSVG.element.attr('width') / 2)
+                         .attr('y', y)
+                         .style("text-anchor", "middle")
+                         .attr("dominant-baseline", "central")
+                         .style("font-family", "Helvetica")
+                         .style("font-weight", "bold")
+                         .style("font-style", "italic")
+                         .attr("font-size", "30px")
+                         .style('fill', '#2dc4fd') #aaaaaa
 
-          # textport all sentences
-          for sentence in sentences
+        y += 40
+        
+        # tokenize all subcategory sentences 
+        sentences = []
+        for rawSentence in subCategory.text
+          sentence = 
+            text: tokenize(rawSentence)        
+          sentences.push(sentence)
 
-            for token in sentence.text
+        console.log """subcategory #{subCategory.name} being handled"""
 
-              tokenViewable = textDraw.tokenToViewable(token.text, sceneObject.textPortInnerSVG.subElement)
-              
-              #
-              # Apply word semantic styling
-              #
-              switch token.mark
-                when 1
-                  tokenViewable.svg.style('fill', '#4488FE')  # #4488FE 'rgb(120,240,240)'
-                when 2
-                  #tokenViewable.svg.style('fill', 'rgb(70,140,140)')
-                  tokenViewable.svg.style('fill', '#4488FE') # rgb(100,200,200)
-                                   .style('font-style', 'italic')
+        # textport all sentences
+        for sentence in sentences
 
-              if x + tokenViewable.width < sceneObject.textPortInnerSVG.element.attr('width')
-                #console.log 'adding to line'
-                tokenViewable.svg.attr('x', x)
-                                 .attr('y', y)
-                x += tokenViewable.width
-              else  
-                #if y + tokenViewable.height + lHeight < sceneObject.textPortInnerSVG.element.attr('height')
-                  #console.log 'adding to new line'
-                x = 0
-                y += tokenViewable.height
-                tokenViewable.svg.attr('x', x)
-                                 .attr('y', y)
-                x += tokenViewable.width  
-                #else
-                #  console.log 'text port full'
-                #  viewPortFull = true
-                #  break
-              
-              # add word space unless end of line
-              if x + spaceWidth < sceneObject.textPortInnerSVG.element.attr('width')
-                x += spaceWidth
-                #console.log "x after space adding = " + x
-            y += (tokenViewable.height)*2
-            x = 0
-    
+          for token in sentence.text
+
+            tokenViewable = textDraw.tokenToViewable(token.text, sceneObject.textPortInnerSVG.subElement)
+            
+            #
+            # Apply word semantic styling
+            #
+            switch token.mark
+              when 1
+                tokenViewable.svg.style('fill', '#4488FE')  # #4488FE 'rgb(120,240,240)'
+              when 2
+                #tokenViewable.svg.style('fill', 'rgb(70,140,140)')
+                tokenViewable.svg.style('fill', '#4488FE') # rgb(100,200,200)
+                                 .style('font-style', 'italic')
+
+            if x + tokenViewable.width < sceneObject.textPortInnerSVG.element.attr('width')
+              #console.log 'adding to line'
+              tokenViewable.svg.attr('x', x)
+                               .attr('y', y)
+              x += tokenViewable.width
+            else  
+              #if y + tokenViewable.height + lHeight < sceneObject.textPortInnerSVG.element.attr('height')
+                #console.log 'adding to new line'
+              x = 0
+              y += tokenViewable.height
+              tokenViewable.svg.attr('x', x)
+                               .attr('y', y)
+              x += tokenViewable.width  
+              #else
+              #  console.log 'text port full'
+              #  viewPortFull = true
+              #  break
+            
+            # add word space unless end of line
+            if x + spaceWidth < sceneObject.textPortInnerSVG.element.attr('width')
+              x += spaceWidth
+              #console.log "x after space adding = " + x
+          y += (tokenViewable.height)*2
+          x = 0
+
+      categories[c].ending = y - 1 # mark end location of category. the -1 is rather arbitrary
+  
     # adjust container svg to length of text (to enable smooth scrolability)
     sceneObject.textPortInnerSVG.element.attr('height', y + 30)
 
-    sceneHook.textPortDiv.node().scrollTop = 300
+    #sceneHook.textPortDiv.node().scrollTop = 300
 
     return viewPortFull        
 
-  return redraw()  
+  redraw()  
+
+  sceneHook.textPortDiv.on('scroll', () -> 
+    #console.log("""scroll #{sceneHook.textPortDiv.node().scrollTop}""")
+    if sceneHook.textPortDiv.node().scrollTop < categories[currentCategory].beginning or
+       sceneHook.textPortDiv.node().scrollTop > categories[currentCategory].ending
+
+      for category, c in categories 
+        if sceneHook.textPortDiv.node().scrollTop > category.beginning and
+           sceneHook.textPortDiv.node().scrollTop < category.ending
+
+          currentCategory = c
+
+          console.log """switched to category #{c}"""
+
+          break
+  )
+
 
  

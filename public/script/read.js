@@ -1614,7 +1614,7 @@ fontSize = '22px';
 fontFamily = 'Helvetica';
 
 module.exports = function(categorizedTextTree, fontSizeChange, scroll, mode) {
-  var height, lHeight, paddingX, paddingY, redraw, spaceWidth, width;
+  var categories, currentCategory, height, lHeight, paddingX, paddingY, redraw, spaceWidth, width;
   if (scroll != null) {
     console.log(scroll);
     sceneObject.textPortInnerSVG.element.transition().ease('sin').duration(2000).attr('y', 0);
@@ -1633,9 +1633,6 @@ module.exports = function(categorizedTextTree, fontSizeChange, scroll, mode) {
   paddingY = 18;
   sceneHook.textPortDiv = d3.select('body').append('xhtml:div').style('overflow-y', 'auto').style('position', 'absolute').style('-overflow-scrolling', 'touch').attr('class', 'scroll').html("<svg id='textPortInnerSVG' style='overflow-y: scroll;'></svg>");
   sceneObject.textPortInnerSVG.element = d3.select('#' + 'textPortInnerSVG');
-  sceneHook.textPortDiv.on('scroll', function() {
-    return console.log("scroll " + (sceneHook.textPortDiv.node().scrollTop));
-  });
   sceneObject.textPortInnerSVG.subElement = sceneObject.textPortInnerSVG.element.append('g').style('text-anchor', 'start').style('fill', 'rgb(220,220,220)').style('font-family', fontFamily).style('font-size', fontSize);
   width = parseFloat(sceneObject.textPort.element.attr('width')) - (paddingX * 2) - 3 + 20;
   height = parseFloat(sceneObject.textPort.element.attr('height')) - (paddingY * 2);
@@ -1644,71 +1641,91 @@ module.exports = function(categorizedTextTree, fontSizeChange, scroll, mode) {
   spaceWidth *= 1.4;
   lHeight = textDraw.tokenToViewable('l', sceneObject.textPortInnerSVG.subElement).height;
   sceneObject.textPortInnerSVG.element.attr('width', parseFloat(sceneObject.textPort.element.attr('width') - (paddingX * 2) - 3));
+  categories = [];
+  currentCategory = 0;
   redraw = function() {
-    var categoryNode, rawSentence, sentence, sentences, subCategory, token, tokenViewable, viewPortFull, x, y, _i, _j, _k, _l, _len, _len1, _len2, _len3, _len4, _m, _ref, _ref1, _ref2;
+    var c, categoryNode, rawSentence, sentence, sentences, subCategory, token, tokenViewable, viewPortFull, x, y, _i, _j, _k, _l, _len, _len1, _len2, _len3, _len4, _m, _ref, _ref1, _ref2;
     viewPortFull = false;
     x = 0;
     y = 0;
-    for (_i = 0, _len = categorizedTextTree.length; _i < _len; _i++) {
-      categoryNode = categorizedTextTree[_i];
-      if (categoryNode.name === session.selected.name) {
-        console.log("categroy " + session.selected.name + " found");
-        _ref = categoryNode.subs;
-        for (_j = 0, _len1 = _ref.length; _j < _len1; _j++) {
-          subCategory = _ref[_j];
-          if (y !== 0) {
-            y += 30;
-          }
-          tokenViewable = textDraw.tokenToViewable(subCategory.name, sceneObject.textPortInnerSVG.subElement);
-          tokenViewable.svg.attr('x', sceneObject.textPortInnerSVG.element.attr('width') / 2).attr('y', y).style("text-anchor", "middle").attr("dominant-baseline", "central").style("font-family", "Helvetica").style("font-weight", "bold").style("font-style", "italic").attr("font-size", "30px").style('fill', '#2dc4fd');
-          y += 40;
-          sentences = [];
-          _ref1 = subCategory.text;
-          for (_k = 0, _len2 = _ref1.length; _k < _len2; _k++) {
-            rawSentence = _ref1[_k];
-            sentence = {
-              text: tokenize(rawSentence)
-            };
-            sentences.push(sentence);
-          }
-          console.log("subcategory " + subCategory.name + " being handled");
-          for (_l = 0, _len3 = sentences.length; _l < _len3; _l++) {
-            sentence = sentences[_l];
-            _ref2 = sentence.text;
-            for (_m = 0, _len4 = _ref2.length; _m < _len4; _m++) {
-              token = _ref2[_m];
-              tokenViewable = textDraw.tokenToViewable(token.text, sceneObject.textPortInnerSVG.subElement);
-              switch (token.mark) {
-                case 1:
-                  tokenViewable.svg.style('fill', '#4488FE');
-                  break;
-                case 2:
-                  tokenViewable.svg.style('fill', '#4488FE').style('font-style', 'italic');
-              }
-              if (x + tokenViewable.width < sceneObject.textPortInnerSVG.element.attr('width')) {
-                tokenViewable.svg.attr('x', x).attr('y', y);
-                x += tokenViewable.width;
-              } else {
-                x = 0;
-                y += tokenViewable.height;
-                tokenViewable.svg.attr('x', x).attr('y', y);
-                x += tokenViewable.width;
-              }
-              if (x + spaceWidth < sceneObject.textPortInnerSVG.element.attr('width')) {
-                x += spaceWidth;
-              }
+    for (c = _i = 0, _len = categorizedTextTree.length; _i < _len; c = ++_i) {
+      categoryNode = categorizedTextTree[c];
+      categories.push({
+        name: categoryNode.name,
+        beginning: y
+      });
+      _ref = categoryNode.subs;
+      for (_j = 0, _len1 = _ref.length; _j < _len1; _j++) {
+        subCategory = _ref[_j];
+        if (y !== 0) {
+          y += 30;
+        }
+        tokenViewable = textDraw.tokenToViewable(subCategory.name, sceneObject.textPortInnerSVG.subElement);
+        tokenViewable.svg.attr('x', sceneObject.textPortInnerSVG.element.attr('width') / 2).attr('y', y).style("text-anchor", "middle").attr("dominant-baseline", "central").style("font-family", "Helvetica").style("font-weight", "bold").style("font-style", "italic").attr("font-size", "30px").style('fill', '#2dc4fd');
+        y += 40;
+        sentences = [];
+        _ref1 = subCategory.text;
+        for (_k = 0, _len2 = _ref1.length; _k < _len2; _k++) {
+          rawSentence = _ref1[_k];
+          sentence = {
+            text: tokenize(rawSentence)
+          };
+          sentences.push(sentence);
+        }
+        console.log("subcategory " + subCategory.name + " being handled");
+        for (_l = 0, _len3 = sentences.length; _l < _len3; _l++) {
+          sentence = sentences[_l];
+          _ref2 = sentence.text;
+          for (_m = 0, _len4 = _ref2.length; _m < _len4; _m++) {
+            token = _ref2[_m];
+            tokenViewable = textDraw.tokenToViewable(token.text, sceneObject.textPortInnerSVG.subElement);
+            switch (token.mark) {
+              case 1:
+                tokenViewable.svg.style('fill', '#4488FE');
+                break;
+              case 2:
+                tokenViewable.svg.style('fill', '#4488FE').style('font-style', 'italic');
             }
-            y += tokenViewable.height * 2;
-            x = 0;
+            if (x + tokenViewable.width < sceneObject.textPortInnerSVG.element.attr('width')) {
+              tokenViewable.svg.attr('x', x).attr('y', y);
+              x += tokenViewable.width;
+            } else {
+              x = 0;
+              y += tokenViewable.height;
+              tokenViewable.svg.attr('x', x).attr('y', y);
+              x += tokenViewable.width;
+            }
+            if (x + spaceWidth < sceneObject.textPortInnerSVG.element.attr('width')) {
+              x += spaceWidth;
+            }
           }
+          y += tokenViewable.height * 2;
+          x = 0;
         }
       }
+      categories[c].ending = y - 1;
     }
     sceneObject.textPortInnerSVG.element.attr('height', y + 30);
-    sceneHook.textPortDiv.node().scrollTop = 300;
     return viewPortFull;
   };
-  return redraw();
+  redraw();
+  return sceneHook.textPortDiv.on('scroll', function() {
+    var c, category, _i, _len, _results;
+    if (sceneHook.textPortDiv.node().scrollTop < categories[currentCategory].beginning || sceneHook.textPortDiv.node().scrollTop > categories[currentCategory].ending) {
+      _results = [];
+      for (c = _i = 0, _len = categories.length; _i < _len; c = ++_i) {
+        category = categories[c];
+        if (sceneHook.textPortDiv.node().scrollTop > category.beginning && sceneHook.textPortDiv.node().scrollTop < category.ending) {
+          currentCategory = c;
+          console.log("switched to category " + c);
+          break;
+        } else {
+          _results.push(void 0);
+        }
+      }
+      return _results;
+    }
+  });
 };
 
 },{"./globalDims":3,"./session":8,"./textDraw":10,"./tokenize":13,"./util":14}],12:[function(require,module,exports){
