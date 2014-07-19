@@ -95,6 +95,7 @@ textportFluent = (categorizedTextTree, fontSizeChange, scroll, mode) ->
     
   sceneHook.textPortDiv = d3.select('body').append('xhtml:div')
                                    .style('overflow-y', 'auto')
+                                   .style('z-index',2)
                                    .style('position', 'absolute')
                                    .style('-overflow-scrolling', 'touch') # check out http://iscrolljs.com/ for finer experience
                                    .attr('class', 'scroll')

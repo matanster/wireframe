@@ -1,3 +1,5 @@
+# this module is currently not in use.
+
 #
 # module for showing and interacting the special navigation bars.
 #

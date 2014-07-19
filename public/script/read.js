@@ -153,6 +153,9 @@ TitleChooser = function() {
     'selectorMode': articles.length * articleSelectorPaneHeight,
     'selectedMode': articleSelectorPaneHeight
   };
+  if (sceneHook.textPortDiv != null) {
+    sceneHook.textPortDiv.style('z-index', 0);
+  }
   chooserClose = function() {
     var article, i, _i, _len;
     console.log('closing article chooser');
@@ -161,7 +164,10 @@ TitleChooser = function() {
     sceneObject.titlePort.textWrapper.transition().duration(300).styleTween('-webkit-transform', function() {
       return d3.interpolateString('perspective(40px) rotate3d(1, 0, 0, 0deg)', 'perspective(40px) rotate3d(1, 0, 0, 2deg)');
     });
-    sceneObject.topPane.transition().duration(400).ease('linear').attr('height', height.selectedMode).each('end', sceneObject.fontSize.redraw);
+    sceneObject.topPane.transition().duration(400).ease('linear').attr('height', height.selectedMode).each('end', function() {
+      sceneObject.fontSize.redraw();
+      return sceneHook.textPortDiv.style('z-index', 2);
+    });
     for (i = _i = 0, _len = articles.length; _i < _len; i = ++_i) {
       article = articles[i];
       titlePanes[i].element.remove();
@@ -419,7 +425,8 @@ sceneDefine = function() {
       }
     };
   };
-  sceneHook.svg = d3.select('body').append('svg').style('background-color', '#999999');
+  sceneHook.div = d3.select('body').append('div').style('z-index', 1).style('position', 'absolute');
+  sceneHook.svg = sceneHook.div.append('svg').style('background-color', '#999999');
   sceneObject.categories = {};
   navBarHook = sceneHook.svg.append('g');
   rightPane();
@@ -812,7 +819,7 @@ textportFluent = function(categorizedTextTree, fontSizeChange, scroll, mode) {
   sceneObject.textPortInnerSVG = {};
   paddingX = 20;
   paddingY = 18;
-  sceneHook.textPortDiv = d3.select('body').append('xhtml:div').style('overflow-y', 'auto').style('position', 'absolute').style('-overflow-scrolling', 'touch').attr('class', 'scroll').html("<svg id='textPortInnerSVG' style='overflow-y: scroll;'></svg>");
+  sceneHook.textPortDiv = d3.select('body').append('xhtml:div').style('overflow-y', 'auto').style('z-index', 2).style('position', 'absolute').style('-overflow-scrolling', 'touch').attr('class', 'scroll').html("<svg id='textPortInnerSVG' style='overflow-y: scroll;'></svg>");
   sceneObject.textPortInnerSVG.element = d3.select('#' + 'textPortInnerSVG');
   sceneObject.textPortInnerSVG.subElement = sceneObject.textPortInnerSVG.element.append('g').style('text-anchor', 'start').style('fill', 'rgb(220,220,220)').style('font-family', fontFamily).style('font-size', fontSize);
   width = parseFloat(sceneObject.textPort.element.attr('width')) - (paddingX * 2) - 3 + 20;

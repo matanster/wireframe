@@ -86,7 +86,7 @@ textportFluent = function(categorizedTextTree, fontSizeChange, scroll, mode) {
   sceneObject.textPortInnerSVG = {};
   paddingX = 20;
   paddingY = 18;
-  sceneHook.textPortDiv = d3.select('body').append('xhtml:div').style('overflow-y', 'auto').style('position', 'absolute').style('-overflow-scrolling', 'touch').attr('class', 'scroll').html("<svg id='textPortInnerSVG' style='overflow-y: scroll;'></svg>");
+  sceneHook.textPortDiv = d3.select('body').append('xhtml:div').style('overflow-y', 'auto').style('z-index', 2).style('position', 'absolute').style('-overflow-scrolling', 'touch').attr('class', 'scroll').html("<svg id='textPortInnerSVG' style='overflow-y: scroll;'></svg>");
   sceneObject.textPortInnerSVG.element = d3.select('#' + 'textPortInnerSVG');
   sceneObject.textPortInnerSVG.subElement = sceneObject.textPortInnerSVG.element.append('g').style('text-anchor', 'start').style('fill', 'rgb(220,220,220)').style('font-family', fontFamily).style('font-size', fontSize);
   width = parseFloat(sceneObject.textPort.element.attr('width')) - (paddingX * 2) - 3 + 20;

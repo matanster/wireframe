@@ -151,6 +151,10 @@ TitleChooser = () ->
     'selectorMode' : articles.length * articleSelectorPaneHeight,
     'selectedMode' : articleSelectorPaneHeight
 
+  # hide the text port - for now
+  if sceneHook.textPortDiv?
+    sceneHook.textPortDiv.style('z-index', 0)
+
   chooserClose = () ->
     console.log 'closing article chooser'
 
@@ -162,7 +166,9 @@ TitleChooser = () ->
           #.each("end", () -> sceneObject.titlePort.element.remove())
 
     sceneObject.topPane.transition().duration(400).ease('linear').attr('height', height.selectedMode)
-                       .each('end', sceneObject.fontSize.redraw)
+                       .each('end', ()->
+                                         sceneObject.fontSize.redraw()
+                                         sceneHook.textPortDiv.style('z-index', 2))
 
     for article, i in articles
       titlePanes[i].element.remove()
@@ -512,7 +518,12 @@ sceneDefine = () ->
           svgUtil.sync(sceneObject.rightPane)
 
 
-  sceneHook.svg = d3.select('body').append('svg')
+  sceneHook.div = d3.select('body').append('div') # we enclose the main svg in a div, so that we can use z-index for it
+                                   .style('z-index', 1) 
+                                   .style('position', 'absolute') # otherwise z-index can't work as the textport div is also absolute
+
+  sceneHook.svg = sceneHook.div
+      .append('svg')
       .style('background-color', '#999999')
       #.style('background-image', '-webkit-linear-gradient(45deg, #888888, #999999)')
 
